@@ -14,6 +14,64 @@
         "isAffix": true,
         "isKeepAlive": true
       }
+    },
+    {
+      "path": "/dataScreen",
+      "name": "dataScreen",
+      "redirect": "/dataScreen/sunBurst",
+      "meta": {
+        "icon": "Histogram",
+        "title": "数据大屏",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": false,
+        "isKeepAlive": true
+      },
+      "children": [
+        {
+          "path": "/dataScreen/sunBurst",
+          "name": "sunBurst",
+          "component": "/dataScreen/sunBurst/index",
+          "meta": {
+            "icon": "Histogram",
+            "title": "热点旭日图",
+            "isLink": "",
+            "isHide": false,
+            "isFull": true,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "path": "/dataScreen/search",
+          "name": "search",
+          "component": "/dataScreen/Search/index",
+          "meta": {
+            "icon": "Search",
+            "title": "搜索",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "path": "/dataScreen/trend",
+          "name": "trend",
+          "component": "/dataScreen/Trend/index",
+          "meta": {
+            "icon": "TrendCharts",
+            "title": "热点变化趋势",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        }
+      ]
     }
   ],
   "msg": "成功"
