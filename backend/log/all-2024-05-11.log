@@ -1,0 +1,7 @@
+[2024-05-11 16:21:28,396] [autoreload.py:668] [autoreload:run_with_reloader] [INFO]- Watching for file changes with StatReloader
+[2024-05-11 16:21:50,636] [autoreload.py:266] [autoreload:trigger_reload] [INFO]- /home/zsdx/Desktop/hwf/HotSpotAnalyzer/backend/server/settings.py changed, reloading.
+[2024-05-11 16:21:50,988] [autoreload.py:668] [autoreload:run_with_reloader] [INFO]- Watching for file changes with StatReloader
+[2024-05-11 16:22:03,145] [autoreload.py:668] [autoreload:run_with_reloader] [INFO]- Watching for file changes with StatReloader
+[2024-05-11 16:23:40,828] [autoreload.py:668] [autoreload:run_with_reloader] [INFO]- Watching for file changes with StatReloader
+[2024-05-11 16:23:50,008] [autoreload.py:266] [autoreload:trigger_reload] [INFO]- /home/zsdx/Desktop/hwf/HotSpotAnalyzer/backend/server/settings.py changed, reloading.
+[2024-05-11 16:23:50,352] [autoreload.py:668] [autoreload:run_with_reloader] [INFO]- Watching for file changes with StatReloader
