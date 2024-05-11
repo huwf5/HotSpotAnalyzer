@@ -1,0 +1,27 @@
+.divider {
+  margin-top: 15px;
+  .el-icon {
+    position: relative;
+    top: 2px;
+    right: 5px;
+    font-size: 15px;
+  }
+}
+.theme-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  margin: 14px 0;
+  span {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    .el-icon {
+      margin-left: 3px;
+      font-size: 15px;
+      color: var(--el-text-color-regular);
+      cursor: pointer;
+    }
+  }
+}
