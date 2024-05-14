@@ -1,15 +1,16 @@
 [tool.poetry]
-name = "server"
+name = "application"
 version = "0.1.0"
 description = ""
 authors = ["huwf5 <huwf5@mail2.sysu.edu.cn>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.10"
 django = "^5.0.6"
 mysqlclient = "^2.2.4"
 djangorestframework = "^3.15.1"
+djangorestframework-simplejwt = "^5.3.1"
 
 
 [build-system]

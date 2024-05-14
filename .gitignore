@@ -1,3 +1,6 @@
+#backend
+__pycache__/
+backend/log
 
 #web
 # Logs

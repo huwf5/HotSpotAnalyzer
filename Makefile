@@ -10,13 +10,20 @@ server_build_deps:
 	@echo "Building backend dependencies..."
 	@cd $(backend_base_dir) && poetry install
 
+.PHONY: enter_virtualEnv
+enter_virtualEnv:
+	@echo "Entering virtual environment..."
+	@cd $(backend_base_dir) && poetry shell
+
 .PHONY: server_init_db
-server_init_db:
+server_init_db: enter_virtualEnv
 	@echo "Initializing database..."
 	@cd $(backend_base_dir) && python manage.py makemigrations && python manage.py migrate
+	@echo "Adding initial data..."
+	@cd $(backend_base_dir) && python manage.py init
 
 .PHONY: run_server
-run_server:
+run_server: enter_virtualEnv
 	@echo "Running server..."
 	@cd $(backend_base_dir) && python manage.py runserver
 

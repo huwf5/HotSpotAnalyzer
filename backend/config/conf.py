@@ -5,10 +5,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'HotSpotAnalyzerDB',
-        # TODO: Change
         'USER': 'root', # Change to your MySQL username
-        'PASSWORD': '123456', # Change to your MySQL password
+        'PASSWORD': "yourpassword", # Change to your MySQL password
         'HOST': 'localhost', # Change to your MySQL host
         'PORT': '3306', 
     }
 }
+
+# database table prefix
+TABLE_PREFIX = "hotspot_sys_"
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
+ALLOWED_HOSTS = ["*"]
