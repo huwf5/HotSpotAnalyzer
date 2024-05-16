@@ -9,7 +9,6 @@ from application.settings import TABLE_PREFIX, EMAIL_VALIDATION_TIME_LIMIT
 from django.utils.translation import gettext_lazy as _
 
 from django.core.validators import validate_email
-from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError as ValitonError
 
 
@@ -56,7 +55,7 @@ class EmailFormatTag(models.Model):
 
 
 def check_email_suffix_format(value):
-    message = _("Please provide a valid email, check valid email format")
+    message = "Please provide a valid email, check valid email format"
     code = "invalid_email_suffix_format"
     try:
         validate_email(value)
@@ -70,7 +69,7 @@ def check_email_suffix_format(value):
     except EmailSuffixFormat.DoesNotExist:
         raise ValitonError(message, code=code, params={"value": value})
     for suffix_format in suffix_formats:
-        if suffix_format.format == "@*" or suffix_format.format.match(suffix):
+        if suffix_format.format == "@*" or suffix.startswith(suffix_format.format[1:]):
             return
     raise ValitonError(message, code=code, params={"value": value})
 

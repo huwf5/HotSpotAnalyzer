@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from apps.user import validator
-from apps.user.models import Role, User, WaitingList
+from apps.user.models import Role, User, WaitingList, check_email_suffix_format
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +29,7 @@ class WaitingListSerializer(serializers.ModelSerializer):
     
     def validate_email(self, value):
         value = super().validate_email(value)
-        validator.check_email_suffix_format(value)
+        check_email_suffix_format(value)
         return value
             
 

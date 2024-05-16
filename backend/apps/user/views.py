@@ -10,7 +10,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.exceptions import ValidationError
 from rest_framework.throttling import AnonRateThrottle
 from apps.system.utils.api_response import APIResponse
-from apps.user.validator import check_email_suffix_format
+from apps.user.models import check_email_suffix_format
 from apps.user.utils.email import (
     send_verify_email
 )
