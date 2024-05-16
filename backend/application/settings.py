@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'application.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 DATABASES = conf.DATABASES
-
 TABLE_PREFIX = locals().get("TABLE_PREFIX", "")
 
+AUTH_USER_MODEL = "user.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -207,3 +207,13 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
+# EMAIL SETTINGS
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = conf.EMAIL_HOST
+EMAIL_PORT = conf.EMAIL_PORT
+EMAIL_HOST_USER = conf.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = conf.EMAIL_HOST_PASSWORD
+
+EMAIL_VALIDATION_TIME_LIMIT = locals().get("EMAIL_VALIDATION_TIME_LIMIT", 5)

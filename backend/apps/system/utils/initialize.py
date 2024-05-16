@@ -7,7 +7,7 @@ class BaseInitialize:
     def __init__(self, app=None):
         self.app = app or ""
 
-    def init_base(self, Serializer, unique_fields=None):
+    def init_from_json(self, Serializer, unique_fields=None):
         model = Serializer.Meta.model
         file_path = os.path.join(
             apps.get_app_config(self.app.split(".")[-1]).path,
@@ -33,6 +33,20 @@ class BaseInitialize:
                 serializer = Serializer(instance, data=data)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
+        print(f"[{self.app}][{model._meta.model_name}] initialization completed")
+
+    def init_from_list(self, Serializer, data_list):
+        model = Serializer.Meta.model
+        for obj_data in data_list:
+            filter_data = {}
+            for key, value in obj_data.items():
+                if isinstance(value, list) or value == None or value == "":
+                    continue
+                filter_data[key] = value
+            instance = model.objects.filter(**filter_data).first()
+            serializer = Serializer(instance, data=obj_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         print(f"[{self.app}][{model._meta.model_name}] initialization completed")
 
     def run(self):
