@@ -58,3 +58,11 @@ class WaitingListSerializer(serializers.ModelSerializer):
         validated_data["password"] = make_password(validated_data["password"])
         self.update_verify_code(validated_data)
         return super().create(validated_data)
+
+
+class VerifyEmailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[validate_email, check_email_suffix_format])
+
+    class Meta:
+        model = WaitingList
+        fields = ["email", "verify_code"]
