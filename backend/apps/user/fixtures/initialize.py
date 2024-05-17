@@ -3,7 +3,7 @@ from apps.user.serializers.user import RoleSerializer
 from apps.user.serializers.email import EmailSuffixFormatSerializer
 from apps.system.utils.initialize import BaseInitialize
 
-from config.conf import (
+from application.settings import (
     EMAIL_WHITELIST,
     SUPER_ADMIN_EMAIL,
     SUPER_ADMIN_USERNAME,

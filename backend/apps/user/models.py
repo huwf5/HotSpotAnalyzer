@@ -1,15 +1,14 @@
+from apps.user.utils.email import generate_verify_code, send_verify_email
+from application.settings import TABLE_PREFIX, EMAIL_VALIDATION_TIME_LIMIT
+from django.apps import apps
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
-from django.apps import apps
-from datetime import timedelta
-from django.utils import timezone
-from apps.user.utils.email import generate_verify_code, send_verify_email
-from application.settings import TABLE_PREFIX, EMAIL_VALIDATION_TIME_LIMIT
 from django.utils.translation import gettext_lazy as _
-
+from django.utils import timezone
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError as ValitonError
+from datetime import timedelta
 
 
 # EMAIL RELATED MODELS
@@ -170,16 +169,13 @@ class User(AbstractBaseUser, BaseModel):
         super().clean()
         check_email_suffix_format(self.email)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
 
 class WaitingList(models.Model):
     email = models.EmailField(_("email"), unique=True, db_index=True, primary_key=True)
     username = models.CharField(_("username"), max_length=24, blank=False, null=False)
     password = models.CharField(_("password"), max_length=128, blank=False, null=False)
     verify_code = models.CharField(
-        _("verify code"), max_length=6
+        _("verify code"), max_length=6, blank=True, null=True
     )  # use update_time to check the expiration
     is_verified = models.BooleanField(_("is verified"), default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -191,9 +187,11 @@ class WaitingList(models.Model):
     def __str__(self):
         return f"{self.username} ({self.email})"
 
+    def plain_save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
     def save(self, *args, **kwargs):
-        if not self.pk:  # only hash the password on creation
-            self.password = make_password(self.password)
+        self.password = make_password(self.password)
         super().save(*args, **kwargs)
 
     def update_verify_code(self):
@@ -202,4 +200,3 @@ class WaitingList(models.Model):
             minutes=EMAIL_VALIDATION_TIME_LIMIT
         )
         send_verify_email(self.email, self.username, self.verify_code)
-        self.save(update_fields=["verify_code", "expired_at"])

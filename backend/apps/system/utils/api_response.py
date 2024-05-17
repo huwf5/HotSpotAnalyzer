@@ -5,8 +5,9 @@ class APIResponse(Response):
     def __init__(self,status,message,data=None,code=None,headers=None,content_type=None,**kwargs):
         standard_response = {
             "message": message,
-            "data": data
         }
+        if data:
+            standard_response["data"] = data
         if code:
             standard_response["code"] = code
         standard_response.update(kwargs)

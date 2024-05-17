@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from datetime import datetime
 from pathlib import Path
-from config import conf
+from config.conf import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9_t+69vx6i*8u_xvl32q^c=%rd&u*^rpih@p9ri7(r&#1=hu0l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = locals().get("DEBUG", True)
+DEBUG = locals().get("DEBUG", False)
 ALLOWED_HOSTS = locals().get("ALLOWED_HOSTS", ["*"])
 
 
@@ -78,7 +78,17 @@ WSGI_APPLICATION = 'application.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-DATABASES = conf.DATABASES
+DATABASES = {
+    "default": {
+        "ENGINE": DATABASES_ENGINE,
+        "NAME": DATABASES_NAME,
+        "USER": DATABASES_USER,
+        "PASSWORD" : DATABASES_PASSWORD,
+        "HOST" : DATABASES_HOST,
+        "PORT" : DATABASES_PORT
+    }
+}
+
 TABLE_PREFIX = locals().get("TABLE_PREFIX", "")
 
 AUTH_USER_MODEL = "user.User"
@@ -211,9 +221,15 @@ REST_FRAMEWORK = {
 # EMAIL SETTINGS
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = conf.EMAIL_HOST
-EMAIL_PORT = conf.EMAIL_PORT
-EMAIL_HOST_USER = conf.EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = conf.EMAIL_HOST_PASSWORD
-
+EMAIL_HOST = EMAIL_HOST
+EMAIL_PORT = EMAIL_PORT
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
 EMAIL_VALIDATION_TIME_LIMIT = locals().get("EMAIL_VALIDATION_TIME_LIMIT", 5)
+EMAIL_WHITELIST = locals().get("EMAIL_WHITELIST", ["@*"])
+
+
+# SUPER ADMIN SETTINGS
+SUPER_ADMIN_EMAIL = locals().get("SUPER_ADMIN_EMAIL", "")
+SUPER_ADMIN_USERNAME = locals().get("SUPER_ADMIN_USERNAME", "")
+SUPER_ADMIN_PASSWORD = locals().get("SUPER_ADMIN_PASSWORD", "")
