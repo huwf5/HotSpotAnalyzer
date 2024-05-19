@@ -1,8 +1,10 @@
 import { App, Directive } from "vue";
 import auth from "./modules/auth";
+import vClickOutside from "./modules/clickOutside";
 
 const directivesList: { [key: string]: Directive } = {
-  auth
+  auth,
+  ["click-outside"]: vClickOutside
 };
 
 const directives = {

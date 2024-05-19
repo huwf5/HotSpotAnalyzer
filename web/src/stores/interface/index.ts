@@ -1,3 +1,5 @@
+import { Messages, UserInfo } from "@/api/interface";
+
 export type LanguageType = "zh" | "en" | null;
 
 /* GlobalState */
@@ -22,7 +24,11 @@ export interface GlobalState {
 /* UserState */
 export interface UserState {
   token: string;
-  userInfo: { name: string };
+  userInfo: {
+    messages: Messages.Message[];
+    basicInfo: UserInfo.BasicInfo;
+    contactInfo: UserInfo.ContactInfo;
+  };
 }
 
 /* tabsMenuProps */

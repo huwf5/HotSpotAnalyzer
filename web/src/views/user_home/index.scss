@@ -1,0 +1,48 @@
+.user_infos {
+  position: static;
+
+  /* 自动布局 */
+  display: flex;
+
+  /* Inside Auto Layout */
+  flex: none;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: flex-start;
+  align-self: stretch;
+  justify-content: flex-start;
+  padding: 10px;
+  margin: 10px 0;
+}
+.info_container {
+  position: static;
+
+  /* 自动布局 */
+  display: flex;
+
+  /* Inside Auto Layout */
+  flex: none;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: flex-start;
+  align-self: stretch;
+  justify-content: flex-start;
+  height: fit-content;
+  padding: 0;
+  margin: 0;
+}
+.arrow_right {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: flex-end;
+}
+.input_container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 300px;
+}
