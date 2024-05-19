@@ -74,13 +74,18 @@ def check_email_suffix_format(value):
 
 
 # USER RELATED MODELS
+ROLE_SUPER_ADMIN = "Super Admin"
+ROLE_ADMIN = "Admin"
+ROLE_USER = "User"
+
+AdminList = [ROLE_SUPER_ADMIN, ROLE_ADMIN]
 
 
 class Role(models.Model):
     ROLE_CHOICES = [
-        ("Super Admin", "Super Admin"),
-        ("Admin", "Admin"),
-        ("User", "User"),
+        (ROLE_SUPER_ADMIN, ROLE_SUPER_ADMIN),
+        (ROLE_ADMIN, ROLE_ADMIN),
+        (ROLE_USER, ROLE_USER),
     ]
     role = models.CharField("Role", max_length=12, choices=ROLE_CHOICES)
 
@@ -107,7 +112,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user_from_waiting_list(self, waitinglist_user):
-        role = Role.objects.get(role="User")
+        role = Role.objects.get(role=ROLE_USER)
         user = self.model(
             username=waitinglist_user.username,
             email=waitinglist_user.email,
@@ -118,15 +123,15 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, username, email=None, password=None, **extra_fields):
-        role = Role.objects.get(role="User")
+        role = Role.objects.get(role=ROLE_USER)
         return self._create_user(username, email, password, role)
 
     def create_admin(self, username, email=None, password=None, **extra_fields):
-        role = Role.objects.get(role="Admin")
+        role = Role.objects.get(role=ROLE_ADMIN)
         return self._create_user(username, email, password, role)
 
     def create_super_admin(self, username, email, password=None, **extra_fields):
-        role = Role.objects.get(role="Super Admin")
+        role = Role.objects.get(role=ROLE_SUPER_ADMIN)
         return self._create_user(username, email, password, role)
 
 
