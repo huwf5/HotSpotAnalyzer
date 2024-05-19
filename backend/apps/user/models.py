@@ -174,6 +174,14 @@ class User(AbstractBaseUser, BaseModel):
         super().clean()
         check_email_suffix_format(self.email)
 
+    def upgrade_to_admin(self):
+        self.role = Role.objects.get(role=ROLE_ADMIN)
+        self.save(update_fields=["role"])
+
+    def downgrade_to_user(self):
+        self.role = Role.objects.get(role=ROLE_USER)
+        self.save(update_fields=["role"])
+
 
 class WaitingList(models.Model):
     email = models.EmailField(_("email"), unique=True, db_index=True, primary_key=True)

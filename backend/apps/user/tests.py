@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .fixtures.initialize import Initialize
-from .serializer import RoleSerializer
+from .serializers.user import RoleSerializer
 
 # Create your tests here.
 

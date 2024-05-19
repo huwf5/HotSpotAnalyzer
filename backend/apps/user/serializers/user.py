@@ -18,14 +18,21 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = RoleSerializer()
+
     class Meta:
         model = User
-        fields = "__all__"
-        read_only_fields = ["email", "role", "username"]
-        exclude = ["password"]
+        fields = ["email", "role", "username", "password"]
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
 
-    def create(self, validated_data):
-        return super().create(validated_data)
+    def update_profile(self, instance, validated_data):
+        validated_data.pop("email", None)
+        validated_data.pop("role", None)
+        if "password" in validated_data:
+            validated_data["password"] = make_password(validated_data["password"])
+        return super().update(instance, validated_data)
 
 
 class WaitingListSerializer(serializers.ModelSerializer):
@@ -35,7 +42,8 @@ class WaitingListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WaitingList
-        fields = ["email", "username", "password", "verify_code"]
+        fields = ["email", "username", "password", "verify_code", "is_verified"]
+        read_only_fields = ["is_verified"]
         extra_kwargs = {
             "password": {"write_only": True},
             "verify_code": {"write_only": True},
@@ -72,12 +80,6 @@ class VerifyEmailSerializer(serializers.ModelSerializer):
         fields = ["email", "verify_code"]
 
 
-class ActiveSerializer(serializers.Serializer):
-    emailList = serializers.ListField(
-        child=serializers.EmailField(validators=[validate_email])
-    )
-
-
 class LoginSerializer(TokenObtainPairSerializer):
     username_field = "email"
 
@@ -91,3 +93,9 @@ class LoginSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         data.update({"email": self.user.email})
         return data
+
+
+class EmailListSerializer(serializers.Serializer):
+    emailList = serializers.ListField(
+        child=serializers.EmailField(validators=[validate_email])
+    )
