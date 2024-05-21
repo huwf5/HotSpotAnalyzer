@@ -1,0 +1,16 @@
+.management_container {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  flex-grow: 1;
+  align-self: stretch;
+  padding: 20px;
+}
+.operations {
+  display: flex;
+  flex: none;
+  flex-direction: row;
+  flex-grow: 1;
+  align-self: stretch;
+  justify-content: center;
+}

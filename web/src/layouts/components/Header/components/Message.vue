@@ -1,43 +1,67 @@
 <template>
   <div class="message">
-    <el-popover placement="bottom" :width="310" trigger="click">
+    <el-popover placement="bottom" :width="310" trigger="hover" @show="fetch_count">
       <template #reference>
-        <el-badge :value="1" class="item">
-          <i :class="'iconfont icon-xiaoxi'" class="toolBar-icon"></i>
+        <el-badge :hidden="unreads === 0" :value="unreads" class="item">
+          <i :class="'iconfont icon-xiaoxi'" class="toolBar-icon" @click="MsgIconClicked"></i>
         </el-badge>
       </template>
-      <el-tabs v-model="activeName">
-        <el-tab-pane label="通知(1)" name="first">
-          <div class="message-list">
-            <div class="message-item">
-              <img src="@/assets/images/msg01.png" alt="" class="message-icon" />
-              <div class="message-content">
-                <span class="message-title">一键三连 Geeker-Admin 🧡</span>
-                <span class="message-date">一分钟前</span>
-              </div>
+      <div v-if="unreads > 0" class="message-list">
+        <div v-for="(messaage, index) in messages" :key="index">
+          <div v-if="messaage.unread" class="message-item">
+            <img src="@/assets/images/msg01.png" alt="" class="message-icon" />
+            <div class="message-content">
+              <span class="message-title">{{ messaage.content }}</span>
+              <span class="message-date">{{ messaage.time }}</span>
             </div>
           </div>
-        </el-tab-pane>
-        <el-tab-pane label="消息(0)" name="second">
-          <div class="message-empty">
-            <img src="@/assets/images/notData.png" alt="notData" />
-            <div>暂无消息</div>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="待办(0)" name="third">
-          <div class="message-empty">
-            <img src="@/assets/images/notData.png" alt="notData" />
-            <div>暂无待办</div>
-          </div>
-        </el-tab-pane>
-      </el-tabs>
+        </div>
+      </div>
+      <div v-else class="message-list">
+        <div class="message-item" style="justify-content: center">
+          <el-icon size="20">
+            <MagicStick />
+          </el-icon>
+          <span>没有未读消息了喔~</span>
+        </div>
+      </div>
     </el-popover>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-const activeName = ref("first");
+import { fetchMessagesApi } from "@/api/modules/messages";
+import { useUserStore } from "@/stores/modules/user";
+import { onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
+
+const unreads = ref(0);
+const router = useRouter();
+const store = useUserStore();
+
+const messages = ref(store.userInfo.messages);
+
+function fetch_count() {
+  fetchMessagesApi().then(response => {
+    if (response.code === "200") {
+      store.setUserMsg(response.data);
+      count_unread();
+    }
+  });
+}
+function count_unread() {
+  messages.value = store.userInfo.messages;
+  let cnt = 0;
+  messages.value.forEach(val => {
+    if (val.unread) cnt += 1;
+  });
+  unreads.value = cnt;
+}
+function MsgIconClicked() {
+  router.push("/messages/index");
+}
+watch(store.userInfo, count_unread);
+onMounted(fetch_count);
 </script>
 
 <style scoped lang="scss">
