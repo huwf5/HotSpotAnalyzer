@@ -19,7 +19,6 @@ export const registerApi = (params: Register.ReqRegisterForm) => {
       if (params) {
       }
       resolve({
-        code: "200",
         msg: "OK",
         data: {
           code: 200,

@@ -28,6 +28,7 @@ export interface UserState {
     messages: Messages.Message[];
     basicInfo: UserInfo.BasicInfo;
     contactInfo: UserInfo.ContactInfo;
+    accountInfo: UserInfo.AccountInfo;
   };
 }
 

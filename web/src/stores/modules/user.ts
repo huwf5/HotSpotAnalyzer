@@ -9,24 +9,13 @@ export const useUserStore = defineStore({
     token: "",
     userInfo: {
       basicInfo: {
-        id: "12345678",
         name: "",
-        avatar: "",
         password: ""
       },
       contactInfo: {
-        email: "",
-        telephone: ""
+        email: ""
       },
-      messages: [],
-      settings: {
-        danger_heat_limit: 1000,
-        warning_heat_limit: 900,
-        danger_composed_limits: [],
-        warning_composed_limits: [],
-        auto_star: true,
-        heat_formula: "$upVote+$like*5+$share*10"
-      }
+      messages: []
     }
   }),
   getters: {},

@@ -43,7 +43,7 @@ import { ref } from "vue";
 import { Messages } from "@/api/interface";
 import { comp } from "./util";
 import { useUserStore } from "@/stores/modules/user";
-import { batchDeleteMsg, batchUpdate, fetchMessagesApi } from "@/api/modules/messages";
+import { batchDeleteMsg, batchUpdateMsg, fetchMessagesApi } from "@/api/modules/messages";
 import router from "@/routers";
 import { ElNotification } from "element-plus";
 import { getTimeState } from "@/utils";
@@ -110,16 +110,14 @@ function fetch() {
   checkboxColor.value = "";
   fetchMessagesApi()
     .then(response => {
-      if (response.code === "200") {
-        store.setUserMsg(response.data);
-        messages.value = store.userInfo.messages;
-        ElNotification({
-          title: getTimeState(),
-          message: "消息同步成功",
-          type: "info",
-          duration: 1000
-        });
-      }
+      store.setUserMsg(response.data);
+      messages.value = store.userInfo.messages;
+      ElNotification({
+        title: getTimeState(),
+        message: "消息同步成功",
+        type: "info",
+        duration: 1000
+      });
     })
     .catch(() => {
       ElNotification({
@@ -146,16 +144,14 @@ function dealStarAll() {
       starred: starAll
     });
   });
-  batchUpdate(update_list).then(response => {
-    if (response.code !== "200") {
-      fetch();
-      ElNotification({
-        title: "错误",
-        message: "消息更新失败，正在尝试同步数据",
-        type: "warning",
-        duration: 1000
-      });
-    }
+  batchUpdateMsg(update_list).then(() => {
+    fetch();
+    ElNotification({
+      title: "错误",
+      message: "消息更新失败，正在尝试同步数据",
+      type: "warning",
+      duration: 1000
+    });
   });
   // 不等待服务器回复就直接更新，避免频繁出现加载页面
   if (starAll) {
@@ -182,16 +178,14 @@ function dealReadAll() {
       unread: false
     });
   });
-  batchUpdate(update_list).then(response => {
-    if (response.code !== "200") {
-      fetch();
-      ElNotification({
-        title: "错误",
-        message: "消息更新失败，正在尝试同步数据",
-        type: "warning",
-        duration: 1000
-      });
-    }
+  batchUpdateMsg(update_list).then(() => {
+    fetch();
+    ElNotification({
+      title: "错误",
+      message: "消息更新失败，正在尝试同步数据",
+      type: "warning",
+      duration: 1000
+    });
   });
   // 不等待服务器回复就直接更新，避免频繁出现加载页面
   messages.value.forEach(msg => {
@@ -208,16 +202,14 @@ function dealDeleteAll() {
   checked.value.forEach(val => {
     delete_list.push({ id: val });
   });
-  batchDeleteMsg(delete_list).then(response => {
-    if (response.code !== "200") {
-      fetch();
-      ElNotification({
-        title: "错误",
-        message: "消息更新失败，正在尝试同步数据",
-        type: "warning",
-        duration: 1000
-      });
-    }
+  batchDeleteMsg(delete_list).then(() => {
+    fetch();
+    ElNotification({
+      title: "错误",
+      message: "消息更新失败，正在尝试同步数据",
+      type: "warning",
+      duration: 1000
+    });
   });
   // 不等待服务器回复就直接更新，避免频繁出现加载页面
   for (let index = messages.value.length - 1; index >= 0; index--) {

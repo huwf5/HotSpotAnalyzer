@@ -1,14 +1,5 @@
 <template>
   <el-form ref="registerFormRef" :model="registerForm" :rules="registerRules" size="large">
-    <el-form-item prop="id">
-      <el-input v-model="registerForm.id" placeholder="学工号" clearable>
-        <template #prefix>
-          <el-icon class="el-input__icon">
-            <CreditCard />
-          </el-icon>
-        </template>
-      </el-input>
-    </el-form-item>
     <el-form-item prop="username">
       <el-input v-model="registerForm.username" placeholder="用户名" clearable>
         <template #prefix>
@@ -52,15 +43,6 @@
         </template>
       </el-input>
     </el-form-item>
-    <el-form-item prop="telephone">
-      <el-input v-model="registerForm.telephone" placeholder="联系电话" clearable>
-        <template #prefix>
-          <el-icon class="el-input__icon">
-            <Cellphone />
-          </el-icon>
-        </template>
-      </el-input>
-    </el-form-item>
   </el-form>
   <div class="register-btn">
     <el-button icon="Back" round size="large" @click="goBack"> 返回 </el-button>
@@ -92,10 +74,6 @@ const keepAliveStore = useKeepAliveStore();
 type FormInstance = InstanceType<typeof ElForm>;
 const registerFormRef = ref<FormInstance>();
 
-function validateId(rule: any, value: string, callback: any) {
-  if (value.length > 0) callback();
-  else callback(new Error("请输入学工号"));
-}
 function validateUserName(rule: any, value: string, callback: any) {
   if (value.match(/^[a-zA-Z0-9]+$/g) !== null) callback();
   else callback(new Error("用户名仅由大小写英文字符与数字0~9组成"));
@@ -113,27 +91,19 @@ function validateEmail(rule: any, value: string, callback: any) {
   if (value.match(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$/g) !== null) callback();
   else callback(new Error("邮箱格式无效"));
 }
-function validateTelephone(rule: any, value: string, callback: any) {
-  if (value.match(/^1\d{10}$|^(0\d{2,3}-?|\(0\d{2,3}\))?[1-9]\d{4,7}(-\d{1,8})?$/g) !== null) callback();
-  else callback(new Error("联系电话格式无效"));
-}
 
 const registerRules = reactive<FormRules>({
-  id: [{ required: true, validator: validateId, trigger: "blur" }],
   username: [{ required: true, validator: validateUserName, trigger: "blur" }],
   password: [{ required: true, validator: validatePassword, trigger: "blur" }],
   repeat_password: [{ required: true, validator: validateRepeat, trigger: "blur" }],
-  email: [{ required: true, validator: validateEmail, trigger: "blur" }],
-  telephone: [{ required: true, validator: validateTelephone, trigger: "blur" }]
+  email: [{ required: true, validator: validateEmail, trigger: "blur" }]
 });
 const loading = ref(false);
 const registerForm = reactive<Register.ReqRegisterForm>({
-  id: "",
   username: "",
   password: "",
   repeat_password: "",
-  email: "",
-  telephone: ""
+  email: ""
 });
 // register
 const register = (formEl: FormInstance | undefined) => {

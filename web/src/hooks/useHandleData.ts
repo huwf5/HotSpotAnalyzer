@@ -10,13 +10,13 @@ import { Result } from "@/api/interface";
  * @param {String} confirmType icon类型 (不必传,默认为 warning)
  * @returns {Promise}
  */
-export const useHandleData = (
-  api: (params: any) => Promise<Result>,
-  params: any = {},
+export const useHandleData = <T>(
+  api: (params: T) => Promise<Result>,
+  params: T,
   message: string,
   confirmType: HandleData.MessageType = "warning"
-) => {
-  return new Promise<void>((resolve, reject) => {
+): Promise<any> => {
+  return new Promise<any>(resolve => {
     ElMessageBox.confirm(`是否${message}?`, "温馨提示", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
@@ -25,21 +25,19 @@ export const useHandleData = (
     })
       .then(async () => {
         await api(params)
-          .then(res => {
-            if (res.code !== "200") {
-              reject({ code: res.code });
-            } else {
-              ElMessage({
-                type: "success",
-                message: `${message}成功!`
-              });
-              resolve();
-            }
+          .then(response => {
+            ElMessage({
+              type: "success",
+              message: `${message}成功!`
+            });
+            resolve(response);
           })
-          .catch(reason => reject(reason));
+          .catch(() => {
+            // API Error
+          });
       })
       .catch(() => {
-        reject({ code: "-1" });
+        // Cancle
       });
   });
 };

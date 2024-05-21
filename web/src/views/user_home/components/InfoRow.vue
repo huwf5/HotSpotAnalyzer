@@ -1,12 +1,12 @@
 /* stylelint-disable order/properties-order */
 <template>
   <div class="single_info" @click.stop="$emit('rowClicked')">
-    <div class="text_container">
+    <div v-if="displayText.length > 0" class="text_container">
       <span class="info_text">{{ $props.displayText }}</span>
     </div>
     <span v-if="!$props.selected" class="info_text">{{ $props.displayValue }}</span>
     <div v-else class="slot_container">
-      <el-popover :visible="$props.toolTipVisivle" placement="right">
+      <el-popover :visible="$props.toolTipVisivle" placement="right" width="200">
         <template #reference>
           <slot />
         </template>
@@ -16,8 +16,10 @@
       </el-popover>
     </div>
     <div v-if="$props.displayIcon">
-      <icon v-if="!$props.selected"><Edit /></icon>
-      <icon v-else :size="20" @click="$emit('checked')"><Check /></icon>
+      <slot name="icon">
+        <icon v-if="!$props.selected"><Edit /></icon>
+        <icon v-else :size="20" @click="$emit('checked')"><Check /></icon>
+      </slot>
     </div>
   </div>
 </template>
@@ -28,12 +30,13 @@ withDefaults(
   defineProps<{
     selected: boolean;
     displayText: string;
-    displayValue: string;
+    displayValue?: string;
     displayIcon?: boolean;
     toolTipVisivle?: boolean;
     tipText?: string;
   }>(),
   {
+    displayValue: "",
     displayIcon: true,
     toolTipVisivle: false,
     tipText: ""
@@ -87,7 +90,6 @@ defineEmits<{
   align-items: center;
   align-self: stretch;
   justify-content: flex-start;
-  padding: 5px;
   font-size: 13px;
   font-weight: 300;
   line-height: 30px;

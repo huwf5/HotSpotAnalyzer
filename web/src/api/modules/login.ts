@@ -20,7 +20,6 @@ export const loginApi = (params: Login.ReqLoginForm) => {
     if (params)
       setTimeout(() => {
         resolve({
-          code: "200",
           msg: "OK",
           data: {
             access_token: "xxx"

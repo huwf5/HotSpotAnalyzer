@@ -1,6 +1,5 @@
 // 请求响应参数（不包含data）
 export interface Result {
-  code: string;
   msg: string;
 }
 
@@ -43,12 +42,10 @@ export namespace Login {
 // 注册模块
 export namespace Register {
   export interface ReqRegisterForm {
-    id: string;
     username: string;
     password: string;
     repeat_password: string;
     email: string;
-    telephone: string;
   }
   export interface ResRegister {
     code: number;
@@ -61,21 +58,17 @@ export namespace User {
   /** 查询过滤条件 */
   export interface ReqUserParams extends ReqPage {
     username: string;
-    id: string;
     email: string;
     createTime: string[];
     status: number;
   }
   /** 返回结果 */
   export interface ResUser {
-    id: string;
     auth: number;
     username: string;
     email: string;
-    telephone: string;
     createTime: string;
     status: number;
-    avatar: string;
   }
   export interface ResStatus {
     userLabel: string;
@@ -86,15 +79,16 @@ export namespace User {
 // 用户信息模块
 export namespace UserInfo {
   export interface BasicInfo {
-    id: string;
     name: string;
-    avatar: string;
     password: string;
   }
   export interface ContactInfo {
     email: string;
-    telephone: string;
   }
+  export interface AccountInfo {
+    role: number;
+  }
+  export const roleNames = ["普通用户", "管理员"];
 }
 
 // 消息模块
@@ -131,9 +125,11 @@ export namespace Messages {
     unread?: boolean;
   }
   export interface ResMessageSettings {
+    use_danger_heat_limit: boolean;
     danger_heat_limit: number;
     use_danger_composed_limits: boolean;
     danger_composed_limits: SingleCond[];
+    use_warning_heat_limit: boolean;
     warning_heat_limit: number;
     use_warning_composed_limits: boolean;
     warning_composed_limits: SingleCond[];

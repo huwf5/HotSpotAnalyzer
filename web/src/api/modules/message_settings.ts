@@ -8,9 +8,10 @@ export const fetchMessagesSettingsApi = () => {
   return new Promise<ResultData<Messages.ResMessageSettings>>(resolve => {
     setTimeout(() => {
       resolve({
-        code: "200",
         msg: "OK",
         data: {
+          use_danger_heat_limit: true,
+          use_warning_heat_limit: true,
           danger_heat_limit: 1000,
           warning_heat_limit: 900,
           use_danger_composed_limits: false,
@@ -33,7 +34,6 @@ export const uploadMessagesSettingsApi = (params: Messages.ReqMessageSettings) =
       if (params) {
       }
       resolve({
-        code: "200",
         msg: "OK",
         data: undefined
       });

@@ -16,7 +16,6 @@ export const getApplication = (params: User.ReqUserParams) => {
     }
     setTimeout(() => {
       resolve({
-        code: "200",
         msg: "OK",
         data: testA
       });
@@ -33,7 +32,6 @@ export const getUserList = (params: User.ReqUserParams) => {
     }
     setTimeout(() => {
       resolve({
-        code: "200",
         msg: "OK",
         data: testA
         // data: {
@@ -48,18 +46,13 @@ export const getUserList = (params: User.ReqUserParams) => {
 };
 
 // 批量授权用户
-export const BatchMandateUser = (params: FormData) => {
+export const BatchMandateUser = (params: string[]) => {
   return http.post(PORT1 + `/user/mandate`, params);
 };
 
 // 批量删除用户
 export const batchDeleteUser = (params: string[]) => {
   return http.post(PORT1 + `/user/remove`, params);
-};
-
-// 批量切换用户状态
-export const batchChangeStatus = (params: FormData) => {
-  return http.post(PORT1 + `/user/batch_change`, params);
 };
 
 // 重置用户密码
