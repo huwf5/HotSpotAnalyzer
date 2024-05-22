@@ -43,10 +43,9 @@ class WaitingListSerializer(serializers.ModelSerializer):
     class Meta:
         model = WaitingList
         fields = ["email", "username", "password", "verify_code", "is_verified"]
-        read_only_fields = ["is_verified"]
+        read_only_fields = ["is_verified","verify_code"]
         extra_kwargs = {
             "password": {"write_only": True},
-            "verify_code": {"write_only": True},
         }
 
     def update_verify_code(self, validated_data):
@@ -74,6 +73,7 @@ class VerifyEmailSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[validate_email, check_email_suffix_format]
     )
+    verify_code = serializers.CharField(required=True)
 
     class Meta:
         model = WaitingList

@@ -24,6 +24,15 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
 from .models import ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_USER, AdminList
 from .permission import IsAdmin, IsSuperAdmin
+from .utils.swagger_schemas import (
+    emailList_schema,
+    get_waitinglist_users_api_response_schema,
+    user_get_profile_schema,
+    get_userList_api_response_schema,
+    user_update_profile_schema,
+)
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 # Create your views here.
@@ -33,6 +42,14 @@ class RegisterView(viewsets.ViewSet):
 
     throttle_classes = [RegisterThrottle]
 
+    @swagger_auto_schema(
+        operation_summary="Create a new user",
+        request_body=WaitingListSerializer,
+        responses={
+            201: "验证码已发送至您的邮箱,请查收",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     def create(self, request: Request) -> APIResponse:
         serializer = WaitingListSerializer(data=request.data)
         # check validation of serializer(including email suffix format)
@@ -88,6 +105,14 @@ class RegisterView(viewsets.ViewSet):
 
 
 class VerifyEmailView(viewsets.ViewSet):
+    @swagger_auto_schema(
+        operation_summary="Verify the email",
+        request_body=VerifyEmailSerializer,
+        responses={
+            200: "邮箱验证成功,请联系管理员激活",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     def verify(self, request: Request) -> APIResponse:
         serializer = VerifyEmailSerializer(data=request.data)
         if not serializer.is_valid():
@@ -141,6 +166,28 @@ class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
     queryset = User.objects.all()
 
+    @swagger_auto_schema(
+        operation_summary="Login",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "email": openapi.Schema(type=openapi.TYPE_STRING),
+                "password": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        responses={
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "email": openapi.Schema(type=openapi.TYPE_STRING),
+                    "username": openapi.Schema(type=openapi.TYPE_STRING),
+                    "token": openapi.Schema(type=openapi.TYPE_STRING),
+                    "refresh": openapi.Schema(type=openapi.TYPE_STRING),
+                },
+            ),
+            400: "登录失败,请检查邮箱和密码是否正确",
+        },
+    )
     def post(self, request: Request, *args, **kwargs) -> Response:
 
         serializer = self.get_serializer(data=request.data)
@@ -167,6 +214,14 @@ class LogoutView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Logout",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={"refresh": openapi.Schema(type=openapi.TYPE_STRING)},
+        ),
+        responses={205: "登出成功", 400: "登出失败"},
+    )
     def post(self, request: Request) -> APIResponse:
         try:
             refresh_token = request.data["refresh"]
@@ -188,6 +243,10 @@ class WaitingListView(mixins.ListModelMixin, viewsets.ViewSet):
         email = self.kwargs.get("email")
         return WaitingList.objects.get(email=email)
 
+    @swagger_auto_schema(
+        operation_summary="Get the waiting list",
+        responses={200: get_waitinglist_users_api_response_schema},
+    )
     def list(self, request):
         queryset = self.get_queryset()
         serializer = WaitingListSerializer(queryset, many=True)
@@ -195,6 +254,14 @@ class WaitingListView(mixins.ListModelMixin, viewsets.ViewSet):
             status=status.HTTP_200_OK, data=serializer.data, message="获取成功"
         )
 
+    @swagger_auto_schema(
+        operation_summary="Delete the waiting user",
+        request_body=emailList_schema,
+        responses={
+            200: "删除成功",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     @action(detail=False, methods=["post"], url_path="bulk-delete")
     @transaction.atomic
     def bulk_delete(self, request):
@@ -225,6 +292,14 @@ class WaitingListView(mixins.ListModelMixin, viewsets.ViewSet):
         data = {"failed_delete": failed_delete} if failed_delete else {}
         return APIResponse(status=status.HTTP_200_OK, message=message, data=data)
 
+    @swagger_auto_schema(
+        operation_summary="Activate the waiting user",
+        request_body=emailList_schema,
+        responses={
+            200: "激活成功",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     @action(detail=False, methods=["post"], url_path="activate")
     @transaction.atomic
     def active(self, request):
@@ -270,6 +345,12 @@ class UserView(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Get the user profile",
+        responses={
+            200: user_get_profile_schema,
+        },
+    )
     @action(detail=False, methods=["get"], url_path="profile")
     def get_profile(self, request: Request) -> APIResponse:
         user = request.user
@@ -283,6 +364,15 @@ class UserView(viewsets.ViewSet):
             },
         )
 
+
+    @swagger_auto_schema(
+        operation_summary="Update the user profile",
+        request_body=user_update_profile_schema,
+        responses={
+            200: "更新成功",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     @action(detail=False, methods=["patch"], url_path="update-profile")
     def update_profile(self, request: Request) -> APIResponse:
         if not request.data:
@@ -302,6 +392,14 @@ class UserView(viewsets.ViewSet):
         )
         return APIResponse(status=status.HTTP_200_OK, message="更新成功")
 
+    @swagger_auto_schema(
+        operation_summary="Delete the user",
+        request_body=emailList_schema,
+        responses={
+            200: "删除成功",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     @action(
         detail=False, methods=["post"], url_path="delete", permission_classes=[IsAdmin]
     )
@@ -340,6 +438,12 @@ class UserView(viewsets.ViewSet):
         data = {"failed_email": failed_email} if failed_email else {}
         return APIResponse(status=status.HTTP_200_OK, message=message, data=data)
 
+    @swagger_auto_schema(
+        operation_summary="Get the user list",
+        responses={
+            200: get_userList_api_response_schema,
+        },
+    )
     @action(
         detail=False, methods=["get"], url_path="list", permission_classes=[IsAdmin]
     )
@@ -357,6 +461,14 @@ class UserView(viewsets.ViewSet):
             status=status.HTTP_200_OK, data=serializer.data, message="请求成功"
         )
 
+    @swagger_auto_schema(
+        operation_summary="Upgrade the user role",
+        request_body=emailList_schema,
+        responses={
+            200: "升级成功",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     @action(
         detail=False,
         methods=["post"],
@@ -385,11 +497,21 @@ class UserView(viewsets.ViewSet):
         return APIResponse(
             status=status.HTTP_200_OK,
             message=(
-                "升级成功" if len(upgrated_email) != 0 else "升级失败,请检查邮箱是否正确"
+                "升级成功"
+                if len(upgrated_email) != 0
+                else "升级失败,请检查邮箱是否正确"
             ),
             data={"failed_email": failed_email} if failed_email else {},
         )
 
+    @swagger_auto_schema(
+        operation_summary="Downgrade the user role",
+        request_body=emailList_schema,
+        responses={
+            200: "降级成功",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
     @action(
         detail=False,
         methods=["post"],
@@ -417,7 +539,9 @@ class UserView(viewsets.ViewSet):
         return APIResponse(
             status=status.HTTP_200_OK,
             message=(
-                "降级成功" if len(downgraded_email) != 0 else "降级失败,请检查邮箱是否正确"
+                "降级成功"
+                if len(downgraded_email) != 0
+                else "降级失败,请检查邮箱是否正确"
             ),
             data={"failed_email": failed_email} if failed_email else {},
         )
