@@ -2,7 +2,11 @@ from apps.user.utils.email import generate_verify_code, send_verify_email
 from application.settings import TABLE_PREFIX, EMAIL_VALIDATION_TIME_LIMIT
 from django.apps import apps
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.contrib.auth.hashers import make_password
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -144,7 +148,7 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class User(AbstractBaseUser, BaseModel):
+class User(AbstractBaseUser, BaseModel, PermissionsMixin):
     email = models.EmailField(
         _("email"),
         unique=True,
@@ -181,6 +185,18 @@ class User(AbstractBaseUser, BaseModel):
     def downgrade_to_user(self):
         self.role = Role.objects.get(role=ROLE_USER)
         self.save(update_fields=["role"])
+
+    @property
+    def is_staff(self):
+        return self.role.role in AdminList
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_superuser(self):
+        return self.role.role == ROLE_SUPER_ADMIN
 
 
 class WaitingList(models.Model):

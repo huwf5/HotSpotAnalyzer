@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_yasg",
     "apps.system",
     "apps.user",
     "rest_framework",
@@ -131,6 +132,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -237,6 +240,18 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_email",
 }
 
+# SWAGGER SETTINGS
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {"basic": {"type": "basic"}},
+    "LOGIN_URL": "admin/",
+    "LOGOUT_URL": "api/logout/",
+    "APIS_SORTER": "alpha",
+    "JSON_EDITOR": True,
+    "OPERATIONS_SORTER": "alpha",
+    "VALIDATOR_URL": None,
+    "AUTO_SCHEMA_TYPE": 2,
+}
 # EMAIL SETTINGS
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
