@@ -46,7 +46,9 @@ user_schema = waitinglist_user_schema = openapi.Schema(
             format=openapi.FORMAT_EMAIL,
             description="email of the user",
         ),
-        "role": role_schema,
+        "role": openapi.Schema(
+            type=openapi.TYPE_INTEGER, description="the primary key of the role"
+        ),
     },
 )
 user_get_profile_schema = openapi.Schema(
@@ -72,11 +74,6 @@ user_update_profile_schema = openapi.Schema(
         "username": openapi.Schema(
             type=openapi.TYPE_STRING, description="username of the user"
         ),
-        "email": openapi.Schema(
-            type=openapi.TYPE_STRING,
-            format=openapi.FORMAT_EMAIL,
-            description="email of the user",
-        ),
         "password": openapi.Schema(
             type=openapi.TYPE_STRING, description="password of the user"
         ),
@@ -91,4 +88,42 @@ get_waitinglist_users_api_response_schema = api_response_schema(
 
 get_userList_api_response_schema = api_response_schema(
     data_schema=openapi.Schema(type=openapi.TYPE_ARRAY, items=user_schema)
+)
+
+get_roleList_api_response_schema = api_response_schema(
+    data_schema=openapi.Schema(type=openapi.TYPE_ARRAY, items=role_schema)
+)
+
+emailTag_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Email tag ID"),
+        "email_format": openapi.Schema(
+            type=openapi.TYPE_STRING, description="Email format"
+        ),
+        "email_tag": openapi.Schema(type=openapi.TYPE_STRING, description="Email tag"),
+    },
+)
+delete_emailTag_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "email_format": openapi.Schema(
+            type=openapi.TYPE_STRING, description="Email format"
+        ),
+        "email_tag": openapi.Schema(type=openapi.TYPE_STRING, description="Email tag"),
+    },
+)
+get_emailTagList_api_response_schema = api_response_schema(
+    data_schema=openapi.Schema(type=openapi.TYPE_ARRAY, items=emailTag_schema)
+)
+
+email_format_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "format": openapi.Schema(type=openapi.TYPE_STRING, description="Email format"),
+    },
+)
+
+get_whiteList_api_response_schema = api_response_schema(
+    data_schema=openapi.Schema(type=openapi.TYPE_ARRAY, items=email_format_schema)
 )
