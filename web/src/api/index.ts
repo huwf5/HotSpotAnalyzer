@@ -14,13 +14,16 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   cancel?: boolean;
 }
 
-const config = {
+const config: AxiosRequestConfig = {
   // 默认地址请求地址，可在 .env.** 文件中修改
   baseURL: import.meta.env.VITE_API_URL as string,
   // 设置超时时间
   timeout: ResultEnum.TIMEOUT as number,
   // 跨域时候允许携带凭证
-  withCredentials: true
+  withCredentials: true,
+  headers: {
+    Authorization: ""
+  }
 };
 
 const axiosCanceler = new AxiosCanceler();
@@ -46,7 +49,7 @@ class RequestHttp {
         config.loading ??= true;
         config.loading && showFullScreenLoading();
         if (config.headers && typeof config.headers.set === "function") {
-          config.headers.set("x-access-token", userStore.token);
+          config.headers.set("Authorization", "Bearer " + userStore.token);
         }
         return config;
       },
@@ -68,7 +71,7 @@ class RequestHttp {
         config.loading && tryHideFullScreenLoading();
         // 登录失效
         if (data.code == ResultEnum.OVERDUE) {
-          userStore.setToken("");
+          userStore.setTokens("", "", -1);
           router.replace(LOGIN_URL);
           ElMessage.error(data.msg);
           return Promise.reject(data);
@@ -102,7 +105,7 @@ class RequestHttp {
   get<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
     return this.service.get(url, { params, ..._object });
   }
-  post<T>(url: string, params?: object | string, _object = {}): Promise<ResultData<T>> {
+  post<T>(url: string, params?: object | string, _object = {}): Promise<T> {
     return this.service.post(url, params, _object);
   }
   put<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {

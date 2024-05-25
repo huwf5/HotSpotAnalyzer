@@ -28,7 +28,7 @@ export const initDynamicRouter = async () => {
         type: "warning",
         duration: 3000
       });
-      userStore.setToken("");
+      userStore.setTokens("", "", -1);
       router.replace(LOGIN_URL);
       return Promise.reject("No permission");
     }
@@ -47,7 +47,7 @@ export const initDynamicRouter = async () => {
     });
   } catch (error) {
     // 当按钮 || 菜单请求出错时，重定向到登陆页
-    userStore.setToken("");
+    userStore.setTokens("", "", -1);
     router.replace(LOGIN_URL);
     return Promise.reject(error);
   }

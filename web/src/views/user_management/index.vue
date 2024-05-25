@@ -6,6 +6,7 @@
       </template>
       <template #operations="scope">
         <el-button type="primary" link icon="Refresh" @click="resetUserPwd(scope.row)">重置密码</el-button>
+        <el-button type="primary" link icon="Upload">升级权限</el-button>
         <el-button type="primary" link icon="Delete" @click="removeUser(scope.row)">删除</el-button>
       </template>
     </ProTable>
@@ -28,20 +29,13 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
     fixed: "left"
   },
   {
-    prop: "createTime",
-    width: 150,
-    label: "申请时间",
-    search: {
-      el: "date-picker",
-      span: 2,
-      props: { type: "datetimerange", valueFormat: "YYYY-MM-DD" },
-      order: 4
-    }
-  },
-  {
     prop: "username",
     label: "用户名",
-    width: 100
+    width: 100,
+    search: {
+      el: "input",
+      order: 1
+    }
   },
   {
     prop: "auth",
@@ -58,7 +52,11 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
   },
   {
     prop: "email",
-    label: "邮箱地址"
+    label: "邮箱地址",
+    search: {
+      el: "input",
+      order: 2
+    }
   },
   {
     prop: "operations",
@@ -68,10 +66,10 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
   }
 ]);
 async function resetUserPwd(params: User.ResUser) {
-  await useHandleData(resetUserPassWord, { id: params.email }, `重置${params.username}密码`);
+  await useHandleData(resetUserPassWord, null, `重置${params.username}密码`);
 }
 async function removeUser(params: User.ResUser) {
-  await useHandleData(batchDeleteUser, [params.email], `删除${params.username}`).then(() => {
+  await useHandleData(batchDeleteUser, { emailList: [params.email] }, `删除${params.username}`).then(() => {
     // 刷新数据
     proTable.value?.getTableList();
   });
@@ -82,7 +80,7 @@ async function handleRemoveAll() {
     if (selected_list.length === 0) return;
     let delete_list: string[] = [];
     selected_list.forEach(val => delete_list.push(val.id));
-    await useHandleData(batchDeleteUser, delete_list, "全部删除").then(() => {
+    await useHandleData(batchDeleteUser, { emailList: delete_list }, "全部删除").then(() => {
       proTable.value?.getTableList();
     });
   }

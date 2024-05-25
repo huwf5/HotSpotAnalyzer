@@ -37,10 +37,10 @@ const logout = () => {
     type: "warning"
   }).then(async () => {
     // 1.执行退出登录接口
-    await logoutApi();
+    await logoutApi({ refresh: userStore.refresh });
 
     // 2.清除 Token
-    userStore.setToken("");
+    userStore.setTokens("", "", -1);
 
     // 3.重定向到登陆页
     router.replace(LOGIN_URL);

@@ -24,6 +24,8 @@ export interface GlobalState {
 /* UserState */
 export interface UserState {
   token: string;
+  refresh: string;
+  token_lifetime: number;
   userInfo: {
     messages: Messages.Message[];
     basicInfo: UserInfo.BasicInfo;

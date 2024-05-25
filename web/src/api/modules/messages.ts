@@ -40,7 +40,7 @@ export const fetchMessagesApi = () => {
   return new Promise<ResultData<Messages.Message[]>>(resolve => {
     setTimeout(() => {
       resolve({
-        msg: "OK",
+        message: "OK",
         data: [test1, test2, test3]
       });
     }, 200);
@@ -55,7 +55,7 @@ export const batchUpdateMsg = (params: Messages.ReqMessages[]) => {
     }
     setTimeout(() => {
       resolve({
-        msg: "OK",
+        message: "OK",
         data: undefined
       });
     }, 1000);
@@ -70,7 +70,7 @@ export const batchDeleteMsg = (params: Messages.ReqMessages[]) => {
     }
     setTimeout(() => {
       resolve({
-        msg: "OK",
+        message: "OK",
         data: undefined
       });
     }, 200);

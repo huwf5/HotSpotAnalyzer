@@ -1,6 +1,6 @@
 // 请求响应参数（不包含data）
 export interface Result {
-  msg: string;
+  message: string;
 }
 
 // 请求响应参数（包含data）
@@ -9,14 +9,8 @@ export interface ResultData<T = any> extends Result {
 }
 
 // 分页响应参数
-export interface ResPage<T> {
-  list: T[];
-  /** 当前分页数 */
-  pageNum: number;
-  /** 页面最大条目数 */
-  pageSize: number;
-  /** 总页数 */
-  total: number;
+export interface ResDataList<T> extends Result {
+  data: T[];
 }
 
 // 分页请求参数
@@ -28,14 +22,29 @@ export interface ReqPage {
 // 登录模块
 export namespace Login {
   export interface ReqLoginForm {
-    username: string;
+    email: string;
     password: string;
   }
+  export interface ReqRefresh {
+    refresh: string;
+  }
+  export interface ReqLogout {
+    refresh: string;
+  }
   export interface ResLogin {
-    access_token: string;
+    email: string;
+    username: string;
+    token: string;
+    refresh: string;
+    token_lifetime: number;
+    refresh_lifetime: number;
   }
   export interface ResAuthButtons {
     [key: string]: string[];
+  }
+  export interface ResRefresh {
+    refresh: string;
+    access: string;
   }
 }
 
@@ -46,29 +55,33 @@ export namespace Register {
     password: string;
     repeat_password: string;
     email: string;
+    captcha: string;
   }
-  export interface ResRegister {
-    code: number;
-    msg: string;
+  export interface ReqEmailCaptcha {
+    email: string;
   }
 }
 
 // 系统用户管理模块
 export namespace User {
   /** 查询过滤条件 */
-  export interface ReqUserParams extends ReqPage {
-    username: string;
-    email: string;
-    createTime: string[];
-    status: number;
+  export interface ReqDelete {
+    emailList: string[];
+  }
+  export interface ReqMandate {
+    emailList: string[];
   }
   /** 返回结果 */
   export interface ResUser {
-    auth: number;
     username: string;
     email: string;
-    createTime: string;
-    status: number;
+    role: number;
+  }
+  /** 等待激活用户 */
+  export interface ResPendingUser {
+    username: string;
+    email: string;
+    role: number;
   }
   export interface ResStatus {
     userLabel: string;
@@ -78,9 +91,17 @@ export namespace User {
 
 // 用户信息模块
 export namespace UserInfo {
+  export interface ResUserProfile {
+    username: string;
+    email: string;
+    role: number;
+  }
+  export interface ReqUpdate {
+    name?: string;
+    password?: string;
+  }
   export interface BasicInfo {
     name: string;
-    password: string;
   }
   export interface ContactInfo {
     email: string;

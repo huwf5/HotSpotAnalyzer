@@ -7,7 +7,7 @@
           :display-value="basicInfo.name"
           :tool-tip-visivle="invalidName"
           display-text="名称"
-          tip-text="用户名仅由大小写英文字符与数字0~9组成"
+          :tip-text="tipText"
           @checked="confirm(0)"
           @row-clicked="handleClick(0)"
         >
@@ -18,7 +18,7 @@
           display-value="*****"
           :tool-tip-visivle="invalidPassword || invalidRepeatPwd"
           display-text="密码"
-          :tip-text="invalidPassword ? '密码仅由大小写英文字符与数字0~9组成' : invalidRepeatPwd ? '两次输入的密码不一致' : ''"
+          :tip-text="tipText"
           @checked="confirm(1)"
           @row-clicked="handleClick(1)"
         >
@@ -36,7 +36,7 @@
           :display-value="contactInfo.email"
           :tool-tip-visivle="invalidEmail"
           display-text="邮箱地址"
-          tip-text="无效的邮箱格式"
+          :tip-text="tipText"
           @checked="confirm(2)"
           @row-clicked="handleClick(2)"
         >
@@ -82,6 +82,7 @@ import { useHandleData } from "@/hooks/useHandleData";
 import { ElMessageBox } from "element-plus";
 import router from "@/routers";
 import { LOGIN_URL } from "@/config";
+import { validateEmail, validatePassword, validateUserName } from "@/utils/eleValidate";
 const store = useUserStore();
 
 const edit = ref(-1);
@@ -98,6 +99,7 @@ const invalidName = ref(false);
 const invalidPassword = ref(false);
 const invalidRepeatPwd = ref(false);
 const invalidEmail = ref(false);
+const tipText = ref("");
 const tips = ref<Ref<boolean>[]>([invalidName, invalidPassword, invalidEmail]);
 const role_tips = [
   "普通用户拥有系统基本功能的使用权，可以查看热点事件与事件时间线等",
@@ -165,49 +167,61 @@ function confirm(index: number) {
   switch (index) {
     // Edit Name
     case 0:
-      if (newName.value.match(/^[a-zA-Z0-9]+$/g) !== null) {
-        uploadUserInfo({
-          basicInfo: { ...basicInfo.value, name: newName.value },
-          contactInfo: { ...contactInfo.value }
-        }).then(() => {
-          basicInfo.value.name = newName.value;
-          edit.value = -1;
-        });
-      } else invalidName.value = true;
+      validateUserName(null, newName.value, (e?: Error) => {
+        if (e === undefined) {
+          uploadUserInfo({
+            basicInfo: { ...basicInfo.value, name: newName.value },
+            contactInfo: { ...contactInfo.value }
+          }).then(() => {
+            basicInfo.value.name = newName.value;
+            edit.value = -1;
+          });
+        } else {
+          tipText.value = e.message;
+          invalidName.value = true;
+        }
+      });
       break;
     // Edit Password
     case 1:
-      let validPasswd = true;
-      if (newPassword.value.match(/^[a-zA-Z0-9]+$/g) === null) {
-        validPasswd = false;
-        invalidPassword.value = true;
-      }
-      if (repeatPassword.value !== newPassword.value) {
-        validPasswd = false;
-        invalidRepeatPwd.value = true;
-      }
-      if (validPasswd) {
-        uploadUserInfo({
-          basicInfo: { ...basicInfo.value, password: newPassword.value },
-          contactInfo: { ...contactInfo.value }
-        }).then(() => {
-          newPassword.value = "";
-          repeatPassword.value = "";
-          edit.value = -1;
-        });
-      }
+      validatePassword(null, newPassword.value, (e?: Error) => {
+        if (e === undefined) {
+          if (repeatPassword.value === newPassword.value) {
+            uploadUserInfo({
+              basicInfo: basicInfo.value,
+              contactInfo: { ...contactInfo.value },
+              password: newPassword.value
+            }).then(() => {
+              newPassword.value = "";
+              repeatPassword.value = "";
+              edit.value = -1;
+            });
+          } else {
+            invalidRepeatPwd.value = true;
+            tipText.value = "两次输入的密码不一致";
+          }
+        } else {
+          invalidPassword.value = true;
+          tipText.value = e.message;
+        }
+      });
       break;
     // Edit Email
     case 2:
-      if (newEmail.value.match(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$/g) !== null) {
-        uploadUserInfo({
-          basicInfo: { ...basicInfo.value },
-          contactInfo: { ...contactInfo.value, email: newEmail.value }
-        }).then(() => {
-          contactInfo.value.email = newEmail.value;
-          edit.value = -1;
-        });
-      } else invalidEmail.value = true;
+      validateEmail(null, newEmail.value, (e?: Error) => {
+        if (e === undefined) {
+          uploadUserInfo({
+            basicInfo: { ...basicInfo.value },
+            contactInfo: { ...contactInfo.value, email: newEmail.value }
+          }).then(() => {
+            contactInfo.value.email = newEmail.value;
+            edit.value = -1;
+          });
+        } else {
+          invalidEmail.value = true;
+          tipText.value = e.message;
+        }
+      });
       break;
     // Apply for Mandate
     case 3:
@@ -223,7 +237,7 @@ function confirm(index: number) {
     // Delete Account
     case 4:
       useHandleData(confirmDelete, { email: contactInfo.value.email }, "删除账号（包含所有账号记录）").then(() => {
-        store.setToken("");
+        store.setTokens("", "", -1);
         router.replace(LOGIN_URL);
       });
       break;

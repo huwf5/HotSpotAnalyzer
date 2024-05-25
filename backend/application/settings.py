@@ -243,7 +243,15 @@ SIMPLE_JWT = {
 # SWAGGER SETTINGS
 
 SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {"basic": {"type": "basic"}},
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"',
+        },
+    },
+    "USE_SESSION_AUTH": False,
     "LOGIN_URL": "admin/",
     "LOGOUT_URL": "api/logout/",
     "APIS_SORTER": "alpha",

@@ -1,10 +1,10 @@
 <template>
   <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
-    <el-form-item prop="username">
-      <el-input v-model="loginForm.username" placeholder="用户名" clearable>
+    <el-form-item prop="email">
+      <el-input v-model="loginForm.email" placeholder="邮箱地址" clearable>
         <template #prefix>
           <el-icon class="el-input__icon">
-            <user />
+            <Message />
           </el-icon>
         </template>
       </el-input>
@@ -46,8 +46,8 @@ import { useUserStore } from "@/stores/modules/user";
 import { useTabsStore } from "@/stores/modules/tabs";
 import { useKeepAliveStore } from "@/stores/modules/keepAlive";
 import { initDynamicRouter } from "@/routers/modules/dynamicRouter";
-import type { ElForm } from "element-plus";
-import md5 from "md5";
+import type { ElForm, FormRules } from "element-plus";
+import { validateEmail, validatePassword } from "@/utils/eleValidate";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -56,14 +56,14 @@ const keepAliveStore = useKeepAliveStore();
 
 type FormInstance = InstanceType<typeof ElForm>;
 const loginFormRef = ref<FormInstance>();
-const loginRules = reactive({
-  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+const loginRules = reactive<FormRules>({
+  email: [{ required: true, validator: validateEmail, trigger: "blur" }],
+  password: [{ required: true, validator: validatePassword, trigger: "blur" }]
 });
 
 const loading = ref(false);
 const loginForm = reactive<Login.ReqLoginForm>({
-  username: userStore.userInfo.basicInfo.name,
+  email: userStore.userInfo.contactInfo.email,
   password: ""
 });
 
@@ -75,8 +75,11 @@ const login = (formEl: FormInstance | undefined) => {
     loading.value = true;
     try {
       // 1.执行登录接口
-      const { data } = await loginApi({ ...loginForm, password: md5(loginForm.password) });
-      userStore.setToken(data.access_token);
+      let { data } = await loginApi(loginForm);
+      console.log(data);
+      userStore.setTokens(data.token, data.refresh, 3600000);
+      userStore.setUserContactInfo({ email: data.email });
+      userStore.setUserBasicInfo({ name: data.username });
 
       // 2.添加动态路由
       await initDynamicRouter();

@@ -3,8 +3,8 @@
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 DATABASES_ENGINE = "django.db.backends.mysql"
 DATABASES_NAME = "HotSpotAnalyzerDB"
-DATABASES_USER = "root"
-DATABASES_PASSWORD = "yourpassword"
+DATABASES_USER = "dj"
+DATABASES_PASSWORD = "dj"
 DATABASES_HOST = "localhost"
 DATABASES_PORT = "3306"
 
@@ -12,7 +12,7 @@ DATABASES_PORT = "3306"
 TABLE_PREFIX = "hotspot_sys_"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
