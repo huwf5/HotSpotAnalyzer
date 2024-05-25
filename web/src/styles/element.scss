@@ -165,11 +165,9 @@
 
     // 解决表格数据为空时样式不居中问题(仅在element-plus中)
     .el-table__empty-block {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      position: static;
       .table-empty {
+        padding: 20px 0;
         line-height: 30px;
       }
     }

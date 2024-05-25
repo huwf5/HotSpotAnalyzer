@@ -1,6 +1,5 @@
 // 请求响应参数（不包含data）
 export interface Result {
-  code: string;
   msg: string;
 }
 
@@ -12,8 +11,11 @@ export interface ResultData<T = any> extends Result {
 // 分页响应参数
 export interface ResPage<T> {
   list: T[];
+  /** 当前分页数 */
   pageNum: number;
+  /** 页面最大条目数 */
   pageSize: number;
+  /** 总页数 */
   total: number;
 }
 
@@ -37,47 +39,109 @@ export namespace Login {
   }
 }
 
-// 用户管理模块
+// 注册模块
+export namespace Register {
+  export interface ReqRegisterForm {
+    username: string;
+    password: string;
+    repeat_password: string;
+    email: string;
+  }
+  export interface ResRegister {
+    code: number;
+    msg: string;
+  }
+}
+
+// 系统用户管理模块
 export namespace User {
+  /** 查询过滤条件 */
   export interface ReqUserParams extends ReqPage {
     username: string;
-    gender: number;
-    idCard: string;
     email: string;
-    address: string;
     createTime: string[];
     status: number;
   }
-  export interface ResUserList {
-    id: string;
+  /** 返回结果 */
+  export interface ResUser {
+    auth: number;
     username: string;
-    gender: number;
-    user: { detail: { age: number } };
-    idCard: string;
     email: string;
-    address: string;
     createTime: string;
     status: number;
-    avatar: string;
-    photo: any[];
-    children?: ResUserList[];
   }
   export interface ResStatus {
     userLabel: string;
     userValue: number;
   }
-  export interface ResGender {
-    genderLabel: string;
-    genderValue: number;
-  }
-  export interface ResDepartment {
-    id: string;
+}
+
+// 用户信息模块
+export namespace UserInfo {
+  export interface BasicInfo {
     name: string;
-    children?: ResDepartment[];
+    password: string;
   }
-  export interface ResRole {
-    id: string;
-    name: string;
-    children?: ResDepartment[];
+  export interface ContactInfo {
+    email: string;
+  }
+  export interface AccountInfo {
+    role: number;
+  }
+  export const roleNames = ["普通用户", "管理员"];
+}
+
+// 消息模块
+export namespace Messages {
+  export const titles = ["系统消息", "预警消息", "警告消息"];
+  export const platforms = ["Bilibili", "小红书", "微博"];
+  export interface Message {
+    id: number;
+    display: boolean;
+    /** 0表示系统消息，1表示预警消息，2表示警告消息 */
+    type: number;
+    starred: boolean;
+    unread: boolean;
+    time: string;
+    content: string;
+  }
+  export interface Event extends Message {
+    platform: number;
+    keywords: string;
+    title: string;
+  }
+  export const conds = ["👍点赞数", "❤喜爱数", "✨转发数"];
+  export const predicators = ["大于＞", "小于＜", "大于等于≥", "小于等于≤"];
+  export interface SingleCond {
+    /** 0表示点赞数，1表示喜爱数，2表示转发数，其它表示空 */
+    key: number;
+    /** 0表示大于，1表示小于，2表示大于等于，3表示小于等于 */
+    predicator: number;
+    limit: number;
+  }
+  export interface ReqMessages {
+    id: number;
+    starred?: boolean;
+    unread?: boolean;
+  }
+  export interface ResMessageSettings {
+    use_danger_heat_limit: boolean;
+    danger_heat_limit: number;
+    use_danger_composed_limits: boolean;
+    danger_composed_limits: SingleCond[];
+    use_warning_heat_limit: boolean;
+    warning_heat_limit: number;
+    use_warning_composed_limits: boolean;
+    warning_composed_limits: SingleCond[];
+    auto_star: boolean;
+    heat_formula: string;
+  }
+  export interface ReqMessageSettings {
+    danger_heat_limit?: number;
+    danger_compsed_limit?: SingleCond[];
+    warning_heat_limit?: number;
+    warning_compsed_limit?: SingleCond[];
+    auto_star?: boolean;
+    heat_formula?: string;
   }
 }

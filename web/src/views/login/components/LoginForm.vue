@@ -1,7 +1,7 @@
 <template>
   <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
     <el-form-item prop="username">
-      <el-input v-model="loginForm.username" placeholder="用户名：admin / user">
+      <el-input v-model="loginForm.username" placeholder="用户名" clearable>
         <template #prefix>
           <el-icon class="el-input__icon">
             <user />
@@ -10,7 +10,14 @@
       </el-input>
     </el-form-item>
     <el-form-item prop="password">
-      <el-input v-model="loginForm.password" type="password" placeholder="密码：123456" show-password autocomplete="new-password">
+      <el-input
+        v-model="loginForm.password"
+        type="password"
+        placeholder="密码"
+        show-password
+        autocomplete="new-password"
+        clearable
+      >
         <template #prefix>
           <el-icon class="el-input__icon">
             <lock />
@@ -20,8 +27,8 @@
     </el-form-item>
   </el-form>
   <div class="login-btn">
-    <el-button :icon="CircleClose" round size="large" @click="resetForm(loginFormRef)"> 重置 </el-button>
-    <el-button :icon="UserFilled" round size="large" type="primary" :loading="loading" @click="login(loginFormRef)">
+    <el-button icon="EditPen" round size="large" @click="register"> 注册 </el-button>
+    <el-button icon="UserFilled" round size="large" type="primary" :loading="loading" @click="login(loginFormRef)">
       登录
     </el-button>
   </div>
@@ -30,7 +37,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { HOME_URL } from "@/config";
+import { HOME_URL, REGISTER_URL } from "@/config";
 import { getTimeState } from "@/utils";
 import { Login } from "@/api/interface";
 import { ElNotification } from "element-plus";
@@ -39,7 +46,6 @@ import { useUserStore } from "@/stores/modules/user";
 import { useTabsStore } from "@/stores/modules/tabs";
 import { useKeepAliveStore } from "@/stores/modules/keepAlive";
 import { initDynamicRouter } from "@/routers/modules/dynamicRouter";
-import { CircleClose, UserFilled } from "@element-plus/icons-vue";
 import type { ElForm } from "element-plus";
 import md5 from "md5";
 
@@ -57,7 +63,7 @@ const loginRules = reactive({
 
 const loading = ref(false);
 const loginForm = reactive<Login.ReqLoginForm>({
-  username: "",
+  username: userStore.userInfo.basicInfo.name,
   password: ""
 });
 
@@ -93,11 +99,9 @@ const login = (formEl: FormInstance | undefined) => {
   });
 };
 
-// resetForm
-const resetForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  formEl.resetFields();
-};
+function register() {
+  router.push(REGISTER_URL);
+}
 
 onMounted(() => {
   // 监听 enter 事件（调用登录）
