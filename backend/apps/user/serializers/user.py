@@ -1,13 +1,8 @@
 from typing import Dict, Any
-from apps.user.models import Role, User, WaitingList, check_email_suffix_format
-from apps.user.utils.email import generate_verify_code, send_verify_email
-from application.settings import EMAIL_VALIDATION_TIME_LIMIT
+from apps.user.models import Role, User, WaitingList
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from datetime import timedelta
-from django.utils import timezone
 from django.contrib.auth.hashers import make_password
-from django.core.validators import validate_email
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -18,7 +13,7 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = RoleSerializer()
+    role = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all())
 
     class Meta:
         model = User
@@ -36,48 +31,29 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class WaitingListSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        validators=[validate_email, check_email_suffix_format]
-    )
+    email = serializers.EmailField()
 
     class Meta:
         model = WaitingList
-        fields = ["email", "username", "password", "verify_code", "is_verified"]
-        read_only_fields = ["is_verified"]
+        fields = ["email", "username"]
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    verify_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = WaitingList
+        fields = ["email", "username", "password", "verify_code"]
         extra_kwargs = {
             "password": {"write_only": True},
             "verify_code": {"write_only": True},
         }
 
-    def update_verify_code(self, validated_data):
-        """
-        Update the verify code and send the email, will automatically set the expiration time
-        But will not save the object to the database
-        """
-
-        verify_code = generate_verify_code()
-        expired_at = timezone.now() + timedelta(minutes=EMAIL_VALIDATION_TIME_LIMIT)
-        send_verify_email(
-            validated_data["email"], validated_data["username"], verify_code
-        )
-        validated_data["verify_code"] = verify_code
-        validated_data["expired_at"] = expired_at
-
     def create(self, validated_data):
-        check_email_suffix_format(validated_data["email"])
-        validated_data["password"] = make_password(validated_data["password"])
-        self.update_verify_code(validated_data)
-        return super().create(validated_data)
-
-
-class VerifyEmailSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        validators=[validate_email, check_email_suffix_format]
-    )
-
-    class Meta:
-        model = WaitingList
-        fields = ["email", "verify_code"]
+        instance = WaitingList(**validated_data)
+        instance.encrypt_password_and_save()
+        return instance
 
 
 class LoginSerializer(TokenObtainPairSerializer):
@@ -96,6 +72,13 @@ class LoginSerializer(TokenObtainPairSerializer):
 
 
 class EmailListSerializer(serializers.Serializer):
-    emailList = serializers.ListField(
-        child=serializers.EmailField(validators=[validate_email])
-    )
+    emailList = serializers.ListField(child=serializers.EmailField())
+
+
+class ForgotPasswordSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    verify_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ["email", "verify_code", "password"]

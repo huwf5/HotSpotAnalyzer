@@ -1,6 +1,7 @@
 #backend
 __pycache__/
 backend/log
+backend/static
 
 #web
 # Logs
