@@ -16,7 +16,9 @@ export const useTable = (
   requestError?: (error: any) => void
 ) => {
   const state = reactive<Table.StateProps>({
-    // 表格数据
+    // 展示的表格数据
+    displayData: [],
+    // 实际表格数据
     tableData: [],
     // 分页数据
     pageable: {
@@ -59,17 +61,49 @@ export const useTable = (
     try {
       // 先把初始化参数和分页参数放到总参数里面
       Object.assign(state.totalParam, initParam, isPageable ? pageParam.value : {});
-      let { data } = await api({ ...state.searchInitParam, ...state.totalParam });
-      dataCallBack && (data = dataCallBack(data));
-      state.tableData = isPageable ? data.list : data;
-      // 解构后台返回的分页数据 (如果有分页更新分页信息)
-      if (isPageable) {
-        const { pageNum, pageSize, total } = data;
-        updatePageable({ pageNum, pageSize, total });
-      }
+      await api(null).then(response => {
+        let data = response.data;
+        if (data === undefined || !Array.isArray(data) || data.length === 0) {
+          state.tableData = [];
+        } else {
+          dataCallBack && (data = dataCallBack(data));
+          // 先储存总表
+          state.tableData = data;
+          state.pageable.total = Math.ceil(data.length / state.pageable.pageSize);
+        }
+        // 然后筛选要展示的表格数据
+        displayTable();
+      });
     } catch (error) {
       requestError && requestError(error);
     }
+  };
+
+  /**
+   * @description 展示过滤后的数据
+   * @return void
+   */
+  const displayTable = () => {
+    let newData: any[] = [];
+    // 遍历所有数据行
+    state.tableData.forEach(dataRow => {
+      let accept = true;
+      // 遍历所有判断条件
+      for (const key in state.searchParam) {
+        // 判断是否满足条件
+        if (typeof dataRow[key] === "string") {
+          if (!dataRow[key].includes(state.searchParam[key])) {
+            accept = false;
+            break;
+          }
+        } else if (dataRow[key] !== state.searchParam[key]) {
+          accept = false;
+          break;
+        }
+      }
+      if (accept) newData.push(dataRow);
+    });
+    state.displayData = newData;
   };
 
   /**
@@ -79,7 +113,9 @@ export const useTable = (
   const updatedTotalParam = () => {
     state.totalParam = {};
     // 处理查询参数，可以给查询参数加自定义前缀操作
-    let nowSearchParam: Table.StateProps["searchParam"] = {};
+    let nowSearchParam: Table.StateProps["searchParam"] = {
+      accept: () => true
+    };
     // 防止手动清空输入框携带参数（这里可以自定义查询参数前缀）
     for (let key in state.searchParam) {
       // 某些情况下参数为 false/0 也应该携带参数
@@ -91,22 +127,13 @@ export const useTable = (
   };
 
   /**
-   * @description 更新分页信息
-   * @param {Object} pageable 后台返回的分页数据
-   * @return void
-   * */
-  const updatePageable = (pageable: Table.Pageable) => {
-    Object.assign(state.pageable, pageable);
-  };
-
-  /**
    * @description 表格数据查询
    * @return void
    * */
   const search = () => {
     state.pageable.pageNum = 1;
     updatedTotalParam();
-    getTableList();
+    displayTable();
   };
 
   /**
@@ -129,7 +156,6 @@ export const useTable = (
   const handleSizeChange = (val: number) => {
     state.pageable.pageNum = 1;
     state.pageable.pageSize = val;
-    getTableList();
   };
 
   /**
@@ -139,7 +165,6 @@ export const useTable = (
    * */
   const handleCurrentChange = (val: number) => {
     state.pageable.pageNum = val;
-    getTableList();
   };
 
   return {

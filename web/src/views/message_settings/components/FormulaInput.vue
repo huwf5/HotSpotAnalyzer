@@ -24,7 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from "vue";
+import { watchOnce } from "@vueuse/core";
+import { nextTick, onMounted, ref } from "vue";
 
 interface input_interface {
   selectionStart: number;
@@ -91,7 +92,7 @@ function handleChange(input: string) {
 function onClickOutside() {
   display_popover.value = false;
 }
-watch(input_str, display);
+watchOnce(input_str, display);
 onMounted(display);
 </script>
 

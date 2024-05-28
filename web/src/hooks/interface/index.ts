@@ -5,6 +5,7 @@ export namespace Table {
     total: number;
   }
   export interface StateProps {
+    displayData: any[];
     tableData: any[];
     pageable: Pageable;
     searchParam: {

@@ -40,14 +40,14 @@ export const fetchMessagesApi = () => {
   return new Promise<ResultData<Messages.Message[]>>(resolve => {
     setTimeout(() => {
       resolve({
-        msg: "OK",
+        message: "OK",
         data: [test1, test2, test3]
       });
     }, 200);
   });
 };
 
-export const batchUpdateMsg = (params: Messages.ReqMessages[]) => {
+export const batchUpdateMsgApi = (params: Messages.ReqMessages[]) => {
   // return http.post(PORT1 + `/message/update`, params, { loading: false });
 
   return new Promise<ResultData<undefined>>(resolve => {
@@ -55,14 +55,14 @@ export const batchUpdateMsg = (params: Messages.ReqMessages[]) => {
     }
     setTimeout(() => {
       resolve({
-        msg: "OK",
+        message: "OK",
         data: undefined
       });
     }, 1000);
   });
 };
 
-export const batchDeleteMsg = (params: Messages.ReqMessages[]) => {
+export const batchDeleteMsgApi = (params: Messages.ReqMessages[]) => {
   // return http.post(PORT1 + `/message/delete`, params, { loading: false });
 
   return new Promise<ResultData<undefined>>(resolve => {
@@ -70,7 +70,7 @@ export const batchDeleteMsg = (params: Messages.ReqMessages[]) => {
     }
     setTimeout(() => {
       resolve({
-        msg: "OK",
+        message: "OK",
         data: undefined
       });
     }, 200);

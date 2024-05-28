@@ -26,7 +26,8 @@
         "isHide": false,
         "isFull": false,
         "isAffix": true,
-        "isKeepAlive": true
+        "isKeepAlive": true,
+        "hideOnTab": true
       },
       "children": [
         {
@@ -76,16 +77,61 @@
     {
       "path": "/user/manage",
       "name": "user_management",
-      "component": "/user_management/index",
+      "redirect": "/user/userlist",
       "meta": {
         "icon": "Grid",
-        "title": "用户管理",
+        "title": "管理",
         "isLink": "",
         "isHide": false,
         "isFull": false,
         "isAffix": true,
-        "isKeepAlive": true
-      }
+        "isKeepAlive": true,
+        "hideOnTab": true
+      },
+      "children": [
+        {
+          "path": "/user/userlist",
+          "name": "user_management",
+          "component": "/user_management/index",
+          "meta": {
+            "icon": "Grid",
+            "title": "用户管理",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "path": "/waitinglist",
+          "name": "waiting_list",
+          "component": "/waiting_list/index",
+          "meta": {
+            "icon": "Grid",
+            "title": "等待列表",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "path": "/whitelist",
+          "name": "whitelist",
+          "component": "/white_list/index",
+          "meta": {
+            "icon": "Grid",
+            "title": "邮箱白名单管理",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true,
+            "isKeepAlive": true
+          }
+        }
+      ]
     }
   ],
   "msg": "成功"

@@ -1,7 +1,7 @@
 <template>
   <div class="tabs-box">
     <div class="tabs-menu">
-      <el-tabs v-model="tabsMenuValue" type="card" @tab-click="tabClick" @tab-remove="tabRemove">
+      <el-tabs v-model="tabsMenuValue" type="card" @tab-click="tabClick" @tab-remove="tabRemove" editable>
         <el-tab-pane v-for="item in tabsMenuList" :key="item.path" :label="item.title" :name="item.path" :closable="item.close">
           <template #label>
             <el-icon v-if="item.icon && tabsIcon" class="tabs-icon">
@@ -63,7 +63,12 @@ watch(
 // 初始化需要固定的 tabs
 const initTabs = () => {
   authStore.flatMenuListGet.forEach(item => {
-    if (item.meta.isAffix && !item.meta.isHide && !item.meta.isFull) {
+    if (
+      item.meta.isAffix &&
+      !item.meta.isHide &&
+      !item.meta.isFull &&
+      ((item.meta.hideOnTab !== undefined && item.meta.hideOnTab !== true) || item.meta.hideOnTab === undefined)
+    ) {
       const tabsParams = {
         icon: item.meta.icon,
         title: item.meta.title,
