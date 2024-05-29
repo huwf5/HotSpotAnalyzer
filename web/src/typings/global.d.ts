@@ -16,6 +16,7 @@ declare namespace Menu {
     isHide: boolean;
     isFull: boolean;
     isAffix: boolean;
+    hideOnTab?: boolean;
     isKeepAlive: boolean;
   }
 }

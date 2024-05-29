@@ -20,7 +20,7 @@
       </div>
       <div v-if="toolButton" class="header-button-ri">
         <slot name="toolButton">
-          <el-button v-if="showToolButton('refresh')" :icon="Refresh" circle @click="getTableList" />
+          <el-button v-if="showToolButton('refresh')" :icon="Refresh" circle @click="refresh" />
           <el-button v-if="showToolButton('setting') && columns.length" :icon="Operation" circle @click="openColSetting" />
           <el-button
             v-if="showToolButton('search') && searchColumns?.length"
@@ -165,8 +165,17 @@ const radio = ref("");
 const { selectionChange, selectedList, selectedListIds, isSelected } = useSelection(props.rowKey);
 
 // 表格操作 Hooks
-const { tableData, pageable, searchParam, searchInitParam, getTableList, search, reset, handleSizeChange, handleCurrentChange } =
-  useTable(props.requestApi, props.initParam, props.pagination, props.dataCallback, props.requestError);
+const {
+  displayData: tableData,
+  pageable,
+  searchParam,
+  searchInitParam,
+  getTableList,
+  search,
+  reset,
+  handleSizeChange,
+  handleCurrentChange
+} = useTable(props.requestApi, props.initParam, props.pagination, props.dataCallback, props.requestError);
 
 // 清空选中数据列表
 const clearSelection = () => tableRef.value!.clearSelection();
@@ -266,6 +275,7 @@ const emit = defineEmits<{
   search: [];
   reset: [];
   dargSort: [{ newIndex?: number; oldIndex?: number }];
+  reload: any;
 }>();
 
 const _search = () => {
@@ -276,6 +286,11 @@ const _search = () => {
 const _reset = () => {
   reset();
   emit("reset");
+};
+
+const refresh = () => {
+  getTableList();
+  emit("reload");
 };
 
 // 拖拽排序

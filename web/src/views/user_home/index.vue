@@ -23,8 +23,23 @@
           @row-clicked="handleClick(1)"
         >
           <div class="input_container">
-            <el-input v-model="newPassword" placeholder="新密码" name="input_box"></el-input>
-            <el-input v-model="repeatPassword" placeholder="重复密码"></el-input>
+            <el-input
+              v-model="newPassword"
+              placeholder="新密码"
+              name="input_box"
+              type="password"
+              show-password
+              clearable
+              style="margin: 10px"
+            />
+            <el-input
+              v-model="repeatPassword"
+              placeholder="重复密码"
+              type="password"
+              show-password
+              clearable
+              style="margin: 10px"
+            />
           </div>
         </InfoRow>
       </div>
@@ -32,16 +47,12 @@
     <SettingPanel setting-title="联系信息">
       <div class="info_container" name="info_panel" @click.stop>
         <InfoRow
-          :selected="edit === 2"
+          :selected="false"
           :display-value="contactInfo.email"
           :tool-tip-visivle="invalidEmail"
           display-text="邮箱地址"
-          tip-text="无效的邮箱格式"
-          @checked="confirm(2)"
-          @row-clicked="handleClick(2)"
-        >
-          <div class="input_container"><el-input v-model="newEmail" name="input_box"></el-input></div>
-        </InfoRow>
+          :display-icon="false"
+        />
       </div>
     </SettingPanel>
     <SettingPanel setting-title="账号与权限">
@@ -51,18 +62,18 @@
           :tool-tip-visivle="role_tip_visible"
           display-text="权限等级"
           :tip-text="role_tip"
-          @row-clicked="confirm(3), handleClick(-1)"
+          @row-clicked="confirm(2), handleClick(-1)"
         >
           <template #default>
             <div class="role_text" @mouseenter="toggleRoleTipVisibility(true)" @mouseleave="toggleRoleTipVisibility(false)">
-              {{ role }}
+              {{ role_name }}
             </div>
           </template>
           <template #icon>
             <icon><Top /></icon>
           </template>
         </InfoRow>
-        <InfoRow :selected="true" :display-icon="false" display-text="" @row-clicked="confirm(4), handleClick(-1)">
+        <InfoRow :selected="true" :display-icon="false" display-text="" @row-clicked="confirm(3), handleClick(-1)">
           <div class="delete_account">删除账号</div>
         </InfoRow>
       </div>
@@ -72,61 +83,57 @@
 
 <script setup lang="ts">
 import icon from "./../../components/el-icon/icon.vue";
-import { applyMandate, confirmDelete, fetchUserInfo, uploadUserInfo } from "@/api/modules/user_info";
+import { applyMandateApi, confirmDeleteApi, getUserInfoApi, uploadUserInfoApi } from "@/api/modules/user_info";
 import SettingPanel from "@/components/SettingPanel/index.vue";
 import { useUserStore } from "@/stores/modules/user";
 import InfoRow from "./components/InfoRow.vue";
 import { Ref, nextTick, onMounted, onUnmounted, ref } from "vue";
-import { UserInfo } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
-import { ElMessageBox } from "element-plus";
 import router from "@/routers";
 import { LOGIN_URL } from "@/config";
+import { ElMessage } from "element-plus";
 const store = useUserStore();
 
 const edit = ref(-1);
 const basicInfo = ref(store.userInfo.basicInfo);
 const contactInfo = ref(store.userInfo.contactInfo);
-const role = ref("普通用户");
 
 const newName = ref(basicInfo.value.name);
 const newPassword = ref("");
 const repeatPassword = ref("");
-const newEmail = ref(contactInfo.value.email);
 
 const invalidName = ref(false);
 const invalidPassword = ref(false);
 const invalidRepeatPwd = ref(false);
 const invalidEmail = ref(false);
 const tips = ref<Ref<boolean>[]>([invalidName, invalidPassword, invalidEmail]);
-const role_tips = [
-  "普通用户拥有系统基本功能的使用权，可以查看热点事件与事件时间线等",
-  "管理员拥有系统所有的使用权限与操作权限，可授权新用户以及管理其它用户"
-];
+const role_name = ref("");
+// const role_tips = [
+//   "超级用户拥有系统所有的使用权限与操作权限，且账号无法被删除",
+//   "管理员拥有系统所有的使用权限与操作权限，可激活、授权用户以及管理其它用户等",
+//   "普通用户拥有系统基本功能的使用权，可以查看热点事件与事件时间线等"
+// ];
 const role_tip_visible = ref(false);
 const role_tip = ref("");
 
-fetchUserInfo().then(response => {
-  store.setUserBasicInfo(response.data.basicInfo);
-  store.setUserContactInfo(response.data.contactInfo);
-  basicInfo.value = response.data.basicInfo;
-  contactInfo.value = response.data.contactInfo;
-  role.value = UserInfo.roleNames[response.data.accountInfo.role];
-  role_tip.value = role_tips[response.data.accountInfo.role];
+await getUserInfoApi().then(async response => {
+  store.setUserBasicInfo({ name: response.data.username });
+  store.setUserContactInfo({ email: response.data.email });
+  basicInfo.value = store.userInfo.basicInfo;
+  contactInfo.value = store.userInfo.contactInfo;
+  role_name.value = response.data.role;
 });
+
 function outsideClicked() {
   if (edit.value === -1) return;
   switch (edit.value) {
-    case 1:
+    case 0:
       newName.value = basicInfo.value.name;
       break;
-    case 2:
+    case 1:
       newPassword.value = "";
       repeatPassword.value = "";
       invalidRepeatPwd.value = false;
-      break;
-    case 3:
-      newEmail.value = contactInfo.value.email;
       break;
     default:
       break;
@@ -141,21 +148,27 @@ onUnmounted(() => {
   document.removeEventListener("click", outsideClicked);
 });
 function toggleRoleTipVisibility(visible: boolean) {
-  role_tip_visible.value = visible;
+  if (role_tip.value.length > 0) {
+    role_tip_visible.value = visible;
+  }
 }
 function handleClick(index: number) {
   if (edit.value >= 0 && edit.value !== index) {
     tips.value[edit.value].value = false;
     invalidRepeatPwd.value = false;
+    newPassword.value = "";
+    repeatPassword.value = "";
   }
-  edit.value = index;
-  nextTick(() => {
-    // auto focus
-    let input_ref = document.getElementsByName("input_box");
-    if (input_ref.length > 0) {
-      input_ref.item(0).focus();
-    }
-  });
+  if (edit.value !== index) {
+    edit.value = index;
+    nextTick(() => {
+      // auto focus
+      let input_ref = document.getElementsByName("input_box");
+      if (input_ref.length > 0) {
+        input_ref.item(0).focus();
+      }
+    });
+  }
 }
 function confirm(index: number) {
   if (index < tips.value.length) {
@@ -166,12 +179,14 @@ function confirm(index: number) {
     // Edit Name
     case 0:
       if (newName.value.match(/^[a-zA-Z0-9]+$/g) !== null) {
-        uploadUserInfo({
-          basicInfo: { ...basicInfo.value, name: newName.value },
-          contactInfo: { ...contactInfo.value }
-        }).then(() => {
+        uploadUserInfoApi({ username: newName.value }).then(() => {
           basicInfo.value.name = newName.value;
+          store.userInfo.basicInfo.name = newName.value;
           edit.value = -1;
+          ElMessage({
+            type: "success",
+            message: "用户名修改成功!"
+          });
         });
       } else invalidName.value = true;
       break;
@@ -187,43 +202,25 @@ function confirm(index: number) {
         invalidRepeatPwd.value = true;
       }
       if (validPasswd) {
-        uploadUserInfo({
-          basicInfo: { ...basicInfo.value, password: newPassword.value },
-          contactInfo: { ...contactInfo.value }
-        }).then(() => {
+        uploadUserInfoApi({ password: newPassword.value }).then(() => {
           newPassword.value = "";
           repeatPassword.value = "";
           edit.value = -1;
+          ElMessage({
+            type: "success",
+            message: "密码修改成功!"
+          });
         });
       }
       break;
-    // Edit Email
-    case 2:
-      if (newEmail.value.match(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$/g) !== null) {
-        uploadUserInfo({
-          basicInfo: { ...basicInfo.value },
-          contactInfo: { ...contactInfo.value, email: newEmail.value }
-        }).then(() => {
-          contactInfo.value.email = newEmail.value;
-          edit.value = -1;
-        });
-      } else invalidEmail.value = true;
-      break;
     // Apply for Mandate
-    case 3:
-      useHandleData(applyMandate, { email: contactInfo.value.email }, "申请提升权限").then(response => {
-        ElMessageBox.confirm(response.msg, "温馨提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "success",
-          draggable: true
-        });
-      });
+    case 2:
+      useHandleData(applyMandateApi, { email: contactInfo.value.email }, "申请提升权限");
       break;
     // Delete Account
-    case 4:
-      useHandleData(confirmDelete, { email: contactInfo.value.email }, "删除账号（包含所有账号记录）").then(() => {
-        store.setToken("");
+    case 3:
+      useHandleData(confirmDeleteApi, { emailList: [contactInfo.value.email] }, "删除账号（包含所有账号记录）").then(() => {
+        store.setTokens("", "", -1);
         router.replace(LOGIN_URL);
       });
       break;

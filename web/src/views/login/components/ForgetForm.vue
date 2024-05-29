@@ -1,19 +1,19 @@
 <template>
-  <el-form ref="registerFormRef" :model="registerForm" :rules="registerRules" size="large">
-    <el-form-item prop="username">
-      <el-input v-model="registerForm.username" placeholder="用户名" clearable>
+  <el-form ref="registerFormRef" :model="resetPwdForm" :rules="resetPwdRules" size="large">
+    <el-form-item prop="email">
+      <el-input v-model="resetPwdForm.email" placeholder="邮箱地址" clearable>
         <template #prefix>
           <el-icon class="el-input__icon">
-            <User />
+            <Message />
           </el-icon>
         </template>
       </el-input>
     </el-form-item>
     <el-form-item prop="password">
       <el-input
-        v-model="registerForm.password"
+        v-model="resetPwdForm.password"
         type="password"
-        placeholder="密码"
+        placeholder="新密码"
         show-password
         autocomplete="new-password"
         clearable
@@ -26,7 +26,7 @@
       </el-input>
     </el-form-item>
     <el-form-item prop="repeat_password">
-      <el-input v-model="registerForm.repeat_password" type="password" show-password placeholder="确认密码" clearable>
+      <el-input v-model="resetPwdForm.repeat_password" type="password" show-password placeholder="确认密码" clearable>
         <template #prefix>
           <el-icon class="el-input__icon">
             <Lock />
@@ -34,18 +34,9 @@
         </template>
       </el-input>
     </el-form-item>
-    <el-form-item prop="email">
-      <el-input v-model="registerForm.email" placeholder="邮箱地址" clearable>
-        <template #prefix>
-          <el-icon class="el-input__icon">
-            <Message />
-          </el-icon>
-        </template>
-      </el-input>
-    </el-form-item>
-    <el-form-item prop="captcha">
+    <el-form-item prop="verify_code">
       <div class="captcha_container">
-        <el-input v-model="registerForm.captcha" placeholder="验证码">
+        <el-input v-model="resetPwdForm.verify_code" placeholder="验证码">
           <template #prefix>
             <el-icon class="el-input__icon">
               <Message />
@@ -64,32 +55,24 @@
       </div>
     </el-form-item>
   </el-form>
-  <div class="register-btn">
+  <div class="login-btn">
     <el-button icon="Back" round size="large" @click="goBack"> 返回 </el-button>
-    <el-button icon="UserFilled" round size="large" type="primary" :loading="loading" @click="register(registerFormRef)">
-      注册
+    <el-button icon="Check" round size="large" type="primary" :loading="loading" @click="resetPwd(registerFormRef)">
+      设置密码
     </el-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { LOGIN_URL } from "@/config";
-import { getTimeState } from "@/utils";
-import { Register } from "@/api/interface";
-import { ElNotification } from "element-plus";
+import { Login, Register } from "@/api/interface";
 import { useUserStore } from "@/stores/modules/user";
-import { useTabsStore } from "@/stores/modules/tabs";
-import { useKeepAliveStore } from "@/stores/modules/keepAlive";
-import type { ElForm, FormRules } from "element-plus";
-import { getCaptchaApi, registerApi } from "@/api/modules/register";
-import { validateEmail, validatePassword, validateUserName } from "@/utils/eleValidate";
+import { ElMessage, type ElForm, type FormRules } from "element-plus";
+import { getCaptchaApi } from "@/api/modules/register";
+import { forgetPwdApi } from "@/api/modules/login";
+import { validateEmail, validatePassword } from "@/utils/eleValidate";
 
-const router = useRouter();
 const userStore = useUserStore();
-const tabsStore = useTabsStore();
-const keepAliveStore = useKeepAliveStore();
 
 type FormInstance = InstanceType<typeof ElForm>;
 const registerFormRef = ref<FormInstance>();
@@ -100,7 +83,7 @@ const countdown = ref(0);
 
 function validateRepeat(rule: any, value: string, callback: any) {
   if (value.match(/^[a-zA-Z0-9]+$/g) === null) callback(new Error("密码仅由大小写英文字符与数字0~9组成"));
-  else if (value === registerForm.password) callback();
+  else if (value === resetPwdForm.password) callback();
   else callback(new Error("密码不一致"));
 }
 function validateCaptcha(rule: any, value: string, callback: any) {
@@ -111,7 +94,7 @@ function getCaptcha() {
   registerFormRef.value?.validateField("email", isValid => {
     if (isValid) {
       captchaLoading.value = true;
-      getCaptchaApi({ email: registerForm.email, usage: Register.CodeUsage.REGISTER })
+      getCaptchaApi({ email: resetPwdForm.email, usage: Register.CodeUsage.RESETPWD })
         .then(() => {
           countdown.value = 60;
           captchaLoading.value = false;
@@ -131,44 +114,39 @@ function getCaptcha() {
   });
 }
 
-const registerRules = reactive<FormRules>({
-  username: [{ required: true, validator: validateUserName, trigger: "blur" }],
+const resetPwdRules = reactive<FormRules>({
   password: [{ required: true, validator: validatePassword, trigger: "blur" }],
   repeat_password: [{ required: true, validator: validateRepeat, trigger: "blur" }],
   email: [{ required: true, validator: validateEmail, trigger: "blur" }],
-  captcha: [{ required: true, validator: validateCaptcha, trigger: "blur" }]
+  verify_code: [{ required: true, validator: validateCaptcha, trigger: "blur" }]
 });
 const loading = ref(false);
-const registerForm = reactive<Register.ReqRegisterForm>({
-  username: "",
+const resetPwdForm = reactive<Login.ReqForgetPwd & { repeat_password: string }>({
   password: "",
   repeat_password: "",
   email: "",
-  captcha: ""
+  verify_code: ""
 });
-// register
-const register = (formEl: FormInstance | undefined) => {
+const emits = defineEmits<{
+  finished: any;
+}>();
+// reset password
+const resetPwd = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async valid => {
     if (!valid) return;
     loading.value = true;
     try {
-      // 1.执行注册接口
-      await registerApi(registerForm).then(() => {
-        userStore.userInfo.contactInfo.email = registerForm.email;
-
-        // 2.清空 tabs、keepAlive 数据
-        tabsStore.setTabs([]);
-        keepAliveStore.setKeepAliveName([]);
-
-        // 3.跳转到登录页
-        router.push(LOGIN_URL);
-        ElNotification({
-          title: getTimeState(),
-          message: "注册成功",
+      // 1.执行重置密码接口
+      await forgetPwdApi(resetPwdForm).then(() => {
+        userStore.userInfo.contactInfo.email = resetPwdForm.email;
+        ElMessage({
           type: "success",
+          message: "密码重置成功",
           duration: 3000
         });
+        // 2.返回到登录页
+        emits("finished");
       });
     } finally {
       loading.value = false;
@@ -176,14 +154,14 @@ const register = (formEl: FormInstance | undefined) => {
   });
 };
 function goBack() {
-  router.push(LOGIN_URL);
+  emits("finished");
 }
 onMounted(() => {
   // 监听 enter 事件（调用注册）
   document.onkeydown = (e: KeyboardEvent) => {
     if (e.code === "Enter" || e.code === "enter" || e.code === "NumpadEnter") {
       if (loading.value) return;
-      register(registerFormRef.value);
+      resetPwd(registerFormRef.value);
     }
   };
 });

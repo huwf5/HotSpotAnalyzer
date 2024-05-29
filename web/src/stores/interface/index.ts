@@ -24,6 +24,9 @@ export interface GlobalState {
 /* UserState */
 export interface UserState {
   token: string;
+  refresh: string;
+  token_lifetime: number;
+  timer?: NodeJS.Timeout;
   userInfo: {
     messages: Messages.Message[];
     basicInfo: UserInfo.BasicInfo;
