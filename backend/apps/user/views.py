@@ -8,7 +8,7 @@ from apps.user.serializers.user import (
     UserSerializer,
     ForgotPasswordSerializer,
     RegisterSerializer,
-    RoleSerializer
+    RoleSerializer,
 )
 from apps.user.serializers.email import EmailVerificationSerializer
 from apps.user.models import EMAIL_USAGE_FOR_REGISTER, EMAIL_USAGE_FOR_RESET_PASSWORD
@@ -256,6 +256,7 @@ class LoginView(TokenObtainPairView):
                 properties={
                     "email": openapi.Schema(type=openapi.TYPE_STRING),
                     "username": openapi.Schema(type=openapi.TYPE_STRING),
+                    "role": openapi.Schema(type=openapi.TYPE_STRING),
                     "token": openapi.Schema(type=openapi.TYPE_STRING),
                     "refresh": openapi.Schema(type=openapi.TYPE_STRING),
                     "token_lifetime": openapi.Schema(type=openapi.TYPE_INTEGER),
@@ -287,6 +288,7 @@ class LoginView(TokenObtainPairView):
         result = serializer.validated_data
         result["email"] = serializer.user.email
         result["username"] = serializer.user.username
+        result["role"] = serializer.user.role.role
         result["token"] = result.pop("access")
         result["token_lifetime"] = ACCESS_TOKEN_LIFETIME
         result["refresh_lifetime"] = REFRESH_TOKEN_LIFETIME
@@ -459,6 +461,19 @@ class UserView(viewsets.ViewSet):
                 "role": user.role.role,
             },
         )
+
+    @swagger_auto_schema(
+        operation_summary="Delete the user", responses={200: "删除成功", 403: "权限不足"}
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request: Request) -> APIResponse:
+        user = request.user
+        if user.role.role == ROLE_SUPER_ADMIN:
+            return APIResponse(
+                status=status.HTTP_403_FORBIDDEN, message="超级管理员无法删除账号"
+            )
+        user.delete()
+        return APIResponse(status=status.HTTP_200_OK, message="删除成功")
 
     @swagger_auto_schema(
         operation_summary="Update the user profile",
@@ -867,8 +882,12 @@ class WhiteListView(viewsets.ViewSet):
         try:
             with transaction.atomic():
                 # delete the waiting user with the email suffix, but when deactivate @* will not delete the waiting user
-                EmailSuffixFormat.objects.select_for_update().get(format=format).deactivate()
-                WaitingList.objects.select_for_update().filter(email__endswith=format).delete()
+                EmailSuffixFormat.objects.select_for_update().get(
+                    format=format
+                ).deactivate()
+                WaitingList.objects.select_for_update().filter(
+                    email__endswith=format
+                ).delete()
         except Exception as e:
             return APIResponse(
                 status=status.HTTP_400_BAD_REQUEST,
@@ -902,7 +921,11 @@ class WhiteListView(viewsets.ViewSet):
         try:
             with transaction.atomic():
                 if email_format != "@*":
-                    if User.objects.select_for_update().filter(email__endswith=email_format).exists():
+                    if (
+                        User.objects.select_for_update()
+                        .filter(email__endswith=email_format)
+                        .exists()
+                    ):
                         return APIResponse(
                             status=status.HTTP_400_BAD_REQUEST,
                             message="删除失败,有现存用户使用该邮箱格式",
@@ -918,6 +941,7 @@ class WhiteListView(viewsets.ViewSet):
             )
         return APIResponse(status=status.HTTP_200_OK, message="删除成功")
 
+
 class RoleView(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -932,4 +956,3 @@ class RoleView(viewsets.ViewSet):
         return APIResponse(
             status=status.HTTP_200_OK, data=serializer.data, message="获取成功"
         )
- 

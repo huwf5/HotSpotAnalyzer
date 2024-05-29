@@ -123,7 +123,14 @@ email_format_schema = openapi.Schema(
         "format": openapi.Schema(type=openapi.TYPE_STRING, description="Email format"),
     },
 )
+whiteList_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "format": openapi.Schema(type=openapi.TYPE_STRING, description="Email format"),
+        "is_active": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Is active"),
+    },
+)
 
 get_whiteList_api_response_schema = api_response_schema(
-    data_schema=openapi.Schema(type=openapi.TYPE_ARRAY, items=email_format_schema)
+    data_schema=openapi.Schema(type=openapi.TYPE_ARRAY, items=whiteList_schema)
 )
