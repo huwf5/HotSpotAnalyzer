@@ -1,61 +1,55 @@
-import { ResPage, ResultData, User } from "@/api/interface/index";
-import { PORT1 } from "@/api/config/servicePort";
+import { ResDataList, Result, User } from "@/api/interface/index";
+import { AuthPort, ManagePort } from "@/api/config/servicePort";
 import http from "@/api";
 
-import testA from "@/assets/json/test_data_userList.json";
 /**
  * @name 用户管理模块
  */
 
 // 获取待处理的注册申请列表
-export const getApplication = (params: User.ReqUserParams) => {
-  // return http.get<ResPage<User.ResUserList>>(PORT1 + `/user/applications`, params);
+export const getPendingListApi = () => {
+  return http.get<ResDataList<User.ResPendingUser>>(ManagePort.IWaitList.GET_LIST);
+};
 
-  return new Promise<ResultData<ResPage<User.ResUser>>>(resolve => {
-    if (params) {
-    }
-    setTimeout(() => {
-      resolve({
-        msg: "OK",
-        data: testA
-      });
-    }, 200);
-  });
+// 激活用户
+export const activateUserApi = (params: User.EmailList) => {
+  return http.post<Result>(ManagePort.IWaitList.ACTIVATE, params);
+};
+
+// 拒绝激活请求
+export const rejectActivationApi = (params: User.EmailList) => {
+  return http.post<Result>(ManagePort.IWaitList.REJECT, params);
 };
 
 // 获取用户列表
-export const getUserList = (params: User.ReqUserParams) => {
-  // return http.get<ResPage<User.ResUserList>>(PORT1 + `/user/list`, params);
-
-  return new Promise<ResultData<ResPage<User.ResUser>>>(resolve => {
-    if (params) {
-    }
-    setTimeout(() => {
-      resolve({
-        msg: "OK",
-        data: testA
-        // data: {
-        //   list: [],
-        //   pageNum: 0,
-        //   pageSize: 0,
-        //   total: 0
-        // }
-      });
-    }, 200);
-  });
+export const getUserListApi = () => {
+  return http.get<ResDataList<User.ResUser>>(ManagePort.IAdmin.USER_LIST);
 };
 
-// 批量授权用户
-export const BatchMandateUser = (params: string[]) => {
-  return http.post(PORT1 + `/user/mandate`, params);
+// 授权用户
+export const batchMandateUserApi = (params: User.EmailList) => {
+  return http.post<Result>(ManagePort.IAdmin.UP_GRADE, params);
 };
 
-// 批量删除用户
-export const batchDeleteUser = (params: string[]) => {
-  return http.post(PORT1 + `/user/remove`, params);
+// 撤回用户权限
+export const batchDemoteUserApi = (params: User.EmailList) => {
+  return http.post<Result>(ManagePort.IAdmin.DOWN_GRADE, params);
+};
+
+// 删除用户
+export const batchDeleteUserApi = (params: User.EmailList) => {
+  return http.post<Result>(ManagePort.IAdmin.DELETE, params);
 };
 
 // 重置用户密码
-export const resetUserPassWord = (params: { id: string }) => {
-  return http.post(PORT1 + `/user/rest_password`, params);
+export const resetUserPassWordApi = () => {
+  let req = {
+    password: "12345" // 默认密码12345
+  };
+  return http.post<Result>(ManagePort.IGuest.UPDATE_PROFILE, req);
+};
+
+// 获取用户身份字典
+export const getRoleDictApi = () => {
+  return http.get<ResDataList<User.RoleDict>>(AuthPort.ROLE_DICT);
 };

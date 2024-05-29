@@ -8,18 +8,18 @@ export const fetchMessagesSettingsApi = () => {
   return new Promise<ResultData<Messages.ResMessageSettings>>(resolve => {
     setTimeout(() => {
       resolve({
-        msg: "OK",
+        message: "OK",
         data: {
-          use_danger_heat_limit: true,
-          use_warning_heat_limit: true,
-          danger_heat_limit: 1000,
-          warning_heat_limit: 900,
+          // use_danger_heat_limit: true,
+          // use_warning_heat_limit: true,
+          // danger_heat_limit: 1000,
+          // warning_heat_limit: 900,
+          // heat_formula: "$upVote+5*$like+10*$share",
           use_danger_composed_limits: false,
           use_warning_composed_limits: false,
           danger_composed_limits: [],
           warning_composed_limits: [],
-          auto_star: true,
-          heat_formula: "$upVote+5*$like+10*$share"
+          auto_star: true
         }
       });
     }, 1000);
@@ -34,7 +34,7 @@ export const uploadMessagesSettingsApi = (params: Messages.ReqMessageSettings) =
       if (params) {
       }
       resolve({
-        msg: "OK",
+        message: "OK",
         data: undefined
       });
     }, 1000);

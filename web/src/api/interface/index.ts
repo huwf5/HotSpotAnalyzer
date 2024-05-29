@@ -1,6 +1,6 @@
 // 请求响应参数（不包含data）
 export interface Result {
-  msg: string;
+  message: string;
 }
 
 // 请求响应参数（包含data）
@@ -9,14 +9,8 @@ export interface ResultData<T = any> extends Result {
 }
 
 // 分页响应参数
-export interface ResPage<T> {
-  list: T[];
-  /** 当前分页数 */
-  pageNum: number;
-  /** 页面最大条目数 */
-  pageSize: number;
-  /** 总页数 */
-  total: number;
+export interface ResDataList<T> extends Result {
+  data: T[];
 }
 
 // 分页请求参数
@@ -28,14 +22,35 @@ export interface ReqPage {
 // 登录模块
 export namespace Login {
   export interface ReqLoginForm {
-    username: string;
+    email: string;
+    password: string;
+  }
+  export interface ReqRefresh {
+    refresh: string;
+  }
+  export interface ReqLogout {
+    refresh: string;
+  }
+  export interface ReqForgetPwd {
+    email: string;
+    verify_code: string;
     password: string;
   }
   export interface ResLogin {
-    access_token: string;
+    email: string;
+    username: string;
+    role: string;
+    token: string;
+    refresh: string;
+    token_lifetime: number;
+    refresh_lifetime: number;
   }
   export interface ResAuthButtons {
     [key: string]: string[];
+  }
+  export interface ResRefresh {
+    refresh: string;
+    access: string;
   }
 }
 
@@ -46,29 +61,39 @@ export namespace Register {
     password: string;
     repeat_password: string;
     email: string;
+    captcha: string;
   }
-  export interface ResRegister {
-    code: number;
-    msg: string;
+  export enum CodeUsage {
+    REGISTER = "register",
+    RESETPWD = "reset_password"
+  }
+  export interface ReqEmailCaptcha {
+    email: string;
+    usage: CodeUsage;
   }
 }
 
 // 系统用户管理模块
 export namespace User {
   /** 查询过滤条件 */
-  export interface ReqUserParams extends ReqPage {
-    username: string;
-    email: string;
-    createTime: string[];
-    status: number;
+  export interface EmailList {
+    emailList: string[];
   }
   /** 返回结果 */
   export interface ResUser {
-    auth: number;
     username: string;
     email: string;
-    createTime: string;
-    status: number;
+    role: number;
+  }
+  export interface RoleDict {
+    id: number;
+    role: string;
+  }
+  /** 等待激活用户 */
+  export interface ResPendingUser {
+    username: string;
+    email: string;
+    role: number;
   }
   export interface ResStatus {
     userLabel: string;
@@ -78,17 +103,44 @@ export namespace User {
 
 // 用户信息模块
 export namespace UserInfo {
+  export interface ResUserProfile {
+    username: string;
+    email: string;
+    role: string;
+  }
+  export interface ReqUpdate {
+    username?: string;
+    password?: string;
+  }
   export interface BasicInfo {
     name: string;
-    password: string;
   }
   export interface ContactInfo {
     email: string;
   }
   export interface AccountInfo {
-    role: number;
+    role: string;
   }
-  export const roleNames = ["普通用户", "管理员"];
+}
+
+// 邮箱后缀白名单模块
+export namespace WhiteList {
+  export interface ReqOnWhiteList {
+    format: string;
+  }
+  export interface ReqOnTags {
+    email_format: string;
+    email_tag: string;
+  }
+  export interface ResWhiteList {
+    format: string;
+    is_active: boolean;
+  }
+  export interface ResTags {
+    id: number;
+    email_format: string;
+    email_tag: string;
+  }
 }
 
 // 消息模块
@@ -125,16 +177,17 @@ export namespace Messages {
     unread?: boolean;
   }
   export interface ResMessageSettings {
-    use_danger_heat_limit: boolean;
-    danger_heat_limit: number;
+    // use_danger_heat_limit: boolean;
+    // danger_heat_limit: number;
+    // use_warning_heat_limit: boolean;
+    // warning_heat_limit: number;
+    // heat_formula: string;
+
     use_danger_composed_limits: boolean;
     danger_composed_limits: SingleCond[];
-    use_warning_heat_limit: boolean;
-    warning_heat_limit: number;
     use_warning_composed_limits: boolean;
     warning_composed_limits: SingleCond[];
     auto_star: boolean;
-    heat_formula: string;
   }
   export interface ReqMessageSettings {
     danger_heat_limit?: number;

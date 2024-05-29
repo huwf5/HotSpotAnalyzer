@@ -71,6 +71,7 @@ export type HeaderRenderScope<T> = {
 export interface ColumnProps<T = any>
   extends Partial<Omit<TableColumnCtx<T>, "type" | "children" | "renderCell" | "renderHeader">> {
   type?: TypeProps; // 列类型
+  showOverflowTooltip?: boolean; // 是否显示提示框
   tag?: boolean | Ref<boolean>; // 是否是标签展示
   isShow?: boolean | Ref<boolean>; // 是否显示在表格当中
   search?: SearchProps | undefined; // 搜索项配置

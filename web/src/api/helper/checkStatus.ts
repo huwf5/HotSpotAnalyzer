@@ -5,7 +5,11 @@ import { ElMessage } from "element-plus";
  * @param {Number} status
  * @return void
  */
-export const checkStatus = (status: number) => {
+export const checkStatus = (status: number, errorMsg?: string) => {
+  if (errorMsg !== undefined) {
+    ElMessage.error(errorMsg);
+    return;
+  }
   switch (status) {
     case 400:
       ElMessage.error("请求失败！请您稍后重试");

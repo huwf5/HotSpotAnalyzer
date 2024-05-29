@@ -17,7 +17,7 @@ export const initDynamicRouter = async () => {
 
   try {
     // 1.获取菜单列表 && 按钮权限列表
-    await authStore.getAuthMenuList();
+    await authStore.getAuthMenuList(userStore.userInfo.accountInfo.role);
     await authStore.getAuthButtonList();
 
     // 2.判断当前用户有没有菜单权限
@@ -28,7 +28,7 @@ export const initDynamicRouter = async () => {
         type: "warning",
         duration: 3000
       });
-      userStore.setToken("");
+      userStore.setTokens("", "", -1);
       router.replace(LOGIN_URL);
       return Promise.reject("No permission");
     }
@@ -47,7 +47,7 @@ export const initDynamicRouter = async () => {
     });
   } catch (error) {
     // 当按钮 || 菜单请求出错时，重定向到登陆页
-    userStore.setToken("");
+    userStore.setTokens("", "", -1);
     router.replace(LOGIN_URL);
     return Promise.reject(error);
   }

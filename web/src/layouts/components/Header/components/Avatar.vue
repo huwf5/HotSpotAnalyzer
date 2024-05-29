@@ -1,7 +1,7 @@
 <template>
   <el-dropdown trigger="click">
     <div class="avatar">
-      <img src="@/assets/images/avatar.gif" alt="avatar" />
+      <el-icon size="20"><User /></el-icon>
     </div>
     <template #dropdown>
       <el-dropdown-menu>
@@ -37,10 +37,10 @@ const logout = () => {
     type: "warning"
   }).then(async () => {
     // 1.执行退出登录接口
-    await logoutApi();
+    await logoutApi({ refresh: userStore.refresh });
 
     // 2.清除 Token
-    userStore.setToken("");
+    userStore.setTokens("", "", -1);
 
     // 3.重定向到登陆页
     router.replace(LOGIN_URL);
@@ -56,14 +56,10 @@ const to_user_info = () => {
 
 <style scoped lang="scss">
 .avatar {
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
+  display: flex;
+  flex: none;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-  border-radius: 50%;
-  img {
-    width: 100%;
-    height: 100%;
-  }
 }
 </style>

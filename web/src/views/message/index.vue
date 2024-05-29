@@ -43,7 +43,7 @@ import { ref } from "vue";
 import { Messages } from "@/api/interface";
 import { comp } from "./util";
 import { useUserStore } from "@/stores/modules/user";
-import { batchDeleteMsg, batchUpdateMsg, fetchMessagesApi } from "@/api/modules/messages";
+import { batchDeleteMsgApi, batchUpdateMsgApi, fetchMessagesApi } from "@/api/modules/messages";
 import router from "@/routers";
 import { ElNotification } from "element-plus";
 import { getTimeState } from "@/utils";
@@ -144,7 +144,7 @@ function dealStarAll() {
       starred: starAll
     });
   });
-  batchUpdateMsg(update_list).then(() => {
+  batchUpdateMsgApi(update_list).then(() => {
     fetch();
     ElNotification({
       title: "错误",
@@ -178,7 +178,7 @@ function dealReadAll() {
       unread: false
     });
   });
-  batchUpdateMsg(update_list).then(() => {
+  batchUpdateMsgApi(update_list).then(() => {
     fetch();
     ElNotification({
       title: "错误",
@@ -202,7 +202,7 @@ function dealDeleteAll() {
   checked.value.forEach(val => {
     delete_list.push({ id: val });
   });
-  batchDeleteMsg(delete_list).then(() => {
+  batchDeleteMsgApi(delete_list).then(() => {
     fetch();
     ElNotification({
       title: "错误",

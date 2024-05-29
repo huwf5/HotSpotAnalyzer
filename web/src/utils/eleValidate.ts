@@ -12,3 +12,27 @@ export function checkPhoneNumber(rule: any, value: any, callback: any) {
     return callback();
   }
 }
+/**
+ *  @rule 用户名
+ */
+export function validateUserName(rule: any, value: string, callback: any) {
+  if (value.length === 0) callback(new Error("请输入用户名"));
+  else if (value.match(/^[a-zA-Z0-9]+$/g) !== null) callback();
+  else callback(new Error("用户名仅由大小写英文字符与数字0~9组成"));
+}
+/**
+ *  @rule 密码
+ */
+export function validatePassword(rule: any, value: string, callback: any) {
+  if (value.length === 0) callback(new Error("请输入密码"));
+  else if (value.match(/^[a-zA-Z0-9]+$/g) !== null) callback();
+  else callback(new Error("密码仅由大小写英文字符与数字0~9组成"));
+}
+/**
+ *  @rule 邮箱地址
+ */
+export function validateEmail(rule: any, value: string, callback: any) {
+  if (value.length === 0) callback(new Error("请输入邮箱地址"));
+  else if (value.match(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$/g) !== null) callback();
+  else callback(new Error("邮箱格式无效"));
+}
