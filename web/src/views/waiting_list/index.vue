@@ -1,6 +1,6 @@
 <template>
   <div class="management_container card">
-    <ProTable :request-api="getPendingListApi" :columns="columns" ref="proTable">
+    <ProTable :request-api="getPendingListApi" :columns="columns" ref="proTable" :filter-callback="filterData">
       <template #tableHeader="scope">
         <el-button type="success" plain round icon="Check" @click="handleAcceptAll" :disabled="!scope.isSelected">
           全部通过
@@ -36,6 +36,7 @@ import { getTagsApi } from "@/api/modules/white_list";
 
 const proTable = ref<ProTableInstance>();
 const tag_map = new Map<string, Ref<Set<string>>>();
+const available_tags = ref<{ value: string; label: string }[]>([]);
 
 const columns = ref<ColumnProps<User.ResUser>[]>([
   {
@@ -45,7 +46,6 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
   {
     prop: "username",
     label: "用户名",
-    width: 100,
     search: {
       el: "input",
       order: 1
@@ -63,8 +63,42 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
     label: "操作",
     fixed: "right",
     width: 200
+  },
+  {
+    isShow: false,
+    enum: available_tags,
+    search: {
+      label: "标签",
+      el: "select",
+      key: "tag",
+      props: { filterable: true, multiple: true }
+    }
   }
 ]);
+function filterData(data: any, params: any): any {
+  let result: any[] = [];
+  let target: string[] | undefined = params["tag"];
+  let available_tags_set: Set<string> = new Set();
+
+  available_tags.value = [];
+  for (const dataRow of data) {
+    getTagSet(dataRow["email"]).value.forEach(val => {
+      if (!available_tags_set.has(val)) {
+        available_tags.value.push({ value: val, label: val });
+        available_tags_set.add(val);
+      }
+    });
+    if (target === undefined) result.push(dataRow);
+    else {
+      let accept = true;
+      target.forEach(str => {
+        !getTagSet(dataRow["email"]).value.has(str) && (accept = false);
+      });
+      accept && result.push(dataRow);
+    }
+  }
+  return result;
+}
 async function rejectUser(params: User.ResPendingUser) {
   await useHandleData(rejectActivationApi, { emailList: [params.email] }, `拒绝${params.username}`).then(() => {
     // 刷新数据
@@ -108,6 +142,8 @@ function getTagSet(format: string) {
 }
 function refreshTags() {
   getTagsApi().then(response => {
+    tag_map.clear();
+    available_tags.value = [];
     response.data.forEach(item => {
       getTagSet(item.email_format).value.add(item.email_tag);
     });

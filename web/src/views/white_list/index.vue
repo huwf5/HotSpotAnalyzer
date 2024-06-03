@@ -1,6 +1,12 @@
 <template>
   <div class="management_container card">
-    <ProTable :request-api="getWhiteListApi" :columns="columns" ref="proTable" @reload="refreshTags">
+    <ProTable
+      :request-api="getWhiteListApi"
+      :columns="columns"
+      ref="proTable"
+      @reload="refreshTags"
+      :filter-callback="filterData"
+    >
       <template #tableHeader="scope">
         <el-button type="primary" plain round icon="Plus" @click="add_dialog = true">添加白名单</el-button>
         <el-button type="primary" plain round :icon="edit_tag ? 'Unlock' : 'Lock'" @click="edit_tag = !edit_tag">
@@ -69,6 +75,7 @@ const proTable = ref<ProTableInstance>();
 const add_dialog = ref(false);
 const edit_tag = ref(false);
 const tag_map = new Map<string, Ref<Set<string>>>();
+const available_tags = ref<{ value: string; label: string }[]>([]);
 
 const columns = ref<ColumnProps<User.ResUser>[]>([
   {
@@ -92,8 +99,42 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
     label: "操作",
     fixed: "right",
     width: 200
+  },
+  {
+    isShow: false,
+    enum: available_tags,
+    search: {
+      label: "标签",
+      el: "select",
+      key: "tag",
+      props: { filterable: true, multiple: true }
+    }
   }
 ]);
+function filterData(data: any, params: any): any {
+  let result: any[] = [];
+  let target: string[] | undefined = params["tag"];
+  let available_tags_set: Set<string> = new Set();
+
+  available_tags.value = [];
+  for (const dataRow of data) {
+    getTagSet(dataRow["format"]).value.forEach(val => {
+      if (!available_tags_set.has(val)) {
+        available_tags.value.push({ value: val, label: val });
+        available_tags_set.add(val);
+      }
+    });
+    if (target === undefined) result.push(dataRow);
+    else {
+      let accept = true;
+      target.forEach(str => {
+        !getTagSet(dataRow["format"]).value.has(str) && (accept = false);
+      });
+      accept && result.push(dataRow);
+    }
+  }
+  return result;
+}
 async function handleStateChange(row: WhiteList.ResWhiteList) {
   if (row.is_active) {
     await activateWhiteListApi({ format: row.format }, { loading: false }).catch(() => {

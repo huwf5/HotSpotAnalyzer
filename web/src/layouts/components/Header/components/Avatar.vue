@@ -37,14 +37,18 @@ const logout = () => {
     type: "warning"
   }).then(async () => {
     // 1.执行退出登录接口
-    await logoutApi({ refresh: userStore.refresh });
+    try {
+      logoutApi({ refresh: userStore.refresh });
+    } finally {
+      console.log("here");
 
-    // 2.清除 Token
-    userStore.setTokens("", "", -1);
+      // 2.清除 Token
+      userStore.setTokens("", "", -1);
 
-    // 3.重定向到登陆页
-    router.replace(LOGIN_URL);
-    ElMessage.success("退出登录成功！");
+      // 3.重定向到登陆页
+      router.replace(LOGIN_URL);
+      ElMessage.success("退出登录成功！");
+    }
   });
 };
 

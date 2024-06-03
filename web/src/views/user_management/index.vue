@@ -1,6 +1,6 @@
 <template>
   <div class="management_container card">
-    <ProTable :request-api="getUserListApi" :columns="columns" ref="proTable">
+    <ProTable :request-api="getUserListApi" :columns="columns" ref="proTable" :filter-callback="filterField">
       <template #tableHeader="scope">
         <el-button type="danger" plain round icon="Delete" @click="handleRemoveAll" :disabled="!scope.isSelected">
           全部删除
@@ -42,6 +42,7 @@ import { getTagsApi } from "@/api/modules/white_list";
 
 const proTable = ref<ProTableInstance>();
 const tag_map = new Map<string, Ref<Set<string>>>();
+const available_tags = ref<{ value: string; label: string }[]>([]);
 
 const columns = ref<ColumnProps<User.ResUser>[]>([
   {
@@ -51,7 +52,6 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
   {
     prop: "username",
     label: "用户名",
-    width: 100,
     search: {
       el: "input",
       order: 1
@@ -68,8 +68,42 @@ const columns = ref<ColumnProps<User.ResUser>[]>([
     prop: "operations",
     label: "操作",
     fixed: "right"
+  },
+  {
+    isShow: false,
+    enum: available_tags,
+    search: {
+      label: "标签",
+      el: "select",
+      key: "tag",
+      props: { filterable: true, multiple: true }
+    }
   }
 ]);
+function filterField(data: any, params: any): any {
+  let result: any[] = [];
+  let target_tags: string[] | undefined = params["tag"];
+  let target_roles: string[] | undefined = params["role"];
+  let available_tags_set: Set<string> = new Set();
+
+  available_tags.value = [];
+  for (const dataRow of data) {
+    getTagSet(dataRow["email"]).value.forEach(val => {
+      if (!available_tags_set.has(val)) {
+        available_tags.value.push({ value: val, label: val });
+        available_tags_set.add(val);
+      }
+    });
+    let accept = true;
+    target_tags &&
+      target_tags.forEach(str => {
+        !getTagSet(dataRow["email"]).value.has(str) && (accept = false);
+      });
+    target_roles && target_roles.length > 0 && !target_roles.includes(dataRow["role"]) && (accept = false);
+    accept && result.push(dataRow);
+  }
+  return result;
+}
 getRoleDictApi().then(response => {
   let dict: EnumProps[] = [];
   response.data.forEach(item => dict.push({ value: item.id, label: item.role }));
@@ -79,7 +113,8 @@ getRoleDictApi().then(response => {
     enum: dict,
     search: {
       el: "select",
-      order: 3
+      order: 3,
+      props: { filterable: true, multiple: true }
     },
     width: 200
   });

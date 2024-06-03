@@ -19,7 +19,7 @@ export const useUserStore = defineStore({
         email: ""
       },
       accountInfo: {
-        role: 1
+        role: ""
       },
       messages: []
     }
