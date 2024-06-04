@@ -41,7 +41,7 @@ def save_cluster_results_to_json(labels, texts, wids, output_file):
         label = int(label)  # 确保键值格式正确
         if label not in clusters:
             clusters[label] = []
-        clusters[label].append({'wid': wid, 'text': text})
+        clusters[label].append(wid)
 
     with open(output_file, 'w', encoding='utf-8') as file:
         json.dump(clusters, file, ensure_ascii=False, indent=4)

@@ -76,7 +76,7 @@ def revise_event_graph(text, graph, publish_time, target_file):
 
 
 def build_event_graph(text, publish_time):
-    example = read_json_file("小米创始人捐款.json")
+    example = read_json_file("example.json")
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWY1NjlkMzUtZjkxYi00MjBhLTkxMjQtOTcxNmVlNGMxZTcyIiwidHlwZSI6ImFwaV90b2tlbiJ9.BfSyYQb4Kj19j0z9GujV65Jq3qLLdL2VcobXfsGiAcE"}
     url = "https://api.edenai.run/v2/text/chat"
@@ -139,7 +139,6 @@ def prune_event_graph(graph, target_file):
 
 
 def generate_title(text):
-    example = read_json_file("documents/中大五院集体患癌.json")
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWY1NjlkMzUtZjkxYi00MjBhLTkxMjQtOTcxNmVlNGMxZTcyIiwidHlwZSI6ImFwaV90b2tlbiJ9.BfSyYQb4Kj19j0z9GujV65Jq3qLLdL2VcobXfsGiAcE"}
     url = "https://api.edenai.run/v2/text/chat"
