@@ -30,28 +30,32 @@ def getId(name, gid):
 
 def ensure_all_nodes_connected(graph_dict, gid):
     """确保所有节点都与组内的主节点连接"""
-    G = nx.DiGraph()
+    # 使用无向图
+    G = nx.Graph()
     for node in graph_dict["nodes"]:
         if node["group"] == gid:
             G.add_node(node["id"])
     for link in graph_dict["links"]:
+        # 仅添加gid组内的节点
         if G.has_node(link["source"]) and G.has_node(link["target"]):
             G.add_edge(link["source"], link["target"], description=link["description"])
-    main_node = "中山大学-1"
-    for node in graph_dict["nodes"]:
-        if node["group"] == gid:
-            main_node = node["id"]
-            break
-    connected_nodes = set(nx.descendants(G, main_node)) | {main_node}
-    all_nodes = {node["id"] for node in graph_dict["nodes"] if node["group"] == gid}
 
-    if all_nodes - connected_nodes is None:
-        return False
+    # 选择主节点，假设第一个节点是主节点
+    main_node = next((node["id"] for node in graph_dict["nodes"] if node["group"] == gid), None)
 
-    # 添加缺失的连接
-    for node in all_nodes - connected_nodes:
-        graph_dict["links"].append({"source": main_node, "target": node, "description": "关联关系"})
-        return True
+    # 使用无向图的connected_components方法来检查是否所有节点都在同一连通分量中
+    if main_node:
+        connected_nodes = set(nx.node_connected_component(G, main_node))
+        all_nodes = {node["id"] for node in graph_dict["nodes"] if node["group"] == gid}
+
+        # 检查是否所有节点都已连接
+        unconnected_nodes = all_nodes - connected_nodes
+        if unconnected_nodes:
+            # 添加缺失的连接
+            for node in unconnected_nodes:
+                graph_dict["links"].append({"source": main_node, "target": node, "description": "关联关系"})
+            return True  # 有节点未连接，添加了新的边
+    return False  # 所有节点已经连接或没有主节点
 
 
 if __name__ == '__main__':
@@ -70,13 +74,16 @@ if __name__ == '__main__':
                                     "target": getId(graph["events"][0]["event"], gid),
                                     "description": "关联"})
         for event in graph["events"]:
-            graph_dict["nodes"].append({"id": getId(event["event"], gid), "group": gid})
+            if {"id": getId(event["event"], gid), "group": gid} not in graph_dict["nodes"]:
+                graph_dict["nodes"].append({"id": getId(event["event"], gid), "group": gid})
             for attribute in event["attributes"]:
                 node_id = getId(attribute["value"], gid)
                 if {"id": node_id, "group": gid} not in graph_dict["nodes"]:
                     graph_dict["nodes"].append({"id": node_id, "group": gid})
                 graph_dict["links"].append(
                     {"source": getId(event["event"], gid), "target": node_id, "description": attribute["type"]})
+        if "relationships" not in graph.keys():
+            continue
         for relation in graph["relationships"]:
             graph_dict["links"].append(
                 {"source": getId(find_event_description(graph["events"], relation["source"]), gid),

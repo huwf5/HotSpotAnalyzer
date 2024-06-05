@@ -42,8 +42,9 @@ def update_dictionary(dict_a, dict_b):
 
 
 def revise_event_graph(text, graph, publish_time, target_file):
+    api_key = read_json_file("documents/api_key.json")["key"]
     headers = {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWY1NjlkMzUtZjkxYi00MjBhLTkxMjQtOTcxNmVlNGMxZTcyIiwidHlwZSI6ImFwaV90b2tlbiJ9.BfSyYQb4Kj19j0z9GujV65Jq3qLLdL2VcobXfsGiAcE"}
+        "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
     payload = {
         "providers": "openai",
@@ -76,9 +77,11 @@ def revise_event_graph(text, graph, publish_time, target_file):
 
 
 def build_event_graph(text, publish_time):
-    example = read_json_file("example.json")
+
+    example = read_json_file("documents/example.json")
+    api_key = read_json_file("documents/api_key.json")["key"]
     headers = {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWY1NjlkMzUtZjkxYi00MjBhLTkxMjQtOTcxNmVlNGMxZTcyIiwidHlwZSI6ImFwaV90b2tlbiJ9.BfSyYQb4Kj19j0z9GujV65Jq3qLLdL2VcobXfsGiAcE"}
+        "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
     payload = {
         "providers": "openai",
@@ -103,12 +106,14 @@ def build_event_graph(text, publish_time):
     print(result)
     print(result['openai']['generated_text'])
     graph = json.loads(result['openai']['generated_text'])
+    time.sleep(13)
     return graph
 
 
 def prune_event_graph(graph, target_file):
+    api_key = read_json_file("documents/api_key.json")["key"]
     headers = {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWY1NjlkMzUtZjkxYi00MjBhLTkxMjQtOTcxNmVlNGMxZTcyIiwidHlwZSI6ImFwaV90b2tlbiJ9.BfSyYQb4Kj19j0z9GujV65Jq3qLLdL2VcobXfsGiAcE"}
+        "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
     payload = {
         "providers": "openai",
@@ -131,6 +136,7 @@ def prune_event_graph(graph, target_file):
     print(result['openai']['generated_text'])
     graph = json.loads(result['openai']['generated_text'])
     # 将结果写入新的 JSON 文件
+    time.sleep(13)
     with open(target_file, 'w', encoding='utf-8') as outfile:
         json.dump(graph, outfile, ensure_ascii=False, indent=4)
 
@@ -139,8 +145,9 @@ def prune_event_graph(graph, target_file):
 
 
 def generate_title(text):
+    api_key = read_json_file("documents/api_key.json")["key"]
     headers = {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWY1NjlkMzUtZjkxYi00MjBhLTkxMjQtOTcxNmVlNGMxZTcyIiwidHlwZSI6ImFwaV90b2tlbiJ9.BfSyYQb4Kj19j0z9GujV65Jq3qLLdL2VcobXfsGiAcE"}
+        "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
     payload = {
         "providers": "openai",
@@ -164,8 +171,9 @@ def generate_title(text):
 
 
 def summarize(text):
+    api_key = read_json_file("documents/api_key.json")["key"]
     headers = {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWY1NjlkMzUtZjkxYi00MjBhLTkxMjQtOTcxNmVlNGMxZTcyIiwidHlwZSI6ImFwaV90b2tlbiJ9.BfSyYQb4Kj19j0z9GujV65Jq3qLLdL2VcobXfsGiAcE"}
+        "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
     payload = {
         "providers": "openai",
@@ -186,27 +194,6 @@ def summarize(text):
     print(summary)
     time.sleep(13)
     return summary
-
-
-# def main():
-#     hotspot_texts = read_json_file("documents/hotspot_texts.json")
-#     for key, value in hotspot_texts.items():
-#         target_file = f"json_for_graphs/{key}.json"
-#         if os.path.exists(target_file):
-#             continue
-#         text = ""
-#         for item in value:
-#             if "text" not in item.keys():
-#                 continue
-#             text += item["text"]
-#             if len(text) >= 4096:
-#                 publish_time = item["publish_time"]
-#                 text = text[:4096]
-#                 break
-#
-#
-#         build_event_graph(text, publish_time, target_file)
-#         time.sleep(8)
 
 
 def select_texts():
