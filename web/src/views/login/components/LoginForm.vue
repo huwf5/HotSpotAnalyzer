@@ -79,7 +79,7 @@ const login = (formEl: FormInstance | undefined) => {
     try {
       // 1.执行登录接口
       let { data } = await loginApi(loginForm);
-      userStore.setTokens(data.token, data.refresh, data.token_lifetime * 1000);
+      userStore.setTokens(data.token, data.refresh, data.token_lifetime);
       userStore.setUserContactInfo({ email: data.email });
       userStore.setUserBasicInfo({ name: data.username });
       userStore.setUserRole({ role: data.role });

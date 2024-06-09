@@ -1,7 +1,7 @@
 <template>
   <v-chart
     class="chart"
-    :option="option"
+    :option="pieOption"
     ref="chart"
     autoresize
     v-loading="props.isLoading"
@@ -31,17 +31,24 @@ const timer = ref<NodeJS.Timeout>();
 const coldBoot = ref(true);
 const chart = ref<ECharts>();
 
+interface PieChartData {
+  name: string;
+  value: number;
+  [key: string]: any;
+}
+
 const props = defineProps<{
   displayMode: number;
   isLoading: boolean;
-  data: any[];
+  chartTitle?: string;
+  data: PieChartData[];
 }>();
 
 const seriesArray = [
   [
     // Minimize Mode
     {
-      name: "Access From",
+      name: props.chartTitle !== undefined ? props.chartTitle : "PieChart",
       type: "pie",
       startAngle: 0,
       endAngle: "auto",
@@ -50,6 +57,7 @@ const seriesArray = [
       center: ["60%", "50%"],
       padAngle: 2,
       avoidLabelOverlap: false,
+      showEmptyCircle: false,
       itemStyle: {
         borderRadius: 10,
         borderColor: "#fff"
@@ -62,7 +70,7 @@ const seriesArray = [
   [
     // Maximize Mode
     {
-      name: "Access From",
+      name: props.chartTitle !== undefined ? props.chartTitle : "PieChart",
       type: "pie",
       startAngle: 180,
       endAngle: 360,
@@ -71,6 +79,7 @@ const seriesArray = [
       center: ["50%", "80%"],
       padAngle: 2,
       avoidLabelOverlap: false,
+      showEmptyCircle: false,
       itemStyle: {
         borderRadius: 10,
         borderColor: "#fff"
@@ -82,7 +91,7 @@ const seriesArray = [
   ]
 ];
 
-const option = ref<any>({
+const pieOption = ref({
   tooltip: {
     trigger: "item"
   },
@@ -104,8 +113,14 @@ watch(
     if (newVal === 1) {
       stopRotation();
     }
-    option.value.series = seriesArray[newVal];
-    chart.value?.setOption(option.value);
+    pieOption.value.series = seriesArray[newVal];
+    chart.value?.setOption(pieOption.value);
+  }
+);
+watch(
+  () => props.data,
+  newVal => {
+    pieOption.value.dataset.source = newVal;
   }
 );
 
@@ -119,15 +134,15 @@ function stratRotation() {
 function stopRotation() {
   timer.value && clearInterval(timer.value);
   timer.value = undefined;
-  option.value.series[0].animation = true;
+  pieOption.value.series[0].animation = true;
 }
 
 function restartRotation() {
   if (timer.value === undefined && rotateEnabled.value && props.displayMode === 0) {
-    option.value.series[0].animation = false;
+    pieOption.value.series[0].animation = false;
     timer.value = setInterval(() => {
       rotate.value = (rotate.value + 0.1) % 360;
-      option.value.series[0].startAngle = 360 - rotate.value;
+      pieOption.value.series[0].startAngle = 360 - rotate.value;
     }, 50);
   }
 }

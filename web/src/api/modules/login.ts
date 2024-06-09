@@ -38,7 +38,7 @@ export const forgetPwdApi = (params: Login.ReqForgetPwd) => {
 
 // 刷新token
 export const refreshTokenApi = (params: Login.ReqRefresh) => {
-  return http.post<ResultData<Login.ResRefresh>>(AuthPort.REFRESH, params, { loading: false });
+  return http.post<Login.ResRefresh>(AuthPort.REFRESH, params, { loading: false });
 };
 
 // 用户退出登录

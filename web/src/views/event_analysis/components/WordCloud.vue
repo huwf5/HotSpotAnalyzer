@@ -8,8 +8,14 @@ import "echarts-wordcloud";
 import { ref, watch } from "vue";
 import VChart from "vue-echarts";
 
+interface WordCloudData {
+  name: string;
+  value: number;
+  [key: string]: any;
+}
+
 const props = defineProps<{
-  data: any[];
+  data: WordCloudData[];
   reload: boolean;
   isLoading: boolean;
 }>();
@@ -58,6 +64,13 @@ const wordCloudOption = ref({
     }
   ]
 });
+
+watch(
+  () => props.data,
+  newVal => {
+    wordCloudOption.value.series[0].data = newVal;
+  }
+);
 </script>
 
 <style scoped lang="scss">
