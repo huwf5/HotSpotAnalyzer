@@ -1,7 +1,8 @@
 import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 import { useUserStore } from "@/stores/modules/user";
 import { useAuthStore } from "@/stores/modules/auth";
-import { LOGIN_URL, REGISTER_URL, ROUTER_WHITE_LIST } from "@/config";
+// import { LOGIN_URL, REGISTER_URL, ROUTER_WHITE_LIST } from "@/config";
+import { LOGIN_URL, ROUTER_WHITE_LIST } from "@/config";
 import { initDynamicRouter } from "@/routers/modules/dynamicRouter";
 import { staticRouter, errorRouter } from "@/routers/modules/staticRouter";
 import NProgress from "@/config/nprogress";
@@ -62,7 +63,7 @@ router.beforeEach(async (to, from, next) => {
 
   // 5.判断是否有 Token，没有重定向到 login 页面
   // TODO: 由于没有后端接口，暂时注释掉
-  if (!userStore.token && to.path !== REGISTER_URL) return next({ path: LOGIN_URL, replace: true });
+  // if (!userStore.token && to.path !== REGISTER_URL) return next({ path: LOGIN_URL, replace: true });
 
   // 6.如果没有菜单列表，就重新请求菜单列表并添加动态路由
   if (!authStore.authMenuListGet.length) {
