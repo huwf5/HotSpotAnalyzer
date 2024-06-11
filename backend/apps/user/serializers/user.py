@@ -1,5 +1,12 @@
 from typing import Dict, Any
-from apps.user.models import Role, User, WaitingList
+from apps.user.models import (
+    Role,
+    User,
+    WaitingList,
+    UserMessageSettings,
+    Message,
+    UserMessage,
+)
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.hashers import make_password
@@ -82,3 +89,24 @@ class ForgotPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["email", "verify_code", "password"]
+
+
+class UserMessageSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMessageSettings
+        fields = "__all__"
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = "__all__"
+
+
+class UserMessageSerializer(serializers.ModelSerializer):
+    message = MessageSerializer(read_only=True)
+
+    class Meta:
+        model = UserMessage
+        fields = ["id", "type", "message", "is_read", "is_starred"]
+        write_only_fields = ["user"]

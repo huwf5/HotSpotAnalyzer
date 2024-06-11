@@ -9,9 +9,16 @@ from apps.user.serializers.user import (
     ForgotPasswordSerializer,
     RegisterSerializer,
     RoleSerializer,
+    UserMessageSettingSerializer,
+    UserMessageSerializer,
 )
 from apps.user.serializers.email import EmailVerificationSerializer
-from apps.user.models import EMAIL_USAGE_FOR_REGISTER, EMAIL_USAGE_FOR_RESET_PASSWORD
+from apps.user.models import (
+    EMAIL_USAGE_FOR_REGISTER,
+    EMAIL_USAGE_FOR_RESET_PASSWORD,
+    MESSAGE_TYPE_INFO,
+    MESSAGE_TYPE_WARNING,
+)
 from django.db import transaction
 from django.db.utils import IntegrityError
 from django.db.models import Q
@@ -35,6 +42,9 @@ from .models import (
     EmailFormatTag,
     EmailVerification,
     EmailSuffixFormat,
+    UserMessageSettings,
+    Message,
+    UserMessage,
 )
 
 from .permission import IsAdmin, IsSuperAdmin
@@ -50,6 +60,11 @@ from .utils.swagger_schemas import (
     get_roleList_api_response_schema,
     email_format_schema,
     get_whiteList_api_response_schema,
+    get_user_message_settings_api_response_schema,
+    user_message_setting_update_schema,
+    get_user_message_api_response_schema,
+    user_message_update_schema
+
 )
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -463,17 +478,18 @@ class UserView(viewsets.ViewSet):
         )
 
     @swagger_auto_schema(
-        operation_summary="Delete the user", responses={200: "删除成功", 403: "权限不足"}
+        operation_summary="Delete account",
+        responses={200: "删除成功", 403: "权限不足"},
     )
     @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request: Request) -> APIResponse:
         user = request.user
         if user.role.role == ROLE_SUPER_ADMIN:
             return APIResponse(
-                status=status.HTTP_403_FORBIDDEN, message="超级管理员无法删除账号"
+                status=status.HTTP_403_FORBIDDEN, message="超级管理员无法注销账号"
             )
         user.delete()
-        return APIResponse(status=status.HTTP_200_OK, message="删除成功")
+        return APIResponse(status=status.HTTP_200_OK, message="注销成功")
 
     @swagger_auto_schema(
         operation_summary="Update the user profile",
@@ -512,7 +528,7 @@ class UserView(viewsets.ViewSet):
         return APIResponse(status=status.HTTP_200_OK, message="更新成功")
 
     @swagger_auto_schema(
-        operation_summary="Delete the user",
+        operation_summary="Delete multiple users",
         request_body=emailList_schema,
         responses={
             200: "删除成功",
@@ -520,7 +536,10 @@ class UserView(viewsets.ViewSet):
         },
     )
     @action(
-        detail=False, methods=["post"], url_path="delete", permission_classes=[IsAdmin]
+        detail=False,
+        methods=["post"],
+        url_path="delete-multiple",
+        permission_classes=[IsAdmin],
     )
     def delete_user(self, request: Request) -> APIResponse:
         serializer = EmailListSerializer(data=request.data)
@@ -956,3 +975,206 @@ class RoleView(viewsets.ViewSet):
         return APIResponse(
             status=status.HTTP_200_OK, data=serializer.data, message="获取成功"
         )
+
+
+class MessageSettingView(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Get the message setting",
+        responses={200: get_user_message_settings_api_response_schema},
+    )
+    def list(self, request: Request) -> APIResponse:
+        try:
+            user_message_setting = UserMessageSettings.objects.get(email=request.user)
+            serializer = UserMessageSettingSerializer(user_message_setting)
+            return APIResponse(
+                status=status.HTTP_200_OK, data=serializer.data, message="获取成功"
+            )
+        except UserMessageSettings.DoesNotExist:
+            return APIResponse(
+                status=status.HTTP_404_NOT_FOUND,
+                message="用户消息设置不存在",
+            )
+
+    @swagger_auto_schema(
+        operation_summary="Update the message setting",
+        request_body=user_message_setting_update_schema,
+        responses={
+            200: "更新成功",
+            400: "请求参数错误,请检查后重试",
+        },
+    )
+    @action(detail=False, methods=["patch"], url_path="update")
+    def update_setting(self, request: Request) -> APIResponse:
+        if not request.data:
+            return APIResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="请求参数不能为空，请检查后重试",
+            )
+        try:
+            with transaction.atomic():
+                user_message_setting = (
+                    UserMessageSettings.objects.select_for_update().get(
+                        email=request.user
+                    )
+                )
+                serializer = UserMessageSettingSerializer(
+                    user_message_setting, data=request.data, partial=True
+                )
+                if not serializer.is_valid():
+                    return APIResponse(
+                        status=status.HTTP_400_BAD_REQUEST,
+                        message="请求参数错误,请检查后重试",
+                        data=serializer.errors if DEBUG else None,
+                    )
+                serializer.save()
+                self.create_or_update_user_messages(user_message_setting, False)
+                return APIResponse(
+                    status=status.HTTP_200_OK,
+                    message="更新成功",
+                )
+        except UserMessageSettings.DoesNotExist:
+            return APIResponse(
+                status=status.HTTP_404_NOT_FOUND,
+                message="用户消息设置不存在",
+            )
+        except Exception as e:
+            return APIResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="更新过程中出现错误,请稍后重试",
+                data={"error": str(e)} if DEBUG else None,
+            )
+
+    @swagger_auto_schema(
+        operation_summary="Create the message setting",
+        responses={
+            201: get_user_message_settings_api_response_schema,
+            400: "用户消息设置已存在",
+        },
+    )
+    def create(self, request: Request) -> APIResponse:
+        if UserMessageSettings.objects.filter(email=request.user).exists():
+            return APIResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="用户消息设置已存在",
+            )
+        with transaction.atomic():
+            user_message_setting = UserMessageSettings.objects.create(
+                email=request.user
+            )
+            self.create_or_update_user_messages(user_message_setting, True)
+        return APIResponse(
+            status=status.HTTP_201_CREATED,
+            message="创建成功",
+            data=UserMessageSettingSerializer(user_message_setting).data,
+        )
+
+    def create_or_update_user_messages(self, user_setting, new_setting):
+        messages = Message.objects.all()
+        user = user_setting.email
+
+        for message in messages:
+            if not message.is_news and not user_setting.allow_non_news:
+                continue
+
+            message_type = None
+            if message.negative_sentiment_ratio >= user_setting.warning_threshold:
+                message_type = MESSAGE_TYPE_WARNING
+            elif message.negative_sentiment_ratio >= user_setting.info_threshold:
+                message_type = MESSAGE_TYPE_INFO
+
+            if message_type:
+                defaults = {"type": message_type}
+                if new_setting:
+                    UserMessage.objects.create(
+                        user=user, message=message, defaults=defaults
+                    )
+                else:
+                    user_message, created = UserMessage.objects.update_or_create(
+                        user=user, message=message, defaults=defaults
+                    )
+                    if not created and user_message.type != message_type:
+                        user_message.type = message_type
+                        user_message.save(update_fields=["type"])
+
+
+class UserMessageView(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Get the user message",
+        responses={200: get_user_message_api_response_schema},
+    )
+    def list(self, request: Request) -> APIResponse:
+        queryset = UserMessage.objects.filter(user=request.user)
+        serializer = UserMessageSerializer(queryset, many=True)
+        return APIResponse(
+            status=status.HTTP_200_OK, data=serializer.data, message="获取成功"
+        )
+    
+    @swagger_auto_schema(
+        operation_description="Update the user message",
+        request_body=user_message_update_schema,
+    )
+    def update(self, request: Request, pk=None) -> APIResponse:
+        if not request.data:
+            return APIResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="请求参数不能为空，请检查后重试",
+            )
+        user = request.user
+        try:
+            user_message = UserMessage.objects.get(pk=pk, user=user)
+            if not user_message:
+                return APIResponse(
+                    status=status.HTTP_404_NOT_FOUND,
+                    message="用户消息不存在",
+                )
+            serializer = UserMessageSerializer(
+                user_message, data=request.data, partial=True
+            )
+            if not serializer.is_valid() or not serializer.validated_data:
+                return APIResponse(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    message="请求参数错误,请检查后重试",
+                    data=serializer.errors if DEBUG else None,
+                )
+            serializer.validated_data.pop("type", None)
+            with transaction.atomic():
+                serializer.update(
+                    instance=user_message,
+                    validated_data=serializer.validated_data,
+                )
+        except Exception as e:
+            return APIResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="更新过程中出现错误,请稍后重试",
+                data={"error": str(e)} if DEBUG else None,
+            )
+        return APIResponse(status=status.HTTP_200_OK, message="更新成功")
+    
+    @swagger_auto_schema(
+        operation_summary= "Delete the user message",
+        operation_id= "delete",
+        responses= {200: "删除成功", 400: "请求参数错误,请检查后重试"}
+    )
+    @action(detail=True, methods=["delete"], url_path="delete")
+    def delete(self, request: Request, pk=None) -> APIResponse:
+        user = request.user
+        try:
+            with transaction.atomic():
+                user_message = UserMessage.objects.get(pk=pk, user=user)
+                user_message.delete()
+                return APIResponse(
+                    status=status.HTTP_200_OK,
+                    message="删除成功"
+                )
+        except Exception as e:
+            return APIResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="删除过程中出现错误,请稍后重试",
+                data={"error": str(e)} if DEBUG else None,
+            )
