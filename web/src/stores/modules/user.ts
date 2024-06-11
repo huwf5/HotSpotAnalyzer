@@ -19,7 +19,7 @@ export const useUserStore = defineStore({
         email: ""
       },
       accountInfo: {
-        role: 1
+        role: ""
       },
       messages: []
     }
@@ -34,9 +34,10 @@ export const useUserStore = defineStore({
         if (this.timer) {
           clearTimeout(this.timer);
         }
+        this.token_lifetime = token_lifetime;
         this.timer = setTimeout(() => {
           refreshTokenApi({ refresh: this.refresh }).then(res => {
-            this.setTokens(res.data.access, res.data.refresh, this.token_lifetime);
+            this.setTokens(res.access, res.refresh, this.token_lifetime);
           });
         }, token_lifetime);
       } else {

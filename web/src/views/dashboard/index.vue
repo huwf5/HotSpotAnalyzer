@@ -39,7 +39,7 @@ import BasicInfoCard from "./components/BasicInfoCard.vue";
 import WordCloudChart from "./components/WordCloudChart.vue";
 import EmotionChart from "./components/EmotionChart.vue";
 import LineChart from "./components/LineChart.vue";
-import EventGraph3D from "./components/EventGraph3D.vue";
+import EventGraph3D from "../../components/Event3D/EventGraph3D.vue";
 import TopicCard from "./components/TopicCard.vue";
 import DashBoardTitle from "./components/DashBoardTitle.vue";
 import GaugeChart from "./components/GaugeChart.vue";
@@ -50,39 +50,31 @@ import DivideLine from "./components/DivideLine.vue";
 .rounded-md {
   border-radius: 10px;
 }
-
 .dark\:bg-black {
   background-color: #ffffff;
 }
-
 .shadow\:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 }
-
 .m-t-5px {
   margin-top: 10px;
   margin-bottom: 10px;
 }
-
 .column-height {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
 }
-
 .gauge-card {
   flex: 3; /* 4/10 of the total height */
 }
-
 .line-card {
   flex: 7; /* 6/10 of the total height */
 }
-
 .full-height {
   height: 100%;
 }
-
 .m-t-10px {
   margin-top: 10px;
 }

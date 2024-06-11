@@ -13,7 +13,8 @@ export const useTable = (
   initParam: object = {},
   isPageable: boolean = true,
   dataCallBack?: (data: any) => any,
-  requestError?: (error: any) => void
+  requestError?: (error: any) => void,
+  customFilterCallBack?: (data: any, params: any) => any
 ) => {
   const state = reactive<Table.StateProps>({
     // 展示的表格数据
@@ -69,7 +70,6 @@ export const useTable = (
           dataCallBack && (data = dataCallBack(data));
           // 先储存总表
           state.tableData = data;
-          state.pageable.total = Math.ceil(data.length / state.pageable.pageSize);
         }
         // 然后筛选要展示的表格数据
         displayTable();
@@ -91,6 +91,7 @@ export const useTable = (
       // 遍历所有判断条件
       for (const key in state.searchParam) {
         // 判断是否满足条件
+        if (dataRow[key] === undefined || Array.isArray(state.searchParam[key])) continue;
         if (typeof dataRow[key] === "string") {
           if (!dataRow[key].includes(state.searchParam[key])) {
             accept = false;
@@ -103,7 +104,9 @@ export const useTable = (
       }
       if (accept) newData.push(dataRow);
     });
+    customFilterCallBack && (newData = customFilterCallBack(newData, state.searchParam));
     state.displayData = newData;
+    state.pageable.total = newData.length;
   };
 
   /**
@@ -145,7 +148,7 @@ export const useTable = (
     // 重置搜索表单的时，如果有默认搜索参数，则重置默认的搜索参数
     state.searchParam = { ...state.searchInitParam };
     updatedTotalParam();
-    getTableList();
+    displayTable();
   };
 
   /**

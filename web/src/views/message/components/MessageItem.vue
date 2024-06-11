@@ -44,14 +44,15 @@ const props = defineProps<{
 }>();
 watch(props, newVal => {
   isChecked.value = newVal.checked;
-  color.value = message.value.starred ? "#FFF102" : "";
 });
 
 const time = computed(() => {
   return message.value.time;
 });
 const isChecked = ref(false);
-const color = ref(message.value.starred ? "#FFF102" : "");
+const color = computed(() => {
+  return message.value.starred ? "#FFF102" : "";
+});
 const shadow_color = computed(() => {
   if (!message.value.unread) return "#737373";
   switch (message.value.type) {

@@ -1,6 +1,6 @@
 import { ManagePort } from "@/api/config/servicePort";
 import http from "@/api";
-import { Result, ResultData, User, UserInfo } from "../interface";
+import { Result, ResultData, UserInfo } from "../interface";
 
 // 获取用户数据
 export const getUserInfoApi = () => {
@@ -26,6 +26,6 @@ export const applyMandateApi = (params: { email: string }) => {
   });
 };
 // 删除账号
-export const confirmDeleteApi = (params: User.EmailList) => {
-  return http.post<Result>(ManagePort.IAdmin.DELETE, params);
+export const confirmDeleteApi = () => {
+  return http.delete<Result>(ManagePort.IGuest.DELETE);
 };

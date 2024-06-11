@@ -43,10 +43,8 @@ const messages = ref(store.userInfo.messages);
 
 function fetch_count() {
   fetchMessagesApi().then(response => {
-    if (response.code === "200") {
-      store.setUserMsg(response.data);
-      count_unread();
-    }
+    store.setUserMsg(response.data);
+    count_unread();
   });
 }
 function count_unread() {

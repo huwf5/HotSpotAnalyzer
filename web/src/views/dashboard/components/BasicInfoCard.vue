@@ -35,7 +35,6 @@ const cardList = reactive([
 <style lang="scss" scoped>
 .el-card {
   border-radius: 8px;
-  background-color: #ffffff;
   transition: box-shadow 0.3s;
 }
 

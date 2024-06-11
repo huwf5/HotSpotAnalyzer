@@ -5,6 +5,7 @@ declare namespace Menu {
     name: string;
     component?: string | (() => Promise<unknown>);
     redirect?: string;
+    props?: boolean;
     meta: MetaProps;
     children?: MenuOptions[];
   }
@@ -16,7 +17,6 @@ declare namespace Menu {
     isHide: boolean;
     isFull: boolean;
     isAffix: boolean;
-    hideOnTab?: boolean;
     isKeepAlive: boolean;
   }
 }
