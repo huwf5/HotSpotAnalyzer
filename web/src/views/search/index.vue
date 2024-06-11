@@ -8,7 +8,6 @@
         size="large"
         prefix-icon="Search"
         v-model="searchKeyWord"
-        clearable
       >
         <template #suffix>
           <el-button type="primary" @click="fetchData">搜索</el-button>

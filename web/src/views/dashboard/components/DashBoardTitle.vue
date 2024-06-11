@@ -9,7 +9,7 @@
       </div>
       <el-input v-model="searchKeyWord" @keyup.enter="jumpToSearch" size="large" prefix-icon="Search">
         <template #suffix>
-          <el-button type="primary">搜索</el-button>
+          <el-button type="primary" @click="jumpToSearch">搜索</el-button>
         </template>
       </el-input>
     </div>
