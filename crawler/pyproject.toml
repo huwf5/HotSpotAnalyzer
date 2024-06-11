@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "crawler"
+version = "0.1.0"
+description = ""
+authors = ["vitaminB <575738467@qq.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+pyquery = "^2.0.0"
+pymysql = "^1.1.1"
+selenium = "^4.21.0"
+pandas = "^2.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
