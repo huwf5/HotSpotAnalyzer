@@ -10,6 +10,8 @@ from .views import (
     UserView,
     WhiteListView,
     RoleView,
+    MessageSettingView,
+    UserMessageView
 )
 
 router = DefaultRouter()
@@ -17,6 +19,9 @@ router.register(r"waitinglist", WaitingListView, basename="waitinglist")
 router.register(r"user", UserView, basename="user")
 router.register(r"whitelist", WhiteListView, basename="whitelist")
 router.register(r"role", RoleView, basename="role")
+router.register(r"messagesetting", MessageSettingView, basename="messagesetting")
+router.register(r"usermessage", UserMessageView, basename="usermessage")
+
 
 urlpatterns = [
     path("", include(router.urls)),

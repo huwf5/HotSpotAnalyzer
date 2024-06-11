@@ -8,7 +8,7 @@ from apps.user.utils.email import (
 from django.core.exceptions import ValidationError
 from application.settings import TABLE_PREFIX, EMAIL_VALIDATION_TIME_LIMIT
 from django.apps import apps
-from django.db import models
+from django.db import models,transaction
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -248,9 +248,65 @@ class WaitingList(models.Model):
             regex_pattern = "|".join(
                 [suffix.replace(".", r"\.") + "$" for suffix in active_suffixes]
             )
-            emails_to_delete = cls.objects.select_for_update().exclude(email__regex=regex_pattern)
+            emails_to_delete = cls.objects.select_for_update().exclude(
+                email__regex=regex_pattern
+            )
         else:
             print(suffix)
-            emails_to_delete = cls.objects.select_for_update().filter(email__endswith=suffix)
+            emails_to_delete = cls.objects.select_for_update().filter(
+                email__endswith=suffix
+            )
             print(emails_to_delete)
         emails_to_delete.delete()
+
+
+class UserMessageSettings(models.Model):
+    email = models.OneToOneField(
+        User, on_delete=models.CASCADE, primary_key=True, db_column="email"
+    )
+    allow_non_news = models.BooleanField(default=True)
+    warning_threshold = models.FloatField(default=0.7)
+    info_threshold = models.FloatField(default=0.5)
+
+    class Meta:
+        db_table = TABLE_PREFIX + "user_message_settings"
+    
+    
+
+
+class Message(models.Model):
+    title = models.CharField(_("event title"), max_length=255)
+    summary = models.CharField(_("event summary"), max_length=255)
+    negative_sentiment_ratio = models.FloatField(default=0.0)
+    is_news = models.BooleanField(_("is news"), default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = TABLE_PREFIX + "message"
+    
+    def __str__(self) -> str:
+        return f"{self.title} - {self.summary}: is_news={self.is_news}, negative_sentiment_ratio={self.negative_sentiment_ratio}"
+
+
+MESSAGE_TYPE_WARNING = "warning"
+MESSAGE_TYPE_INFO = "info"
+
+MESSAGE_TYPE_CHOICES = [
+    (MESSAGE_TYPE_WARNING, MESSAGE_TYPE_WARNING),
+    (MESSAGE_TYPE_INFO, MESSAGE_TYPE_INFO),
+]
+
+
+class UserMessage(models.Model):
+    type = models.CharField(
+        _("message type"), max_length=255, choices=MESSAGE_TYPE_CHOICES
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    is_read = models.BooleanField(default=False)
+    is_starred = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = TABLE_PREFIX + "user_message"
+        unique_together = ("user", "message")
+    
