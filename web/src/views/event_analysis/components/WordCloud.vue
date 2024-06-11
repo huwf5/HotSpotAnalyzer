@@ -1,11 +1,11 @@
 <template>
-  <v-chart class="word_chart" ref="chart" v-loading="props.isLoading" :option="wordCloudOption" />
+  <v-chart class="word_chart" ref="chart" v-loading="props.isLoading" :option="wordCloudOption" autoresize />
 </template>
 
 <script setup lang="ts">
 import { ECharts } from "echarts";
 import "echarts-wordcloud";
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import VChart from "vue-echarts";
 
 interface WordCloudData {
@@ -16,27 +16,33 @@ interface WordCloudData {
 
 const props = defineProps<{
   data: WordCloudData[];
-  reload: boolean;
+  reload?: boolean;
   isLoading: boolean;
 }>();
 
 const chart = ref<ECharts>();
 watch(
   () => props.reload,
-  () => {
-    chart.value!.resize();
+  async newVal => {
+    if (newVal) {
+      await nextTick();
+      chart.value!.resize();
+    }
   }
 );
 
 const wordCloudOption = ref({
+  tooltip: {
+    trigger: "item"
+  },
   series: [
     {
       type: "wordCloud",
       shape: "square",
       keepAspect: true,
       center: ["50%", "50%"],
-      sizeRange: [10, 60],
-      rotationRange: [0, 90],
+      sizeRange: [10, 50],
+      rotationRange: [-60, 60],
       rotationStep: 45,
       gridSize: 8,
       drawOutOfBound: false,
@@ -76,6 +82,6 @@ watch(
 <style scoped lang="scss">
 .word_chart {
   width: 100%;
-  height: 100%;
+  height: 500px;
 }
 </style>

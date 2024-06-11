@@ -39,6 +39,7 @@ import { User } from "@/api/interface";
 import { Ref, ref } from "vue";
 import { useHandleData } from "@/hooks/useHandleData";
 import { getTagsApi } from "@/api/modules/white_list";
+import { ElMessage } from "element-plus";
 
 const proTable = ref<ProTableInstance>();
 const tag_map = new Map<string, Ref<Set<string>>>();
@@ -131,7 +132,13 @@ async function changeUserPower(params: User.ResUser, upgrade: boolean) {
   }
 }
 async function resetUserPwd(params: User.ResUser) {
-  await useHandleData(resetUserPassWordApi, { id: params.email }, `重置${params.username}密码`);
+  await useHandleData(resetUserPassWordApi, { id: params.email }, `重置${params.username}密码`).then(() => {
+    ElMessage({
+      type: "success",
+      message: "用户密码已重置为12345",
+      duration: 3000
+    });
+  });
 }
 async function removeUser(params: User.ResUser) {
   await useHandleData(batchDeleteUserApi, { emailList: [params.email] }, `删除${params.username}`).then(() => {

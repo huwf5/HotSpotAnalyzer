@@ -37,12 +37,17 @@ interface PieChartData {
   [key: string]: any;
 }
 
-const props = defineProps<{
-  displayMode: number;
-  isLoading: boolean;
-  chartTitle?: string;
-  data: PieChartData[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    displayMode?: number;
+    isLoading: boolean;
+    chartTitle?: string;
+    data: PieChartData[];
+  }>(),
+  {
+    displayMode: 0
+  }
+);
 
 const seriesArray = [
   [
@@ -54,7 +59,7 @@ const seriesArray = [
       endAngle: "auto",
       animation: true,
       radius: ["35%", "40%"],
-      center: ["60%", "50%"],
+      center: ["50%", "50%"],
       padAngle: 2,
       avoidLabelOverlap: false,
       showEmptyCircle: false,
@@ -150,9 +155,7 @@ function restartRotation() {
 
 <style scoped lang="scss">
 .chart {
-  display: flex;
-  flex: none;
-  flex-grow: 1;
-  align-self: stretch;
+  width: 100%;
+  height: 200px;
 }
 </style>

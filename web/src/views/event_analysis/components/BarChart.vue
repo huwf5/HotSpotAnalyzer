@@ -94,9 +94,6 @@ watch(
 
 <style scoped lang="scss">
 .chart {
-  display: flex;
-  flex: none;
-  flex-grow: 1;
-  align-self: stretch;
+  height: 300px;
 }
 </style>

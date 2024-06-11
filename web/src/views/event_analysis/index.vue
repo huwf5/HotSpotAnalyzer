@@ -1,8 +1,8 @@
 <template>
-  <div class="card event_analysis">
-    <div class="abstract_container">
-      <div class="title_container">
-        <div class="title_text_container">
+  <div class="card">
+    <el-card>
+      <el-row>
+        <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
           <div class="title">事件标题</div>
           <div class="keyword">
             事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词
@@ -11,36 +11,39 @@
           <div class="content">
             事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述
           </div>
-        </div>
-        <div class="statistic_container expand_statistic">
-          <el-statistic class="statistic_col light_border_right" :value="upVoteValue" title="点赞数"></el-statistic>
-          <el-statistic class="statistic_col light_border_right" :value="likeValue" title="喜爱数"></el-statistic>
-          <el-statistic class="statistic_col light_border_right" :value="collectValue" title="收藏数"></el-statistic>
-          <el-statistic class="statistic_col" :value="shareValue" title="转发数"></el-statistic>
-        </div>
-      </div>
-      <div class="abstract_charts_container">
-        <div class="left_chart_container">
-          <PieChart :display-mode="pieChartMode ? 1 : 0" :is-loading="loading" :data="emotionData" chart-title="情感分析" />
-        </div>
-        <div class="left_chart_container"><BarChart :is-loading="loading" :data="eventsData" /></div>
-      </div>
-    </div>
-    <div class="map_outer_container expand_chart" @transitionend="transitionFinished">
-      <div class="collapse_button_container" @click="toggle_right_panel" @transitionend.stop>
-        <el-icon class="collapse_button">
-          <ArrowRight />
-        </el-icon>
-      </div>
-      <div class="tab_outer_layout">
-        <el-tabs v-if="displayRightChart" class="map_container">
-          <el-tab-pane class="tab_container" label="词云图">
-            <WordCloud :reload="displayWordCloud" :is-loading="loading" :data="wordFreqData" />
-          </el-tab-pane>
-          <el-tab-pane class="tab_container" label="关系图"></el-tab-pane>
-        </el-tabs>
-      </div>
-    </div>
+        </el-col>
+        <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
+          <el-row class="statistic_container">
+            <el-statistic class="statistic_col" :value="upVoteValue" title="点赞数"></el-statistic>
+            <el-statistic class="statistic_col" :value="likeValue" title="喜爱数"></el-statistic>
+            <el-statistic class="statistic_col" :value="collectValue" title="收藏数"></el-statistic>
+            <el-statistic class="statistic_col" :value="shareValue" title="转发数"></el-statistic>
+          </el-row>
+        </el-col>
+      </el-row>
+    </el-card>
+    <el-row class="event_analysis" :gutter="20">
+      <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
+        <el-space fill wrap direction="vertical" :fill-ratio="100" style="width: 100%; height: 100%">
+          <el-card>
+            <PieChart :is-loading="loading" :data="emotionData" chart-title="情感分析" />
+          </el-card>
+          <el-card> <BarChart :is-loading="loading" :data="eventsData" /></el-card>
+        </el-space>
+      </el-col>
+      <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
+        <el-card>
+          <el-tabs v-if="displayRightChart" class="map_container">
+            <el-tab-pane label="词云图">
+              <WordCloud :is-loading="loading" :data="wordFreqData" />
+            </el-tab-pane>
+            <el-tab-pane label="关系图">
+              <!-- <EventGraph3D /> -->
+            </el-tab-pane>
+          </el-tabs>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -48,8 +51,9 @@
 import PieChart from "./components/PieChart.vue";
 import WordCloud from "./components/WordCloud.vue";
 import BarChart from "./components/BarChart.vue";
-import { computed, nextTick, ref, watch } from "vue";
-import { useToggle, useTransition } from "@vueuse/core";
+// import EventGraph3D from "@/components/Event3D/EventGraph3D.vue";
+import { computed, ref, watch } from "vue";
+import { useTransition } from "@vueuse/core";
 
 const loading = ref(false);
 
@@ -181,14 +185,9 @@ function processData() {
 processData();
 watch(datasource.value, processData);
 
-const rotation = ref(0);
 const expand_chart = ref(10);
 const expand_statistic = ref(0);
-const pageMode = ref(0);
-const transitionToLeft = ref(true);
 const displayRightChart = ref(true);
-const [displayWordCloud, reloadWordCloud] = useToggle();
-const [pieChartMode, togglePieChartMode] = useToggle(true);
 
 const upVotes = ref(0);
 const likes = ref(0);
@@ -199,36 +198,6 @@ const likeValue = useTransition(likes, { duration: 1500 });
 const collectValue = useTransition(collects, { duration: 1500 });
 const shareValue = useTransition(shares, { duration: 1500 });
 
-function toggle_right_panel() {
-  rotation.value = 0.5 - rotation.value;
-  expand_chart.value = 10 - expand_chart.value;
-  transitionToLeft.value = !(pageMode.value === 0);
-  if (pageMode.value === 0) {
-    pageMode.value = 1 - pageMode.value;
-    togglePieChartMode();
-    displayRightChart.value = false;
-  } else {
-    expand_statistic.value = 0;
-  }
-}
-function transitionFinished() {
-  if (transitionToLeft.value) {
-    transitionToLeft.value = false;
-    pageMode.value = 0;
-    displayRightChart.value = true;
-    nextTick(() => {
-      reloadWordCloud();
-      togglePieChartMode();
-    });
-  } else if (pageMode.value === 1) {
-    expand_statistic.value = 1;
-    // 测试数据
-    upVotes.value = 100;
-    likes.value = 150;
-    collects.value = 10;
-    shares.value = 23;
-  }
-}
 setTimeout(() => {
   loading.value = true;
   datasource.value.push({
@@ -247,15 +216,7 @@ setTimeout(() => {
 .expand_statistic {
   flex-grow: v-bind("expand_statistic");
 }
-.collapse_button {
-  transition: all 0.5s ease-in-out;
-  transform: v-bind('"rotate(" + rotation + "turn)"');
-}
-::v-deep .el-tabs__content {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  flex-grow: 1;
-  align-self: stretch;
+:deep(.el-tabs__content) {
+  width: 100%;
 }
 </style>

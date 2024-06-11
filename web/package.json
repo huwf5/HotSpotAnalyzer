@@ -28,6 +28,7 @@
     "prepare": "cd .. && husky web/.husky"
   },
   "dependencies": {
+    "3d-force-graph": "^1.73.3",
     "@element-plus/icons-vue": "^2.3.1",
     "@vueuse/core": "^10.9.0",
     "axios": "^1.6.8",
@@ -37,6 +38,7 @@
     "echarts-liquidfill": "^3.1.0",
     "echarts-wordcloud": "^2.1.0",
     "element-plus": "^2.7.2",
+    "highcharts": "^11.4.3",
     "md5": "^2.3.0",
     "mitt": "^3.0.1",
     "nprogress": "^0.2.0",
@@ -45,10 +47,13 @@
     "qs": "^6.12.1",
     "screenfull": "^6.0.2",
     "sortablejs": "^1.15.2",
+    "three": "^0.165.0",
+    "three-spritetext": "^1.8.2",
     "vue": "^3.4.25",
     "vue-echarts": "^6.7.2",
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.3.2",
+    "vue3-count-to": "^1.1.2",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {

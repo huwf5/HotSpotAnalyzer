@@ -54,7 +54,7 @@ const handleClose = async (tag: string) => {
 const showInput = () => {
   inputVisible.value = true;
   nextTick(() => {
-    InputRef.value?.input?.focus();
+    InputRef.value!.input!.focus();
   });
 };
 
