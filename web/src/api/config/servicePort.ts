@@ -1,5 +1,4 @@
 // 后端微服务模块前缀
-export const PORT2 = "/hooks";
 
 /** 身份验证接口 */
 export namespace AuthPort {
@@ -18,7 +17,7 @@ export namespace ManagePort {
   const WHITE_LIST_PORT = "/whitelist";
   /** 管理员接口 */
   export enum IAdmin {
-    DELETE = USER_BASE_PORT + "/delete/",
+    DELETE = USER_BASE_PORT + "/delete-multiple/",
     DOWN_GRADE = USER_BASE_PORT + "/downgrade/",
     UP_GRADE = USER_BASE_PORT + "/upgrade/",
     USER_LIST = USER_BASE_PORT + "/list/"
@@ -26,6 +25,7 @@ export namespace ManagePort {
   /** 用户接口 */
   export enum IGuest {
     FORGET_PWD = USER_BASE_PORT + "/forget/",
+    DELETE = USER_BASE_PORT + "/delete/",
     UPDATE_PROFILE = USER_BASE_PORT + "/update-profile/",
     GET_PROFILE = USER_BASE_PORT + "/profile/"
   }

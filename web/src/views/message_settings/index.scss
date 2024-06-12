@@ -7,12 +7,11 @@
   /* Inside Auto Layout */
   flex: none;
   flex-direction: column;
-  flex-grow: 1;
   align-items: flex-start;
   align-self: stretch;
   justify-content: flex-start;
+  min-height: 100%;
   padding: 10px;
-  margin: 10px 0;
 }
 .single_setting {
   position: static;

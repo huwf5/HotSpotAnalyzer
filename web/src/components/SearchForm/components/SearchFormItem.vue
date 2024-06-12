@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts" name="SearchFormItem">
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import { handleProp } from "@/utils";
 import { ColumnProps } from "@/components/ProTable/interface";
 
@@ -47,7 +47,8 @@ const fieldNames = computed(() => {
 
 // 接收 enumMap (el 为 select-v2 需单独处理 enumData)
 const enumMap = inject("enumMap", ref(new Map()));
-const columnEnum = computed(() => {
+const columnEnum = ref<any>();
+const calEnum = () => {
   let enumData = enumMap.value.get(props.column.prop);
   if (!enumData) return [];
   if (props.column.search?.el === "select-v2" && props.column.fieldNames) {
@@ -56,6 +57,10 @@ const columnEnum = computed(() => {
     });
   }
   return enumData;
+};
+columnEnum.value = calEnum();
+watch(props, () => {
+  columnEnum.value = calEnum();
 });
 
 // 处理透传的 searchProps (el 为 tree-select、cascader 的时候需要给下默认 label && value && children)

@@ -72,6 +72,7 @@ defineProps<{
   margin: 0;
   overflow: hidden;
   border-radius: 15px;
-  box-shadow: 0 1.5px 6px 0;
+  outline: 1px solid var(--el-border-color);
+  box-shadow: var(--el-box-shadow-light);
 }
 </style>

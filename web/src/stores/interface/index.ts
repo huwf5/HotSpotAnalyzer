@@ -6,6 +6,8 @@ export type LanguageType = "zh" | "en" | null;
 export interface GlobalState {
   language: LanguageType;
   maximize: boolean;
+  assemblySize: string;
+  layout: string;
   primary: string;
   isDark: boolean;
   isGrey: boolean;

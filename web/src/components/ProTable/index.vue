@@ -122,7 +122,8 @@ export interface ProTableProps {
   requestApi?: (params: any) => Promise<any>; // 请求表格数据的 api ==> 非必传
   requestAuto?: boolean; // 是否自动执行请求 api ==> 非必传（默认为true）
   requestError?: (params: any) => void; // 表格 api 请求错误监听 ==> 非必传
-  dataCallback?: (data: any) => any; // 返回数据的回调函数，可以对数据进行处理 ==> 非必传
+  dataCallback?: (data: any) => any; // 返回数据的回调函数，可以对Api获取的数据进行处理 ==> 非必传
+  filterCallback?: (data: any, params: any) => any; // 展示数据的回调函数，可以对展示数据进行处理 ==> 非必传
   title?: string; // 表格标题 ==> 非必传
   pagination?: boolean; // 是否需要分页组件 ==> 非必传（默认为true）
   initParam?: any; // 初始化请求参数 ==> 非必传（默认为{}）
@@ -175,7 +176,7 @@ const {
   reset,
   handleSizeChange,
   handleCurrentChange
-} = useTable(props.requestApi, props.initParam, props.pagination, props.dataCallback, props.requestError);
+} = useTable(props.requestApi, props.initParam, props.pagination, props.dataCallback, props.requestError, props.filterCallback);
 
 // 清空选中数据列表
 const clearSelection = () => tableRef.value!.clearSelection();
@@ -189,7 +190,11 @@ onMounted(() => {
 
 // 处理表格数据
 const processTableData = computed(() => {
-  if (!props.data) return tableData.value;
+  if (!props.data)
+    return tableData.value.slice(
+      (pageable.value.pageNum - 1) * pageable.value.pageSize,
+      pageable.value.pageSize * pageable.value.pageNum
+    );
   if (!props.pagination) return props.data;
   return props.data.slice(
     (pageable.value.pageNum - 1) * pageable.value.pageSize,
