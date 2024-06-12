@@ -1,5 +1,0 @@
-1、analyze_result_with_sentiment_0527.json是最近一个月的每一个title聚类下的所有帖子的情感分析统计
-
-2、sentiments_counts_eng.json是中间产物，是每一个帖子各自的情感分析结果
-
-3、目前总的数据的情感分析暂时还没有跑代码，所以没有结果
