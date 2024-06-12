@@ -23,6 +23,8 @@ from django.db import transaction
 from django.db.utils import IntegrityError
 from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
 from rest_framework import status, viewsets, throttling, mixins
 from rest_framework.decorators import action
 from rest_framework.views import APIView
@@ -63,8 +65,7 @@ from .utils.swagger_schemas import (
     get_user_message_settings_api_response_schema,
     user_message_setting_update_schema,
     get_user_message_api_response_schema,
-    user_message_update_schema
-
+    user_message_update_schema,
 )
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -1072,7 +1073,9 @@ class MessageSettingView(viewsets.ViewSet):
         )
 
     def create_or_update_user_messages(self, user_setting, new_setting):
-        messages = Message.objects.all()
+        now = timezone.now()
+        one_month_ago = now - timedelta(days=30)
+        messages = Message.objects.filter(created_at__gte=one_month_ago)
         user = user_setting.email
 
         for message in messages:
@@ -1114,7 +1117,7 @@ class UserMessageView(viewsets.ViewSet):
         return APIResponse(
             status=status.HTTP_200_OK, data=serializer.data, message="获取成功"
         )
-    
+
     @swagger_auto_schema(
         operation_description="Update the user message",
         request_body=user_message_update_schema,
@@ -1155,11 +1158,11 @@ class UserMessageView(viewsets.ViewSet):
                 data={"error": str(e)} if DEBUG else None,
             )
         return APIResponse(status=status.HTTP_200_OK, message="更新成功")
-    
+
     @swagger_auto_schema(
-        operation_summary= "Delete the user message",
-        operation_id= "delete",
-        responses= {200: "删除成功", 400: "请求参数错误,请检查后重试"}
+        operation_summary="Delete the user message",
+        operation_id="delete",
+        responses={200: "删除成功", 400: "请求参数错误,请检查后重试"},
     )
     @action(detail=True, methods=["delete"], url_path="delete")
     def delete(self, request: Request, pk=None) -> APIResponse:
@@ -1168,13 +1171,70 @@ class UserMessageView(viewsets.ViewSet):
             with transaction.atomic():
                 user_message = UserMessage.objects.get(pk=pk, user=user)
                 user_message.delete()
-                return APIResponse(
-                    status=status.HTTP_200_OK,
-                    message="删除成功"
-                )
+                return APIResponse(status=status.HTTP_200_OK, message="删除成功")
         except Exception as e:
             return APIResponse(
                 status=status.HTTP_400_BAD_REQUEST,
                 message="删除过程中出现错误,请稍后重试",
+                data={"error": str(e)} if DEBUG else None,
+            )
+
+    @swagger_auto_schema(
+        operation_summary="Refresh user messages based on new messages created within the last month",
+        responses={
+            200: get_user_message_api_response_schema,
+            204: "无新消息",
+            400: "请求参数错误，请检查后重试",
+        },
+    )
+    @action(detail=False, methods=["get"], url_path="refresh")
+    def refresh(self, request: Request) -> APIResponse:
+        user = request.user
+        now = timezone.now()
+        one_month_ago = now - timedelta(days=30)
+        try:
+            with transaction.atomic():
+                user_message_setting = (
+                    UserMessageSettings.objects.select_for_update().get(email=user)
+                )
+                new_messages = Message.objects.filter(created_at__gte=one_month_ago)
+                if not new_messages.exists():
+                    return APIResponse(
+                        status=status.HTTP_204_NO_CONTENT, message="无新消息"
+                    )
+
+                # create the new user message
+                for message in new_messages:
+                    if not message.is_news and not user_message_setting.allow_non_news:
+                        continue
+
+                    message_type = None
+                    if (
+                        message.negative_sentiment_ratio
+                        >= user_message_setting.warning_threshold
+                    ):
+                        message_type = MESSAGE_TYPE_WARNING
+                    elif (
+                        message.negative_sentiment_ratio
+                        >= user_message_setting.info_threshold
+                    ):
+                        message_type = MESSAGE_TYPE_INFO
+                    if message_type:
+                        UserMessage.objects.update_or_create(
+                            user=user, message=message, defaults={"type": message_type}
+                        )
+                updated_user_messages = UserMessage.objects.filter(user=user)
+                serializer = UserMessageSerializer(updated_user_messages, many=True)
+                return APIResponse(
+                    status=status.HTTP_200_OK, message="更新成功", data=serializer.data
+                )
+        except UserMessageSettings.DoesNotExist:
+            return APIResponse(
+                status=status.HTTP_404_NOT_FOUND, message="用户消息设置不存在"
+            )
+        except Exception as e:
+            return APIResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="更新过程中出现错误,请稍后重试",
                 data={"error": str(e)} if DEBUG else None,
             )
