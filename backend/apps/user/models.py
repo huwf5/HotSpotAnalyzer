@@ -41,6 +41,7 @@ class EmailSuffixFormat(models.Model):
 
     class Meta:
         db_table = TABLE_PREFIX + "email_format"
+        app_label = 'user'  # 使用你的应用名称
 
     def __str__(self):
         return self.format

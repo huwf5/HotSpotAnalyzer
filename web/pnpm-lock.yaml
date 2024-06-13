@@ -86,6 +86,9 @@ importers:
       vuedraggable:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.4.26(typescript@5.4.5))
+      vuex:
+        specifier: ^4.0.2
+        version: 4.0.2(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.3.0
@@ -4657,6 +4660,11 @@ packages:
     resolution: {integrity: sha512-FU5HCWBmsf20GpP3eudURW3WdWTKIbEIQxh9/8GE806hydR9qZqRRxRE3RjqX7PkuLuMQG/A7n3cfj9rCEchww==}
     peerDependencies:
       vue: ^3.0.1
+
+  vuex@4.0.2:
+    resolution: {integrity: sha512-M6r8uxELjZIK8kTKDGgZTYX/ahzblnzC4isU1tpmEuOIIKmV+TRdc+H4s8ds2NuZ7wpUTdGRzJRtoj+lI+pc0Q==}
+    peerDependencies:
+      vue: ^3.0.2
 
   webidl-conversions@4.0.2:
     resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
@@ -9643,6 +9651,11 @@ snapshots:
   vuedraggable@4.1.0(vue@3.4.26(typescript@5.4.5)):
     dependencies:
       sortablejs: 1.14.0
+      vue: 3.4.26(typescript@5.4.5)
+
+  vuex@4.0.2(vue@3.4.26(typescript@5.4.5)):
+    dependencies:
+      '@vue/devtools-api': 6.6.1
       vue: 3.4.26(typescript@5.4.5)
 
   webidl-conversions@4.0.2: {}

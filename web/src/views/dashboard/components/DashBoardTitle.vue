@@ -6,57 +6,75 @@
           <span>数据大屏🌻</span>
           <div class="font-bold whitespace-nowrap">author: hcp🌻</div>
         </div>
+        <!-- 添加下拉框 -->
+        <el-select v-model="selectedDate" @change="updateDate" placeholder="选择日期" class="p-t-8px">
+          <el-option label="2024-05-27" value="2024-05-27"></el-option>
+          <el-option label="更早" value="earlier"></el-option>
+        </el-select>
       </div>
     </div>
   </el-card>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref, watch } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+const selectedDate = ref(store.state.selectedDate);
+
+const updateDate = value => {
+  store.dispatch("updateSelectedDate", value);
+};
+
+// Watch for changes in Vuex state to update local ref
+watch(
+  () => store.state.selectedDate,
+  newDate => {
+    selectedDate.value = newDate;
+  },
+  { immediate: true }
+);
+</script>
 
 <style scoped>
 .rounded-md {
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
-
 .dark\:bg-black {
   background-color: #ffffff;
 }
-
 .flex {
   display: flex;
   align-items: center;
   padding: 14px;
 }
-
 .p-l-20px {
   padding-left: 20px;
 }
-
 .font-bold {
   font-weight: bold;
 }
-
 .p-b-8px {
   padding-bottom: 24px;
 }
-
+.p-t-8px {
+  padding-top: 8px;
+}
 .whitespace-nowrap {
   white-space: nowrap;
 }
-
 .el-card[shadow="hover"]:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 20%);
 }
-
 .watermark {
   color: #d9d9d9;
 }
-
 span,
 .font-bold div {
-  vertical-align: middle;
-  color: #007bff;
   font-size: 22px;
+  color: #007bff;
+  vertical-align: middle;
 }
 </style>

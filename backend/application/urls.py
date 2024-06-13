@@ -23,6 +23,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from apps.system.views import fetch_graph, fetch_cardList, fetch_wordCloud, fetch_emotionData, fetch_chartData, fetch_topicCard
+
 schema_view = get_schema_view(
     openapi.Info(
         title="API Documentation",
@@ -40,4 +42,11 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("apps.user.urls")),
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('fetch-graph/', fetch_graph, name='fetch-graph'),
+    path('fetch-cardList/', fetch_cardList, name='fetch-cardList'),
+    path('fetch-wordCloud/', fetch_wordCloud, name='fetch-wordCloud'),
+    path('fetch-emotionData', fetch_emotionData, name='fetch-emotionData'),
+    path('fetch-chartData', fetch_chartData, name='fetch-chartData'),
+    path('fetch-topicCard', fetch_topicCard, name='fetch-topicCard')
+
 ]

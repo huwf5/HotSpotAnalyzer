@@ -9,7 +9,7 @@ def api_response_schema(data_schema=None, code_schema=None):
             "message": openapi.Schema(
                 type=openapi.TYPE_STRING, description="response message"
             ),
-            "data": data_schema,
+            "graph": data_schema,
             "code": code_schema,
         },
     )

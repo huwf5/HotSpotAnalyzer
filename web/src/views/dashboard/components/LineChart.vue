@@ -4,23 +4,55 @@
     <div ref="chartContainer" class="chart-container"></div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-import { init as initECharts, ECharts, EChartsOption, graphic } from "echarts";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { init as initECharts, ECharts, graphic } from "echarts";
+import { useStore } from "vuex";
+
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
 
 const chartContainer = ref<HTMLDivElement | null>(null);
 let myChart: ECharts | null = null;
 
-const initChart = () => {
+const initChart = async selectedDateValue => {
+  const date = ref("");
+  if (selectedDateValue === "earlier") {
+    date.value = "history";
+  } else {
+    date.value = selectedDateValue;
+  }
+  const response = await fetch(`http://127.0.0.1:8000/fetch-chartData?date=${date.value}`);
+  const chartData = await response.json();
+  const x_data = chartData["x"];
+  const y_data = chartData["y"];
+
   if (chartContainer.value) {
     myChart = initECharts(chartContainer.value);
-    const option: EChartsOption = {
+    const option: {
+      yAxis: { axisLabel: { color: string }; type: string };
+      xAxis: { axisLabel: { rotate: number; color: string }; data: any; type: string };
+      grid: { left: string };
+      series: {
+        areaStyle: { color: LinearGradient };
+        data: any;
+        lineStyle: { shadowOffsetY: number; shadowBlur: number; width: number; shadowColor: string };
+        itemStyle: { borderColor: string; color: string };
+        type: string;
+        smooth: boolean;
+      }[];
+      tooltip: { trigger: string };
+    } = {
+      grid: {
+        left: "15%" // 增加左侧内边距
+      },
       tooltip: {
         trigger: "axis"
       },
       xAxis: {
         type: "category",
-        data: ["2021-09-01", "2021-09-06", "2021-09-11", "2021-09-16", "2021-09-21", "2021-09-26"],
+        data: x_data,
         axisLabel: {
           rotate: 45, // 旋转标签以更好地适应
           color: "#6c757d" // 更改文字颜色
@@ -34,7 +66,7 @@ const initChart = () => {
       },
       series: [
         {
-          data: [120, 200, 150, 80, 180, 230],
+          data: y_data,
           type: "line",
           smooth: true,
           lineStyle: {
@@ -66,9 +98,15 @@ const initChart = () => {
     myChart.setOption(option);
   }
 };
-
+watch(
+  selectedDate,
+  newDate => {
+    initChart(newDate);
+  },
+  { immediate: true }
+);
 onMounted(() => {
-  initChart();
+  initChart(selectedDate.value);
   window.addEventListener("resize", () => {
     myChart?.resize();
   });
@@ -84,21 +122,16 @@ onUnmounted(() => {
   width: 100%; /* 使用100%宽度以适应父容器 */
   height: 375px; /* 保持图表为方形，可以调整为100%或固定尺寸 */
 }
-
 .linechart-wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #fff; /* 背景颜色调整为白色 */
-  position: relative;
+  background-color: #ffffff; /* 背景颜色调整为白色 */
 }
-
 .linechart-title {
-  /* position: absolute;
-  top: 0;
-  left: 10px; */
+  margin: 0;
   font-size: 18px; /* 调整字体大小为较小的尺寸 */
   color: #007bff; /* 字体颜色改为蓝色 */
-  margin: 0;
 }
 </style>

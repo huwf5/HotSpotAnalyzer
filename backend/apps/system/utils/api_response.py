@@ -7,9 +7,9 @@ class APIResponse(Response):
             "message": message,
         }
         if data:
-            standard_response["data"] = data
+            standard_response["graph"] = data
         else:
-            standard_response["data"] = []
+            standard_response["graph"] = []
         if code:
             standard_response["code"] = code
         standard_response.update(kwargs)

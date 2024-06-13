@@ -6,11 +6,11 @@
   <div class="projects-section-line">
     <div class="projects-status">
       <div class="item-status">
-        <span class="status-number">45</span>
+        <span class="status-number">{{ num_of_topics }}</span>
         <span class="status-type">热门话题</span>
       </div>
       <div class="item-status">
-        <span class="status-number">2400</span>
+        <span class="status-number">{{ num_of_comments }}</span>
         <span class="status-type">总讨论数</span>
       </div>
     </div>
@@ -103,97 +103,70 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
+import { useStore } from "vuex";
+
+// Define reactive variables
 const isGridView = ref(true);
 const setCurrentView = view => {
   isGridView.value = view === "grid";
 };
-interface Project {
-  id: number;
-  date: string;
-  title: string;
-  description: string;
-  progress: number;
-  progressType: string;
-  progressColor: string;
-  footerText: string;
-  color: string;
-}
-const projects = ref<Project[]>([
-  {
-    id: 1,
-    date: "December 10, 2020",
-    title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-    description:
-      "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-    progress: 60,
-    progressType: "话题热度",
-    progressColor: "#ff942e",
-    footerText: "话题帖子数: 1000",
-    color: "#fee4cb"
-  },
-  {
-    id: 2,
-    date: "December 10, 2020",
-    title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-    description:
-      "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-    progress: 60,
-    progressType: "话题热度",
-    progressColor: "#4f3ff0",
-    footerText: "话题帖子数: 1000",
-    color: "#e9e7fd"
-  },
-  {
-    id: 3,
-    date: "December 10, 2020",
-    title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-    description:
-      "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-    progress: 60,
-    progressType: "话题热度",
-    progressColor: "#096c86",
-    footerText: "话题帖子数: 1000",
-    color: "#dbf6fd"
-  },
-  {
-    id: 4,
-    date: "December 10, 2020",
-    title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-    description:
-      "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-    progress: 60,
-    progressType: "话题热度",
-    progressColor: "#df3670",
-    footerText: "话题帖子数: 1000",
-    color: "#ffd3e2"
-  },
-  {
-    id: 5,
-    date: "December 10, 2020",
-    title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-    description:
-      "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-    progress: 60,
-    progressType: "话题热度",
-    progressColor: "#34c471",
-    footerText: "话题帖子数: 1000",
-    color: "#c8f7dc"
-  },
-  {
-    id: 6,
-    date: "December 10, 2020",
-    title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-    description:
-      "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-    progress: 60,
-    progressType: "话题热度",
-    progressColor: "#4067f9",
-    footerText: "话题帖子数: 1000",
-    color: "#d5deff"
+
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
+const date = ref("");
+
+// Define a function to fetch topic card data
+const fetchTopicCardData = async selectedDateValue => {
+  if (selectedDateValue === "earlier") {
+    date.value = "history";
+  } else {
+    date.value = selectedDateValue;
   }
-  // Additional projects can be added here
-]);
+
+  const response = await fetch(`http://127.0.0.1:8000/fetch-topicCard?date=${date.value}`);
+  const data = await response.json();
+  topicCard.value = data;
+
+  num_of_topics.value = data["num_of_topics"];
+  num_of_comments.value = data["num_of_comments"];
+
+  projects.value = data["topic_list"].map((topicItem, index) => ({
+    id: index + 1,
+    date: topicItem.date,
+    title: "#" + topicItem.title + "#",
+    description: topicItem.summary,
+    progress: Math.round(topicItem.progress * 100),
+    progressType: "话题热度",
+    progressColor: getProgressColor(topicItem.progress),
+    footerText: "话题帖子数: " + topicItem.num_of_posts,
+    color: "#fee4cb" // Default color, adjust as needed
+  }));
+};
+
+// Watch for changes in selectedDate and fetch data accordingly
+watch(
+  selectedDate,
+  newDate => {
+    fetchTopicCardData(newDate);
+  },
+  { immediate: true }
+);
+
+// Define reactive variables for fetched data
+const topicCard = ref(null);
+const num_of_topics = ref(0);
+const num_of_comments = ref(0);
+const projects = ref([]);
+
+// Function to determine project progress color
+const getProgressColor = progress => {
+  if (progress >= 80) return "#34c471"; // Green
+  if (progress >= 60) return "#ff942e"; // Orange
+  if (progress >= 40) return "#4067f9"; // Blue
+  return "#df3670"; // Red
+};
+console.log(date.value);
 </script>
 <style>
 /* Scoped CSS here */
@@ -203,21 +176,21 @@ const projects = ref<Project[]>([
   --secondary-color: #4a4a4a;
   --link-color: #1f1c2e;
   --link-color-hover: #c3cff4;
-  --link-color-active: #fff;
+  --link-color-active: #ffffff;
   --link-color-active-bg: #1f1c2e;
-  --projects-section: #fff;
+  --projects-section: #ffffff;
 }
 * {
   box-sizing: border-box;
 }
 .app-container {
-  width: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 1800px;
   height: 100%;
   background-color: var(--app-container);
   transition: 0.2s;
-  max-width: 1800px;
 }
 .app-container button,
 .app-container input,
@@ -229,122 +202,113 @@ const projects = ref<Project[]>([
 .app-content {
   display: flex;
   height: 100%;
-  overflow: hidden;
   padding: 16px 24px 24px 0;
+  overflow: hidden;
 }
-
 .mode-switch {
-  background-color: transparent;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   color: var(--main-color);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: transparent;
+  border: none;
 }
-
 .projects-section {
+  display: flex;
   flex: 2;
+  flex-direction: column;
+  height: 100%;
+  padding: 32px 32px 0;
+  overflow: hidden;
   background-color: var(--projects-section);
   border-radius: 32px;
-  padding: 32px 32px 0 32px;
-  overflow: hidden;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 .projects-section-line {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding-bottom: 32px;
 }
 .projects-section-header {
-  display: flex;
   top: 0;
   left: 10px;
-  justify-content: space-between;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 24px;
   color: #007bff;
 }
 .projects-section-header p {
-  font-size: 18px;
-  line-height: 32px;
-  font-weight: 700;
   margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 32px;
   color: #007bff;
 }
 .projects-section-header .time {
   font-size: 20px;
 }
-
 .projects-status {
   display: flex;
 }
-
 .item-status {
   display: flex;
   flex-direction: column;
   margin-right: 16px;
 }
-.item-status:not(:last-child) .status-type:after {
-  content: "";
+.item-status:not(:last-child) .status-type::after {
   position: absolute;
-  right: 8px;
   top: 50%;
-  transform: translatey(-50%);
+  right: 8px;
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  content: "";
   border: 1px solid var(--secondary-color);
+  border-radius: 50%;
+  transform: translateY(-50%);
 }
-
 .status-number {
   font-size: 24px;
-  line-height: 32px;
   font-weight: 700;
+  line-height: 32px;
   color: var(--main-color);
 }
-
 .status-type {
   position: relative;
   padding-right: 24px;
   color: var(--secondary-color);
 }
-
 .view-actions {
   display: flex;
   align-items: center;
 }
-
 .view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 36px;
   height: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 6px;
-  border-radius: 4px;
+  margin-left: 8px;
+  color: var(--main-color);
   background-color: transparent;
   border: none;
-  color: var(--main-color);
-  margin-left: 8px;
+  border-radius: 4px;
   transition: 0.2s;
 }
 .view-btn.active {
-  background-color: var(--link-color-active-bg);
   color: var(--link-color-active);
+  background-color: var(--link-color-active-bg);
 }
 .view-btn:not(.active):hover {
-  background-color: var(--link-color-hover);
   color: var(--link-color-active);
+  background-color: var(--link-color-hover);
 }
-
 .project-boxes {
+  max-height: 600px;
   margin: 0 -8px;
   overflow-y: auto;
-  max-height: 600px;
 }
 .project-boxes.jsGridView {
   display: flex;
@@ -355,17 +319,17 @@ const projects = ref<Project[]>([
   width: 33.3%;
 }
 .project-boxes.jsListView .project-box {
+  position: relative;
   display: flex;
   border-radius: 10px;
-  position: relative;
 }
 .project-boxes.jsListView .project-box > * {
   margin-right: 24px;
 }
 .project-boxes.jsListView .more-wrapper {
   position: absolute;
-  right: 16px;
   top: 16px;
+  right: 16px;
 }
 .project-boxes.jsListView .project-box-content-header {
   order: 1;
@@ -375,22 +339,22 @@ const projects = ref<Project[]>([
   order: 2;
 }
 .project-boxes.jsListView .project-box-footer {
-  order: 3;
-  padding-top: 0;
   flex-direction: column;
   justify-content: flex-start;
+  order: 3;
+  padding-top: 0;
 }
-.project-boxes.jsListView .project-box-footer:after {
+.project-boxes.jsListView .project-box-footer::after {
   display: none;
 }
 .project-boxes.jsListView .participants {
   margin-bottom: 8px;
 }
 .project-boxes.jsListView .project-box-content-header p {
-  text-align: left;
   overflow: hidden;
-  white-space: nowrap;
+  text-align: left;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .project-boxes.jsListView .project-box-header > span {
   position: absolute;
@@ -399,15 +363,15 @@ const projects = ref<Project[]>([
   font-size: 12px;
 }
 .project-boxes.jsListView .box-progress-wrapper {
-  order: 3;
   flex: 1;
+  order: 3;
 }
-
 .project-box {
   --main-color-card: #dbf6fd;
-  border-radius: 30px;
+
   padding: 16px;
   background-color: var(--main-color-card);
+  border-radius: 30px;
 }
 .project-box-header {
   display: flex;
@@ -417,14 +381,14 @@ const projects = ref<Project[]>([
   color: var(--main-color);
 }
 .project-box-header span {
-  color: #4a4a4a;
-  opacity: 0.7;
   font-size: 14px;
   line-height: 16px;
+  color: #4a4a4a;
+  opacity: 0.7;
 }
 .project-box-content-header {
-  text-align: center;
   margin-bottom: 16px;
+  text-align: center;
 }
 .project-box-content-header p {
   margin: 0;
@@ -433,54 +397,47 @@ const projects = ref<Project[]>([
   padding: 8px;
   transition: 0.2s;
 }
-
 .project-btn-more {
-  padding: 0;
-  height: 14px;
+  position: relative;
+  flex-shrink: 0;
   width: 24px;
   height: 24px;
-  position: relative;
+  padding: 0;
   background-color: transparent;
   border: none;
-  flex-shrink: 0;
-  &:after,
-  &:before {
-    content: "";
+  &::after,
+  &::before {
     position: absolute;
+    left: 50%;
     width: 6px;
     height: 6px;
-    border-radius: 50%;
+    content: "";
     background-color: var(--main-color);
+    border-radius: 50%;
     opacity: 0.8;
-    left: 50%;
-    transform: translatex(-50%);
+    transform: translateX(-50%);
   }
-
-  &:before {
+  &::before {
     top: 0;
   }
-  &:after {
+  &::after {
     bottom: 0;
   }
 }
-
 .more-wrapper {
   position: relative;
 }
-
 .box-content-header {
   font-size: 16px;
-  line-height: 24px;
   font-weight: 700;
+  line-height: 24px;
   opacity: 0.7;
 }
-
 .box-content-subheader {
   font-size: 14px;
   line-height: 24px;
   opacity: 0.7;
 }
-
 .box-progress {
   display: block;
   height: 4px;
@@ -489,97 +446,91 @@ const projects = ref<Project[]>([
 .box-progress-bar {
   width: 100%;
   height: 4px;
-  border-radius: 6px;
-  overflow: hidden;
-  background-color: #fff;
   margin: 8px 0;
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 6px;
 }
 .box-progress-header {
+  margin: 0;
   font-size: 14px;
   font-weight: 700;
   line-height: 16px;
-  margin: 0;
 }
 .box-progress-percentage {
-  text-align: right;
   margin: 0;
   font-size: 14px;
   font-weight: 700;
   line-height: 16px;
+  text-align: right;
 }
-
 .project-box-footer {
+  position: relative;
   display: flex;
   justify-content: space-between;
   padding-top: 16px;
-  position: relative;
 }
-.project-box-footer:after {
-  content: "";
+.project-box-footer::after {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.6);
-  width: calc(100% + 32px);
   top: 0;
   left: -16px;
+  width: calc(100% + 32px);
   height: 1px;
+  content: "";
+  background-color: rgb(255 255 255 / 60%);
 }
-
 .days-left {
-  background-color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
-  border-radius: 20px;
   flex-shrink: 0;
   padding: 6px 16px;
+  font-size: 12px;
   font-weight: 700;
+  background-color: rgb(255 255 255 / 60%);
+  border-radius: 20px;
 }
-
 .mode-switch.active .moon {
   fill: var(--main-color);
 }
 
-@media screen and (max-width: 980px) {
+@media screen and (width <= 980px) {
   .project-boxes.jsGridView .project-box-wrapper {
     width: 50%;
   }
-
   .status-number,
   .status-type {
     font-size: 14px;
   }
-
-  .status-type:after {
+  .status-type::after {
     width: 4px;
     height: 4px;
   }
-
   .item-status {
     margin-right: 0;
   }
 }
-@media screen and (max-width: 880px) {
+
+@media screen and (width <= 880px) {
   .messages-section {
-    transform: translateX(100%);
     position: absolute;
-    opacity: 0;
     top: 0;
     z-index: 2;
-    height: 100%;
     width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateX(100%);
   }
   .messages-section .messages-close {
     display: block;
   }
-
   .messages-btn {
     display: flex;
   }
 }
-@media screen and (max-width: 720px) {
+
+@media screen and (width <= 720px) {
   .app-name,
   .profile-btn span {
     display: none;
   }
-
   .add-btn,
   .notification-btn,
   .mode-switch {
@@ -592,114 +543,85 @@ const projects = ref<Project[]>([
     width: 16px;
     height: 16px;
   }
-
   .app-header-right button {
     margin-left: 4px;
   }
 }
-@media screen and (max-width: 520px) {
+
+@media screen and (width <= 520px) {
   .projects-section {
+    padding: 24px 16px 0;
     overflow: auto;
   }
-
   .project-boxes {
     overflow-y: visible;
   }
-
   .app-sidebar,
   .app-icon {
     display: none;
   }
-
   .app-content {
-    padding: 16px 12px 24px 12px;
+    padding: 16px 12px 24px;
   }
-
   .status-number,
   .status-type {
     font-size: 10px;
   }
-
   .view-btn {
     width: 24px;
     height: 24px;
   }
-
   .app-header {
     padding: 16px 10px;
   }
-
   .search-input {
     max-width: 120px;
+    font-size: 14px;
   }
-
   .project-boxes.jsGridView .project-box-wrapper {
     width: 100%;
   }
-
-  .projects-section {
-    padding: 24px 16px 0 16px;
-  }
-
-  .app-header {
-    padding: 10px;
-  }
-
   .projects-section-header p,
   .projects-section-header .time {
     font-size: 18px;
   }
-
   .status-type {
     padding-right: 4px;
   }
-  .status-type:after {
+  .status-type::after {
     display: none;
   }
-
-  .search-input {
-    font-size: 14px;
-  }
-
   .messages-btn {
     top: 48px;
   }
-
   .box-content-header {
     font-size: 12px;
     line-height: 16px;
   }
-
   .box-content-subheader {
     font-size: 12px;
     line-height: 16px;
   }
-
   .project-boxes.jsListView .project-box-header > span {
     font-size: 10px;
   }
-
   .box-progress-header {
     font-size: 12px;
   }
-
   .box-progress-percentage {
     font-size: 10px;
   }
-
   .days-left {
+    padding: 6px;
     font-size: 8px;
-    padding: 6px 6px;
     text-align: center;
   }
-
   .project-boxes.jsListView .project-box > * {
     margin-right: 10px;
   }
-
   .project-boxes.jsListView .more-wrapper {
-    right: 2px;
     top: 10px;
+    right: 2px;
   }
 }
 </style>

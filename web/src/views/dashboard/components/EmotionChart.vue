@@ -6,20 +6,27 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import * as echarts from "echarts";
+import { useStore } from "vuex";
 
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
 const chartRef = ref(null);
-const emotionData = ref([
-  { emotion: "Happy", percentage: 20 },
-  { emotion: "Sad", percentage: 30 },
-  { emotion: "Angry", percentage: 10 },
-  { emotion: "Surprised", percentage: 15 },
-  { emotion: "Fearful", percentage: 5 },
-  { emotion: "Disgusted", percentage: 20 }
-]);
 
-onMounted(() => {
+const fetchEmotionData = async selectedDateValue => {
+  const date = ref("");
+  if (selectedDateValue === "earlier") {
+    date.value = "history";
+  } else {
+    date.value = selectedDateValue;
+  }
+
+  const response = await fetch(`http://127.0.0.1:8000/fetch-emotionData?date=${date.value}`);
+  const emotionData = ref(null);
+  emotionData.value = await response.json();
+  emotionData.value = emotionData.value["data"];
+
   if (chartRef.value) {
     // 对 emotionData 进行排序，根据需求选择升序或降序
     emotionData.value.sort((a, b) => b.percentage - a.percentage); // 降序排序
@@ -32,7 +39,7 @@ onMounted(() => {
       },
       xAxis: {
         type: "category",
-        data: emotionData.value.map(item => item.emotion)
+        data: emotionData.value.map(item => item["emotion"])
       },
       yAxis: {
         type: "value",
@@ -41,7 +48,7 @@ onMounted(() => {
       series: [
         {
           type: "bar",
-          data: emotionData.value.map(item => item.percentage),
+          data: emotionData.value.map(item => item["percentage"]),
           itemStyle: {
             color: params => {
               const colors = {
@@ -52,7 +59,7 @@ onMounted(() => {
                 Fearful: "#13c2c2",
                 Disgusted: "#389e0d"
               };
-              return colors[emotionData.value[params.dataIndex].emotion] || "#000";
+              return colors[emotionData.value[params.dataIndex]["emotion"]] || "#000";
             }
           },
           animationDuration: 2000,
@@ -65,24 +72,32 @@ onMounted(() => {
       ]
     });
   }
+};
+onMounted(() => {
+  fetchEmotionData(selectedDate.value);
 });
+watch(
+  selectedDate,
+  newDate => {
+    fetchEmotionData(newDate);
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
 .emotion-wrapper {
-  background-color: #fff; /* 背景颜色调整为白色 */
   position: relative;
+  background-color: #ffffff; /* 背景颜色调整为白色 */
 }
-
 .emotion-title {
   position: absolute; /* 使标题定位到左上角 */
   top: 0;
   left: 10px;
+  margin: 0;
   font-size: 18px;
   color: #007bff; /* 字体颜色改为蓝色 */
-  margin: 0;
 }
-
 .emotion-chart {
   width: 100%;
   height: 350px;
