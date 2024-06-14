@@ -22,8 +22,13 @@ server_init_db: enter_virtualEnv
 	@echo "Adding initial data..."
 	@cd $(backend_base_dir) && python manage.py init
 
+.PHONY: build_frontend
+build_frontend:
+	@echo "Building frontend..."
+	@cd $(web_base_dir) && pnpm run build:pro
+
 .PHONY: server_collect_static
-server_collect_static: enter_virtualEnv
+server_collect_static: enter_virtualEnv build_frontend
 	@echo "collecting static files..."
 	@mkdir -p $(backend_base_dir)/static
 	@cd $(backend_base_dir) && python manage.py collectstatic --noinput
