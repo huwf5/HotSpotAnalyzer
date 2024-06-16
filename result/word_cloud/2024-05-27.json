@@ -1,0 +1,85 @@
+{
+  "data":
+ [
+  {
+    "name": "JavaScript",
+    "value": 1000
+  },
+  {
+    "name": "Vue",
+    "value": 800
+  },
+  {
+    "name": "React",
+    "value": 600
+  },
+  {
+    "name": "Angular",
+    "value": 400
+  },
+  {
+    "name": "Svelte",
+    "value": 200
+  },
+  {
+    "name": "Python",
+    "value": 950
+  },
+  {
+    "name": "Ruby",
+    "value": 300
+  },
+  {
+    "name": "Java",
+    "value": 850
+  },
+  {
+    "name": "C#",
+    "value": 500
+  },
+  {
+    "name": "C++",
+    "value": 650
+  },
+  {
+    "name": "JavaScript",
+    "value": 100
+  },
+  {
+    "name": "Vue",
+    "value": 8000
+  },
+  {
+    "name": "React",
+    "value": 6000
+  },
+  {
+    "name": "Angular",
+    "value": 4000
+  },
+  {
+    "name": "Svelte",
+    "value": 2000
+  },
+  {
+    "name": "Python",
+    "value": 9050
+  },
+  {
+    "name": "Ruby",
+    "value": 3000
+  },
+  {
+    "name": "Java",
+    "value": 8050
+  },
+  {
+    "name": "C#",
+    "value": 5000
+  },
+  {
+    "name": "C++",
+    "value": 6500
+  }
+]
+}

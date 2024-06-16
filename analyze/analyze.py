@@ -55,17 +55,17 @@ def main():
             target[label]["is_news"] = isNews
             save_json_file(target, args.target_file)
         else:
-            isNews = target[label]["is_news"]
-        if isNews:
-            target[label]["posts"] = wids.copy()
-            if "summary" not in target[label].keys():
-                summary = summarize(text)
-                target[label]["summary"] = summary
-                save_json_file(target, args.target_file)
-            if "title" not in target[label].keys():
-                title = generate_title(text)
-                target[label]["title"] = title
-                save_json_file(target, args.target_file)
+            pass
+
+        target[label]["posts"] = wids.copy()
+        if "summary" not in target[label].keys():
+            summary = summarize(text)
+            target[label]["summary"] = summary
+            save_json_file(target, args.target_file)
+        if "title" not in target[label].keys():
+            title = generate_title(text)
+            target[label]["title"] = title
+            save_json_file(target, args.target_file)
 
 
 

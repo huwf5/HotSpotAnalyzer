@@ -1,0 +1,28 @@
+{"data":
+[
+  {
+    "emotion": "Happy",
+    "percentage": 20
+  },
+  {
+    "emotion": "Sad",
+    "percentage": 30
+  },
+  {
+    "emotion": "Angry",
+    "percentage": 10
+  },
+  {
+    "emotion": "Surprised",
+    "percentage": 15
+  },
+  {
+    "emotion": "Fearful",
+    "percentage": 5
+  },
+  {
+    "emotion": "Disgusted",
+    "percentage": 20
+  }
+]
+}
