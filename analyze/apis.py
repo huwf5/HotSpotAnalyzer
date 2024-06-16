@@ -106,7 +106,7 @@ def build_event_graph(text, publish_time):
     print(result)
     print(result['openai']['generated_text'])
     graph = json.loads(result['openai']['generated_text'])
-    time.sleep(20)
+    time.sleep(15)
     return graph
 
 
@@ -136,7 +136,7 @@ def prune_event_graph(graph, target_file):
     print(result['openai']['generated_text'])
     graph = json.loads(result['openai']['generated_text'])
     # 将结果写入新的 JSON 文件
-    time.sleep(20)
+    time.sleep(15)
     with open(target_file, 'w', encoding='utf-8') as outfile:
         json.dump(graph, outfile, ensure_ascii=False, indent=4)
 
@@ -166,7 +166,7 @@ def generate_title(text):
     result = json.loads(response.text)
     title = result['openai']['generated_text']
     print(title)
-    time.sleep(20)
+    time.sleep(15)
     return title
 
 
@@ -192,7 +192,7 @@ def summarize(text):
     result = json.loads(response.text)
     summary = result['openai']['generated_text']
     print(summary)
-    time.sleep(20)
+    time.sleep(15)
     return summary
 
 
@@ -234,7 +234,7 @@ def is_news(text):
     print(result['openai']['generated_text'])
     predictions = json.loads(result['openai']['generated_text'])
     print(predictions)
-    time.sleep(20)
+    time.sleep(15)
     return predictions
 
 

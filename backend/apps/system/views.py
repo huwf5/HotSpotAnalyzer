@@ -42,7 +42,7 @@ def find_closest_date_file(directory):
 
 def fetch_wordCloud(request):
     date = request.GET.get('date')
-    file_path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'word_cloud', f'{date}.json')
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'word_cloud', f'{date}.json')
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return JsonResponse(data)
@@ -52,7 +52,7 @@ def fetch_graph(request):
     date = request.GET.get('date')
     print(f"graphDate:{date}")
     # 构建文件的绝对路径
-    file_path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'graph', f'{date}.json')
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'graph', f'{date}.json')
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return JsonResponse(data)
@@ -60,7 +60,7 @@ def fetch_graph(request):
 
 def fetch_emotionData(request):
     date = request.GET.get('date')
-    file_path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'emotion_data', f'{date}.json')
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'emotion_data', f'{date}.json')
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return JsonResponse(data)
@@ -69,7 +69,7 @@ def fetch_emotionData(request):
 def fetch_chartData(request):
     date = request.GET.get('date')
     print(f"chartDataDate:{date}")
-    file_path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'chart_data', f"{date}.json")
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'chart_data', f"{date}.json")
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return JsonResponse(data)
@@ -78,7 +78,7 @@ def fetch_chartData(request):
 def fetch_cardList(request):
     try:
         # 构建文件的绝对路径
-        file_path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'weibo_data')
+        file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data')
         filename = find_closest_date_file(file_path)
         file_path = os.path.join(file_path, filename)
         print(file_path)
@@ -94,8 +94,8 @@ def fetch_cardList(request):
         history_like_counts = 0
         history_comment_counts = 0
         history_forward_counts = 0
-        for filename in os.listdir(os.path.join(settings.BASE_DIR, 'apps', 'system', 'weibo_data')):
-            path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'weibo_data', filename)
+        for filename in os.listdir(os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data')):
+            path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', filename)
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             history_num_of_posts += len(data)
@@ -129,11 +129,11 @@ def fetch_cardList(request):
 
 def fetch_topicCard(request):
     date = request.GET.get('date')
-    file_path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'topic_data', f'{date}.json')
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data', f'{date}.json')
     print(os.path.exists(file_path))
     with open(file_path, 'r', encoding='utf-8') as file:
         topic_data = json.load(file)
-    source_data_path = os.path.join(settings.BASE_DIR, 'apps', 'system', 'weibo_data', f'{date}.json')
+    source_data_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
 
     with open(source_data_path, 'r', encoding='utf-8') as file:
         source_data = json.load(file)
