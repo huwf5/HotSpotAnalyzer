@@ -12,7 +12,7 @@ event_graph := $(event_dir)/build_event_graph.py
 convert_knowledge_graph := $(event_dir)/convert_knowledge_graph.py
 # 情感分析和词频部分
 senti_dir := sentiment
-wordcount_dir := word_cloud
+wordcount_dir := wordcount
 post_sentiment := $(senti_dir)/post_senti.py
 topic_sentiment := $(senti_dir)/analyze_add.py
 word_count_jieba := $(wordcount_dir)/title_wordcount_jieba.py
