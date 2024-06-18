@@ -1,0 +1,7 @@
+	Traceback (most recent call last):
+	  File "/home/zsdx/Desktop/chatglm3/analyze/sentiment/analyze_add.py", line 38, in <module>
+	    add_sentiments(analyze_result, post_sentiment_counts, output_file)
+	  File "/home/zsdx/Desktop/chatglm3/analyze/sentiment/analyze_add.py", line 5, in add_sentiments
+	    with open(analyze_result_file, 'r', encoding='utf-8') as file:
+	         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	FileNotFoundError: [Errno 2] No such file or directory: '../result/topic_data/2024-06-18.json'

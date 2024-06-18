@@ -1,0 +1,8 @@
+	Traceback (most recent call last):
+	  File "/home/zsdx/Desktop/chatglm3/analyze/event/convert_knowledge_graph.py", line 68, in <module>
+	    graphs = read_json_file(args.graph_file)
+	             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	  File "/home/zsdx/Desktop/chatglm3/analyze/event/convert_knowledge_graph.py", line 8, in read_json_file
+	    with open(file_path, 'r', encoding='utf-8') as file:
+	         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	FileNotFoundError: [Errno 2] No such file or directory: '../result/topic_data/2024-06-18.json'
