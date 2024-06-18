@@ -52,7 +52,7 @@ def fetch_graph(request):
     date = request.GET.get('date')
     print(f"graphDate:{date}")
     # 构建文件的绝对路径
-    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'graph', f'{date}.json')
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', '3d-force-graph', f'{date}.json')
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return JsonResponse(data)
@@ -187,7 +187,6 @@ def fetch_event(request):
         content["like_count"] += item["like_count"]
         content["forward_count"] += item["forward_count"]
         content["comment_count"] += item["comment_count"]
-    graph_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'graph', f'{date}.json')
     with open(filepath, 'r', encoding='utf-8') as file:
         content["graph"] = json.load(file)
     return JsonResponse(content)
