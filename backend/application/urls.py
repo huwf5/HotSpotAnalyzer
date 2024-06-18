@@ -24,6 +24,7 @@ from drf_yasg import openapi
 from django.conf import settings
 from django.views.generic import TemplateView
 from django.views import static
+from apps.system.views import fetch_graph, fetch_cardList, fetch_wordCloud, fetch_emotionData, fetch_chartData, fetch_topicCard, fetch_event
 
 
 schema_view = get_schema_view(
@@ -45,4 +46,11 @@ urlpatterns = [
     path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('',TemplateView.as_view(template_name='index.html')),
     re_path(r'^static/(?P<path>.*)$',static.serve,{'document_root':settings.STATIC_ROOT},name='static'),
+    path('fetch-graph/', fetch_graph, name='fetch-graph'),
+    path('fetch-cardList/', fetch_cardList, name='fetch-cardList'),
+    path('fetch-wordCloud/', fetch_wordCloud, name='fetch-wordCloud'),
+    path('fetch-emotionData', fetch_emotionData, name='fetch-emotionData'),
+    path('fetch-chartData', fetch_chartData, name='fetch-chartData'),
+    path('fetch-topicCard', fetch_topicCard, name='fetch-topicCard'),
+    path('fetch-event', fetch_event, name='fetch-event')
 ]

@@ -26,6 +26,18 @@ pip install jieba
 pip install keybert
 ```
 
+#构建事件图谱
+```shell
+python build_event_graph.py -source_data_file 2024-05-27.json -analyze_result 2024-05-27.json -target_file 2024-05-27.json
+```
+
+# 转换事件图谱
+```shell
+python convert_knowledge_graph.py -graph_file 2024-05-27.json -target_file 2024-05-27.json
+```
+
+
+
 ## 情感分析
 
 #### 运行

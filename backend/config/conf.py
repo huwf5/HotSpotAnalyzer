@@ -4,7 +4,7 @@
 DATABASES_ENGINE = "django.db.backends.mysql"
 DATABASES_NAME = "HotSpotAnalyzerDB"
 DATABASES_USER = "root"
-DATABASES_PASSWORD = "yourpassword"
+DATABASES_PASSWORD = "12345678"
 DATABASES_HOST = "localhost"
 DATABASES_PORT = "3306"
 
