@@ -8,6 +8,9 @@ from django.http import JsonResponse
 from django.conf import settings
 import json
 import os
+from collections import defaultdict
+import heapq
+
 
 
 def find_closest_date_file(directory):
@@ -36,15 +39,47 @@ def find_closest_date_file(directory):
         except ValueError:
             # 如果日期解析失败，忽略这个文件
             continue
-
     return closest_file
-
 
 def fetch_wordCloud(request):
     date = request.GET.get('date')
-    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'word_cloud', f'{date}.json')
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data', f'{date}.json')
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        # 使用字典来累加词频
+        word_counts = defaultdict(int)
+
+        # 遍历数据中的每个item，累加词频
+        for item in data:
+            for word_info in item['word_count']:
+                word_counts[word_info['name']] += word_info['value']
+
+        # 获取词频最高的30个词
+        top_words = heapq.nlargest(30, word_counts.items(), key=lambda x: x[1])
+
+        # 生成最终的词云数据格式
+        result = {
+            "data": [{"name": word, "value": count} for word, count in top_words]
+        }
+
+        return JsonResponse(result, safe=False)
+
+    except FileNotFoundError:
+        return JsonResponse({'error': 'File not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Error decoding JSON'}, status=500)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def fetch_wordCloud(request):
+    date = request.GET.get('date')
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data', f'{date}.json')
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
+
     return JsonResponse(data)
 
 
@@ -67,7 +102,6 @@ def fetch_emotionData(request):
 
 def fetch_chartData(request):
     date = request.GET.get('date')
-    print(f"chartDataDate:{date}")
     file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'chart_data', f"{date}.json")
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
@@ -168,25 +202,38 @@ def find_event_by_title(title):
             source_data = json.load(file)
         for key, value in source_data.items():
             if value["title"] == title:
-                return (value, filename.split(".")[0])
+                return (key, value, filename.split(".")[0])
 def find_post_by_wid(wid, source):
     for item in source:
         if item["wid"] == wid:
             return item
 def fetch_event(request):
-    title, date = request.GET.get('title')
-    content = find_event_by_title(title)
-    filepath = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
-    with open(filepath, 'r', encoding='utf-8') as file:
-        source_data = json.load(file)
-    content["like_count"] = 0
-    content["forward_count"] = 0
-    content["comment_count"] = 0
-    for wid in content["posts"]:
-        item = find_post_by_wid(wid, source_data)
-        content["like_count"] += item["like_count"]
-        content["forward_count"] += item["forward_count"]
-        content["comment_count"] += item["comment_count"]
-    with open(filepath, 'r', encoding='utf-8') as file:
-        content["graph"] = json.load(file)
-    return JsonResponse(content)
+    try:
+        title = request.GET.get('title')
+        content = {}
+        key, value, date = find_event_by_title(title)
+        filepath = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
+        with open(filepath, 'r', encoding='utf-8') as file:
+            source_data = json.load(file)
+        content["like_count"] = 0
+        content["forward_count"] = 0
+        content["comment_count"] = 0
+        for wid in value["posts"]:
+            item = find_post_by_wid(wid, source_data)
+            content["like_count"] += item["like_count"]
+            content["forward_count"] += item["forward_count"]
+            content["comment_count"] += item["comment_count"]
+        if value["is_news"]:
+            graph_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'graph', f'{date}.json')
+            with open(graph_path, 'r', encoding='utf-8') as file:
+                graphs = json.load(file)
+            content["graph"] = graphs[key]
+        else:
+            content["graph"] = None
+        content["word_count"] = value["word_count"]
+        content["senti_count"] = value["senti_count"]
+        return JsonResponse(content)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+

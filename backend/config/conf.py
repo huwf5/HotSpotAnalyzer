@@ -12,7 +12,7 @@ DATABASES_PORT = "3306"
 TABLE_PREFIX = "hotspot_sys_"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
