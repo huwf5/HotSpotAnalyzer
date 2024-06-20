@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "launch backend",
+      "command": "cd ../backend && poetry run python manage.py runserver",
+      "type": "shell",
+      "presentation": {
+        "reveal": "always"
+      }
+    }
+  ]
+}
