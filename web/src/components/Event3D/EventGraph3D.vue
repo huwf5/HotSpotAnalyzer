@@ -5,50 +5,31 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted } from "vue";
 import ForceGraph3D from "3d-force-graph";
 import * as THREE from "three"; // 引入THREE库
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { CSS2DRenderer, CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import SpriteText from "three-spritetext";
-import { useStore } from "vuex";
+import graphData from "../../views/dashboard/components/graph_dict.json";
 
-const store = useStore();
-const selectedDate = computed(() => store.getters.getSelectedDate);
-const date = ref("");
-
-const fetchGraphData = async selectedDateValue => {
-  if (selectedDateValue === "earlier") {
-    date.value = "history";
-  } else {
-    date.value = selectedDateValue;
-  }
-
+// import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+// import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+onMounted(() => {
   const graphContainer = document.getElementById("3d-graph");
-  const response = await fetch(`http://127.0.0.1:8000/fetch-graph?date=${date.value}`);
-  const graphData = ref(null);
-  const cache = {}; // 缓存对象
-  if (cache[date.value]) {
-    // 如果缓存中有数据，直接使用缓存数据
-    graphData.value = cache[date.value];
-  } else {
-    graphData.value = await response.json();
-    // 将数据存入缓存
-    cache[date.value] = graphData.value;
-  }
   if (graphContainer) {
     const Graph = ForceGraph3D({
       extraRenderers: [new CSS2DRenderer()]
     })(graphContainer)
       .backgroundColor("#000003")
-      .graphData(graphData.value)
+      .graphData(graphData)
       .nodeAutoColorBy("group")
       .linkDirectionalArrowLength(3.5)
       .linkDirectionalArrowRelPos(1)
       .linkWidth(2)
       .linkColor(link => {
-        const sourceNode = graphData.value.nodes.find(node => node.id === link.source);
-        const targetNode = graphData.value.nodes.find(node => node.id === link.target);
+        const sourceNode = graphData.nodes.find(node => node.id === link.source)!;
+        const targetNode = graphData.nodes.find(node => node.id === link.target)!;
         if (sourceNode.group === targetNode.group) {
           return sourceNode.color;
         } else {
@@ -79,22 +60,31 @@ const fetchGraphData = async selectedDateValue => {
         return new CSS2DObject(nodeEl);
       })
       .onNodeClick(node => {
-        // Aim at node from outside it
-        const distance = 40;
-        const distRatio = 1 - distance / Math.hypot(node.x, node.y, node.z);
-
-        const newPos =
-          node.x || node.y || node.z
-            ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
-            : { x: 0, y: 0, z: -distance }; // special case if node is in (0,0,0)
-
+        // Focus on node
         Graph.cameraPosition(
-          newPos, // new position
+          { x: node.x, y: node.y, z: node.z * 1.5 }, // new position
           node, // lookAt ({ x, y, z })
-          3000 // ms transition duration
+          1000 // ms transition duration
         );
       })
       .nodeThreeObjectExtend(true);
+
+    // const loader = new FontLoader();
+    // loader.load("fonts/helvetiker_regular.typeface.json", function (font) {
+    //   const textGeometry = new TextGeometry("情感分析概览", {
+    //     font: font,
+    //     size: 8,
+    //     height: 0.5
+    //   });
+
+    //   const textMaterial = new THREE.MeshBasicMaterial({ color: 0x007bff });
+    //   const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+    //   // Position the text in the scene
+    //   textMesh.position.set(-30, 50, 0);
+    //   Graph.scene().add(textMesh);
+    // });
+
     const bloomPass = new UnrealBloomPass();
     bloomPass.strength = 2;
     bloomPass.radius = 0.5;
@@ -115,17 +105,6 @@ const fetchGraphData = async selectedDateValue => {
   } else {
     console.error("Failed to find the container element for the 3D graph.");
   }
-};
-
-watch(
-  selectedDate,
-  newDate => {
-    fetchGraphData(newDate);
-  },
-  { immediate: true }
-);
-onMounted(() => {
-  fetchGraphData(selectedDate.value);
 });
 </script>
 
@@ -158,8 +137,8 @@ onMounted(() => {
   box-shadow: 0 0 10px rgb(0 0 0 / 10%); /* Subtle shadow */
 }
 #3d-graph {
-  box-sizing: border-box; /* 包括边界和内边距在内的总宽度和高度 */
-  width: 100%; /* Adjusted to 80% of its parent container */
-  height: 100%; /* Height set to 600px for better visibility */
+  width: 80%; /* Adjusted to 80% of its parent container */
+  height: 80%; /* Height set to 600px for better visibility */
+  border: 10px solid #cccccc; /* Optional: adds a border around the graph area */
 }
 </style>

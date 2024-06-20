@@ -132,7 +132,6 @@ const datasource = ref<EventAnalysisData[]>([
     wordFreq: { Lenova: 10 }
   }
 ]);
-
 const processedData = ref<{
   emotionStatisics: { value: number; name: string }[];
   wordFreqStatistics: { name: string; value: number }[];
@@ -142,7 +141,6 @@ const processedData = ref<{
   wordFreqStatistics: [],
   eventsData: []
 });
-
 const emotionData = computed(() => processedData.value.emotionStatisics);
 const wordFreqData = computed(() => processedData.value.wordFreqStatistics);
 const eventsData = computed(() => processedData.value.eventsData);

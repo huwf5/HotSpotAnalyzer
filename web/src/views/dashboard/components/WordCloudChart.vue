@@ -1,91 +1,76 @@
 <template>
   <div class="word-cloud-wrapper">
     <h1 class="word-cloud-title">👻词云分析</h1>
-    <div ref="refChart" class="word-cloud-container"></div>
+    <v-chart ref="refChart" class="word-cloud-container" :option="option" />
   </div>
 </template>
 
-<script setup>
-// import * as echarts from "echarts";
-import { init as initECharts } from "echarts";
+<script setup lang="ts">
+import VChart from "vue-echarts";
+import { ECharts } from "echarts";
 import "echarts-wordcloud";
-import { ref, onMounted, onUnmounted, watch, computed } from "vue";
-import { useStore } from "vuex";
+import { ref } from "vue";
 
-const refChart = ref(null);
-const store = useStore();
-const selectedDate = computed(() => store.getters.getSelectedDate);
+const refChart = ref<ECharts>();
 
-const fetchWordCloud = async selectedDateValue => {
-  const date = ref("");
-  if (selectedDateValue === "earlier") {
-    date.value = "history";
-  } else {
-    date.value = selectedDateValue;
-  }
-
-  const response = await fetch(`http://127.0.0.1:8000/fetch-wordCloud?date=${date.value}`);
-  const wordCloud = ref(null);
-  wordCloud.value = await response.json();
-  if (refChart.value) {
-    const chartInstance = initECharts(refChart.value, null, {
-      devicePixelRatio: 2
-    });
-    chartInstance.setOption({
-      tooltip: {
-        show: true,
-        formatter: function (params) {
-          return `${params.name}: ${params.value}`;
+const option = ref({
+  tooltip: {
+    show: true,
+    formatter: function (params) {
+      return `${params.name}: ${params.value}`;
+    }
+  },
+  series: [
+    {
+      type: "wordCloud",
+      shape: "ellipse",
+      gridSize: 8,
+      sizeRange: [12, 50], // 设置初始文字大小范围
+      rotationRange: [-60, 60],
+      textStyle: {
+        fontFamily: "sans-serif",
+        fontWeight: "bold",
+        color: function () {
+          return (
+            "rgb(" +
+            [Math.round(Math.random() * 200) + 50, Math.round(Math.random() * 50), Math.round(Math.random() * 50 + 50)].join(
+              ","
+            ) +
+            ")"
+          );
         }
       },
-      series: [
-        {
-          type: "wordCloud",
-          shape: "ellipse",
-          gridSize: 8,
-          sizeRange: [12, 50], // 设置初始文字大小范围
-          rotationRange: [-60, 60],
-          textStyle: {
-            fontFamily: "sans-serif",
-            fontWeight: "bold",
-            color: function () {
-              return (
-                "rgb(" +
-                [Math.round(Math.random() * 200) + 50, Math.round(Math.random() * 50), Math.round(Math.random() * 50 + 50)].join(
-                  ","
-                ) +
-                ")"
-              );
-            }
-          },
-          data: wordCloud.value["data"].map(item => ({
-            name: item["name"],
-            value: Math.sqrt(item["value"]) * 10
-          }))
-        }
-      ]
-    });
-  }
-};
-watch(
-  selectedDate,
-  newDate => {
-    fetchWordCloud(newDate);
-  },
-  { immediate: true }
-);
-onMounted(() => {
-  fetchWordCloud(selectedDate.value);
-});
-
-onUnmounted(() => {
-  if (chartInstance && chartInstance.dispose) {
-    chartInstance.dispose();
-  }
+      data: [
+        { name: "JavaScript", value: 1000 },
+        { name: "Vue", value: 800 },
+        { name: "React", value: 600 },
+        { name: "Angular", value: 400 },
+        { name: "Svelte", value: 200 },
+        { name: "Python", value: 950 },
+        { name: "Ruby", value: 300 },
+        { name: "Java", value: 850 },
+        { name: "C#", value: 500 },
+        { name: "C++", value: 650 },
+        { name: "JavaScript", value: 100 },
+        { name: "Vue", value: 8000 },
+        { name: "React", value: 6000 },
+        { name: "Angular", value: 4000 },
+        { name: "Svelte", value: 2000 },
+        { name: "Python", value: 9050 },
+        { name: "Ruby", value: 3000 },
+        { name: "Java", value: 8050 },
+        { name: "C#", value: 5000 },
+        { name: "C++", value: 6500 }
+      ].map(item => ({
+        name: item.name,
+        value: Math.sqrt(item.value) * 10
+      }))
+    }
+  ]
 });
 </script>
 <style scoped>
-@keyframes fade-in-scale-up {
+@keyframes fadeInScaleUp {
   0% {
     opacity: 0;
     transform: scale(0.5);
@@ -110,6 +95,6 @@ onUnmounted(() => {
 .word-cloud-container {
   width: 100%;
   height: 350px;
-  animation: fade-in-scale-up 1s ease-out forwards;
+  animation: fadeInScaleUp 1s ease-out forwards;
 }
 </style>

@@ -5,18 +5,18 @@ backend/static
 
 #web
 # Logs
-web/logs
+web1/logs
 web/*.log
-web/npm-debug.log*
-web/yarn-debug.log*
-web/yarn-error.log*
-web/pnpm-debug.log*
-web/lerna-debug.log*
+web1/npm-debug.log*
+web1/yarn-debug.log*
+web1/yarn-error.log*
+web1/pnpm-debug.log*
+web1/lerna-debug.log*
 
-web/node_modules
-web/dist
-web/dist-ssr
-web/stats.html
+web1/node_modules
+web1/dist
+web1/dist-ssr
+web1/stats.html
 web/*.local
 
 # Editor directories and files

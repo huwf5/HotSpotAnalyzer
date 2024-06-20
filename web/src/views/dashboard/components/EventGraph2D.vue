@@ -246,24 +246,28 @@ onMounted(() => {
 }
 .highcharts-figure,
 .highcharts-data-table table {
-  width: 100%;
   min-width: 320px;
-  max-width: 500px;
+  max-width: 800px;
   margin: 1em auto;
-  margin: 10px auto;
+}
+
+.highcharts-data-table table {
   font-family: Verdana, sans-serif;
-  text-align: center;
   border-collapse: collapse;
   border: 1px solid #ebebeb;
+  margin: 10px auto;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
 }
 .highcharts-data-table caption {
   padding: 1em 0;
   font-size: 1.2em;
-  color: #555555;
+  color: #555;
 }
 .highcharts-data-table th {
-  padding: 0.5em;
   font-weight: 600;
+  padding: 0.5em;
 }
 .highcharts-data-table td,
 .highcharts-data-table th,
@@ -277,6 +281,5 @@ onMounted(() => {
 .highcharts-data-table tr:hover {
   background: #f1f7ff;
 }
-
 /* Additional CSS here */
 </style>

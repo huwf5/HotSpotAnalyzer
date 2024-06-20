@@ -39,7 +39,7 @@ import BasicInfoCard from "./components/BasicInfoCard.vue";
 import WordCloudChart from "./components/WordCloudChart.vue";
 import EmotionChart from "./components/EmotionChart.vue";
 import LineChart from "./components/LineChart.vue";
-import EventGraph3D from "./components/EventGraph3D.vue";
+import EventGraph3D from "../../components/Event3D/EventGraph3D.vue";
 import TopicCard from "./components/TopicCard.vue";
 import DashBoardTitle from "./components/DashBoardTitle.vue";
 import GaugeChart from "./components/GaugeChart.vue";
