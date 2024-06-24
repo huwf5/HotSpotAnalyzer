@@ -109,14 +109,6 @@ function loadMore() {
     loading.value = false;
   }, 1000);
 }
-
-// onMounted(() => {
-//   // 监听 enter 事件（调用登录）
-//   document.onkeydown = (e: KeyboardEvent) => {
-//     if (e.code === "Enter" || e.code === "enter" || e.code === "NumpadEnter") {
-//     }
-//   };
-// });
 </script>
 
 <style scoped lang="scss">

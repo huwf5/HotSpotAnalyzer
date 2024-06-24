@@ -145,56 +145,37 @@ export namespace WhiteList {
 
 // 消息模块
 export namespace Messages {
-  export const titles = ["系统消息", "预警消息", "警告消息"];
-  export const platforms = ["Bilibili", "小红书", "微博"];
-  export interface Message {
-    id: number;
-    display: boolean;
-    /** 0表示系统消息，1表示预警消息，2表示警告消息 */
-    type: number;
-    starred: boolean;
-    unread: boolean;
-    time: string;
-    content: string;
-  }
-  export interface Event extends Message {
-    platform: number;
-    keywords: string;
-    title: string;
-  }
-  export const conds = ["👍点赞数", "❤喜爱数", "✨转发数"];
-  export const predicators = ["大于＞", "小于＜", "大于等于≥", "小于等于≤"];
-  export interface SingleCond {
-    /** 0表示点赞数，1表示喜爱数，2表示转发数，其它表示空 */
-    key: number;
-    /** 0表示大于，1表示小于，2表示大于等于，3表示小于等于 */
-    predicator: number;
-    limit: number;
+  export interface ReqMessageSetting {
+    allow_non_news: boolean;
+    warning_threshold: number;
+    info_threshold: number;
   }
   export interface ReqMessages {
     id: number;
-    starred?: boolean;
-    unread?: boolean;
+    is_starred: boolean;
+    is_read: boolean;
   }
-  export interface ResMessageSettings {
-    // use_danger_heat_limit: boolean;
-    // danger_heat_limit: number;
-    // use_warning_heat_limit: boolean;
-    // warning_heat_limit: number;
-    // heat_formula: string;
-
-    use_danger_composed_limits: boolean;
-    danger_composed_limits: SingleCond[];
-    use_warning_composed_limits: boolean;
-    warning_composed_limits: SingleCond[];
-    auto_star: boolean;
+  export enum MessageType {
+    WARN = "warn",
+    INFO = "info"
   }
-  export interface ReqMessageSettings {
-    danger_heat_limit?: number;
-    danger_compsed_limit?: SingleCond[];
-    warning_heat_limit?: number;
-    warning_compsed_limit?: SingleCond[];
-    auto_star?: boolean;
-    heat_formula?: string;
+  export interface ResMessage {
+    id: number;
+    type: MessageType;
+    is_starred: boolean;
+    is_read: boolean;
+    message: {
+      id: number;
+      title: string;
+      summary: string;
+      negative_sentiment_ratio: number;
+      is_news: boolean;
+      created_at: string;
+    };
+  }
+  export interface ResMessageSetting {
+    allow_non_news: boolean;
+    warning_threshold: number;
+    info_threshold: number;
   }
 }

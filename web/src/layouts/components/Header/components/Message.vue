@@ -2,17 +2,17 @@
   <div class="message">
     <el-popover placement="bottom" :width="310" trigger="hover" @show="fetch_count">
       <template #reference>
-        <el-badge :hidden="unreads === 0" :value="unreads" class="item">
+        <el-badge :hidden="unreads === 0" :value="unreads" :max="99" class="item">
           <i :class="'iconfont icon-xiaoxi'" class="toolBar-icon" @click="MsgIconClicked"></i>
         </el-badge>
       </template>
       <div v-if="unreads > 0" class="message-list">
         <div v-for="(messaage, index) in messages" :key="index">
-          <div v-if="messaage.unread" class="message-item">
+          <div v-if="!messaage.is_read" class="message-item">
             <img src="@/assets/images/msg01.png" alt="" class="message-icon" />
             <div class="message-content">
-              <span class="message-title">{{ messaage.content }}</span>
-              <span class="message-date">{{ messaage.time }}</span>
+              <span class="message-title">{{ messaage.message.title }}</span>
+              <span class="message-date">{{ messaage.message.created_at.split("T")[0] }}</span>
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@ function count_unread() {
   messages.value = store.userInfo.messages;
   let cnt = 0;
   messages.value.forEach(val => {
-    if (val.unread) cnt += 1;
+    if (!val.is_read) cnt += 1;
   });
   unreads.value = cnt;
 }
@@ -77,8 +77,11 @@ onMounted(fetch_count);
   .message-item {
     display: flex;
     align-items: center;
-    padding: 20px 0;
+    padding: 10px 0;
     border-bottom: 1px solid var(--el-border-color-light);
+    &:hover {
+      background-color: var(--el-menu-hover-bg-color);
+    }
     &:last-child {
       border: none;
     }
@@ -88,10 +91,15 @@ onMounted(fetch_count);
       margin: 0 20px 0 5px;
     }
     .message-content {
-      display: flex;
       flex-direction: column;
+      width: 200px;
       .message-title {
+        display: block;
+        width: 100%;
         margin-bottom: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .message-date {
         font-size: 12px;

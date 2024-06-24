@@ -47,3 +47,13 @@ export namespace ManagePort {
     DEACTIVATE = WHITE_LIST_PORT + "/deactivate/"
   }
 }
+
+/** 消息接口 */
+export namespace MessagePort {
+  const MESSAGE_SETTINGS_BASE_PORT = "/messagesetting";
+  export const MSG_BASE_PORT = "/usermessage";
+  export enum MSG_SETTINGS {
+    BASE = MESSAGE_SETTINGS_BASE_PORT + "/",
+    UPDATE = MESSAGE_SETTINGS_BASE_PORT + "/update/"
+  }
+}

@@ -1,6 +1,5 @@
 import { ElMessageBox, ElMessage } from "element-plus";
 import { HandleData } from "./interface";
-import { Result } from "@/api/interface";
 
 /**
  * @description 操作单条数据信息 (二次确认【删除、禁用、启用、重置密码】)
@@ -11,12 +10,12 @@ import { Result } from "@/api/interface";
  * @returns {Promise}
  */
 export const useHandleData = <T>(
-  api: (params: T) => Promise<Result>,
+  api: (params: T) => Promise<any>,
   params: T,
   message: string,
   confirmType: HandleData.MessageType = "warning"
 ): Promise<any> => {
-  return new Promise<any>(resolve => {
+  return new Promise<any>((resolve, reject) => {
     ElMessageBox.confirm(`是否${message}?`, "温馨提示", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
@@ -34,10 +33,12 @@ export const useHandleData = <T>(
           })
           .catch(() => {
             // API Error
+            reject();
           });
       })
       .catch(() => {
         // Cancle
+        reject();
       });
   });
 };
