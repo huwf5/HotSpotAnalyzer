@@ -16,6 +16,21 @@ def save_json_file(json_dict, file_path):
     with open(file_path, 'w', encoding='utf-8') as outfile:
         json.dump(json_dict, outfile, ensure_ascii=False, indent=4)
 
+def parse_api_response(response):
+    """
+    解析 API 响应字符串，剥去可能存在的 `json` 标注，并返回 JSON 数据。
+
+    :param response: API 响应字符串
+    :return: 解析后的 JSON 数据
+    :raises: json.JSONDecodeError 如果解析失败
+    """
+    # 检查是否存在 `json` 标注
+    if response.startswith("```json") and response.endswith("```"):
+        # 去掉外层的 `json` 标注
+        response = response[len("```json"): -len("```")].strip()
+
+    # 解析 JSON 数据
+    return json.loads(response)
 
 def update_dictionary(dict_a, dict_b):
     # 更新或添加事件
@@ -105,7 +120,7 @@ def build_event_graph(text, publish_time):
     result = json.loads(response.text)
     print(result)
     print(result['openai']['generated_text'])
-    graph = json.loads(result['openai']['generated_text'])
+    graph = parse_api_response(result['openai']['generated_text'])
     time.sleep(15)
     return graph
 
