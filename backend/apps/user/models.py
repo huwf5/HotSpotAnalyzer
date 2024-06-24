@@ -20,7 +20,6 @@ from django.utils import timezone
 from django.core.validators import validate_email
 from datetime import timedelta
 
-
 # EMAIL RELATED MODELS
 
 
@@ -252,11 +251,9 @@ class WaitingList(models.Model):
                 email__regex=regex_pattern
             )
         else:
-            print(suffix)
             emails_to_delete = cls.objects.select_for_update().filter(
                 email__endswith=suffix
             )
-            print(emails_to_delete)
         emails_to_delete.delete()
 
 

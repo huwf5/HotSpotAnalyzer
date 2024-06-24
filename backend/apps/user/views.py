@@ -176,7 +176,6 @@ class SendCodeView(viewsets.ViewSet):
     def send(self, request: Request) -> APIResponse:
         serializer = EmailVerificationSerializer(data=request.data)
         if not serializer.is_valid():
-            print(serializer.errors)
             return APIResponse(
                 status=status.HTTP_400_BAD_REQUEST,
                 message="请求参数错误,请检查后重试",
@@ -411,7 +410,7 @@ class WaitingListView(mixins.ListModelMixin, viewsets.ViewSet):
         },
     )
     @action(detail=False, methods=["post"], url_path="activate")
-    def active(self, request):
+    def activate(self, request):
         serializer = EmailListSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(
@@ -772,7 +771,7 @@ class WhiteListView(viewsets.ViewSet):
         responses={201: get_emailTagList_api_response_schema},
     )
     @action(detail=False, methods=["get"], url_path="get-tags")
-    def get_tag(self, request: Request) -> APIResponse:
+    def get_tags(self, request: Request) -> APIResponse:
         serializer = EmailFormatTagSerializer(
             EmailFormatTagSerializer.Meta.model.objects.all(), many=True
         )
@@ -1092,7 +1091,7 @@ class MessageSettingView(viewsets.ViewSet):
                 defaults = {"type": message_type}
                 if new_setting:
                     UserMessage.objects.create(
-                        user=user, message=message, defaults=defaults
+                        user=user, message=message, type=message_type
                     )
                 else:
                     user_message, created = UserMessage.objects.update_or_create(
