@@ -42,6 +42,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("apps.user.urls")),
+    path("api/", include("apps.dashboard.urls")),
     path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('',TemplateView.as_view(template_name='index.html')),
     re_path(r'^static/(?P<path>.*)$',static.serve,{'document_root':settings.STATIC_ROOT},name='static'),
