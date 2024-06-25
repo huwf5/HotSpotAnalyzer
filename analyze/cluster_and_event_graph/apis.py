@@ -57,7 +57,15 @@ def update_dictionary(dict_a, dict_b):
 
 
 def revise_event_graph(text, graph, publish_time, target_file):
-    api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改下面这一行
+    # api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改为下面三行（行数不包括注释）：
+    # 获取当前脚本所在的目录
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    # 构建 key.json 文件的路径
+    json_file_path = os.path.join(cur_dir, 'documents', 'api_key.json')
+    api_key = read_json_file(json_file_path)["key"]
+
     headers = {
         "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
@@ -93,8 +101,18 @@ def revise_event_graph(text, graph, publish_time, target_file):
 
 def build_event_graph(text, publish_time):
 
-    example = read_json_file("documents/example.json")
-    api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改下面这两行
+    # example = read_json_file("documents/example.json")
+    # api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改为下面五行（行数不包括注释）：
+    # 获取当前脚本所在的目录
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    # 构建 key.json 文件的路径
+    json_file_path = os.path.join(cur_dir, 'documents', 'api_key.json')
+    example_file_path = os.path.join(cur_dir, 'documents', 'example.json')
+    api_key = read_json_file(json_file_path)["key"]
+    example = read_json_file(example_file_path)
+
     headers = {
         "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
@@ -126,7 +144,14 @@ def build_event_graph(text, publish_time):
 
 
 def prune_event_graph(graph, target_file):
-    api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改下面这一行
+    # api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改为下面三行（行数不包括注释）：
+    # 获取当前脚本所在的目录
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    # 构建 key.json 文件的路径
+    json_file_path = os.path.join(cur_dir, 'documents', 'api_key.json')
+    api_key = read_json_file(json_file_path)["key"]
     headers = {
         "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
@@ -160,7 +185,15 @@ def prune_event_graph(graph, target_file):
 
 
 def generate_title(text):
-    api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改下面这一行
+    # api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改为下面三行（行数不包括注释）：
+    # 获取当前脚本所在的目录
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    # 构建 key.json 文件的路径
+    json_file_path = os.path.join(cur_dir, 'documents', 'api_key.json')
+    api_key = read_json_file(json_file_path)["key"]
+
     headers = {
         "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
@@ -186,7 +219,15 @@ def generate_title(text):
 
 
 def summarize(text):
-    api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改下面这一行
+    # api_key = read_json_file("documents/api_key.json")["key"]
+    # 修改为下面三行（行数不包括注释）：
+    # 获取当前脚本所在的目录
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    # 构建 key.json 文件的路径
+    json_file_path = os.path.join(cur_dir, 'documents', 'api_key.json')
+    api_key = read_json_file(json_file_path)["key"]
+    
     headers = {
         "Authorization": api_key}
     url = "https://api.edenai.run/v2/text/chat"
