@@ -8,15 +8,9 @@ export interface ResultData<T = any> extends Result {
   data: T;
 }
 
-// 分页响应参数
+// 数组型响应参数
 export interface ResDataList<T> extends Result {
   data: T[];
-}
-
-// 分页请求参数
-export interface ReqPage {
-  pageNum: number;
-  pageSize: number;
 }
 
 // 登录模块
@@ -177,5 +171,95 @@ export namespace Messages {
     allow_non_news: boolean;
     warning_threshold: number;
     info_threshold: number;
+  }
+}
+
+// 事件分析模块
+export namespace EventAnalysis {
+  export interface ReqDate {
+    date: string;
+  }
+  export interface ReqTitle {
+    title: string;
+  }
+  /** 根据日期获取所有事件 */
+  export interface ResTopics {
+    num_of_topics: number;
+    num_of_posts: number;
+    num_of_comments: number;
+    topic_list: {
+      title: string;
+      summary: string;
+      posts: string[];
+      is_news: boolean;
+      progress: number;
+      num_of_posts: number;
+      date: string;
+      senti_count: { [key: string]: number };
+      word_count: {
+        name: string;
+        value: number;
+      }[];
+    }[];
+  }
+  /** 根据标题获取的事件数据 */
+  export interface ResEventAnalysis {
+    like_count: number;
+    forward_count: number;
+    comment_count: number;
+    graph: {
+      events: {
+        id: number;
+        event: string;
+        attributes: {
+          type: string;
+          value: string;
+        }[];
+      }[];
+      relationships: {
+        source: number;
+        target: number;
+        type: string;
+      }[];
+    };
+    word_count: {
+      name: string;
+      value: number;
+    }[];
+    senti_count: { [key: string]: number };
+  }
+  /** 获取上月及历史统计数据 */
+  export interface ResStatistics {
+    last_month: {
+      posts: number;
+      like_counts: number;
+      comment_counts: number;
+      forward_counts: number;
+    };
+    history: {
+      posts: number;
+      like_counts: number;
+      comment_counts: number;
+      forward_counts: number;
+    };
+  }
+  export interface ResLineChart {
+    x: string[];
+    y: number[];
+  }
+  export interface ResEmotionAnalysis {
+    emotion: string;
+    percentage: number;
+  }
+  export interface Res3DGraph {
+    node: {
+      id: string;
+      group: number;
+    }[];
+    links: {
+      source: string;
+      target: string;
+      description: string;
+    }[];
   }
 }

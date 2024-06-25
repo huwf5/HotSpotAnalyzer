@@ -19,6 +19,9 @@ web/dist-ssr
 web/stats.html
 web/*.local
 
+# Analysis result
+result
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
