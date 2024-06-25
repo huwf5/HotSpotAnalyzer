@@ -437,3 +437,51 @@ class EventViewSet(viewsets.ViewSet):
             return Response(content)
         except Exception as e:
             return Response({'error': f'发生意外错误：{str(e)}'}, status=500)
+
+class SentimentByPostViewSet(viewsets.ViewSet):
+    """
+    ViewSet 处理帖子的情感分析。
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method='get',
+        operation_summary="获取部分帖子的情感分析",
+        operation_description="根据事件标题获取该事件下帖子的各类情感组分",
+        manual_parameters=[
+            openapi.Parameter('title', openapi.IN_QUERY, description="事件的标题", type=openapi.TYPE_STRING, required=True)
+        ],
+        responses={
+            200: openapi.Response('成功获取事件数据'),
+            400: '请求参数错误',
+            404: '未找到数据',
+            500: '服务器内部错误'
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def fetch_sentiment(self, request):
+        try:
+            title = request.GET.get('title')
+            if not title:
+                return Response({"error": "标题参数是必需的。"}, status=400)
+            key, value, date = find_event_by_title(title)
+            filepath = os.path.join(os.path.dirname(settings.BASE_DIR), 'result',
+                                    'sentiment', 'post_sentiment', f'{date}.json')
+            with open(filepath, 'r', encoding='utf-8') as file:
+                source_data = json.load(file)
+
+            content = {
+                "data": []
+            }
+
+            key, value, date = find_event_by_title(title)
+
+            for wid in value["posts"]:
+                item = source_data[wid]
+                senti_sum = int(np.sum([v for v in item.values()]))
+                if senti_sum > 0:
+                    content["data"].append(item)
+            return Response(content)
+        except Exception as e:
+            return Response({'error': f'发生意外错误：{str(e)}'}, status=500)
