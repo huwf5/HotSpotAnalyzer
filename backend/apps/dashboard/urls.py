@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import GraphViewSet, WordCloudViewSet, EmotionViewSet, \
-    CardListViewSet, TopicCardViewSet, ChartDataViewSet, EventViewSet
+    CardListViewSet, TopicCardViewSet, ChartDataViewSet, EventViewSet, SentimentByPostViewSet
 
 router = DefaultRouter()
 router.register(r'graphs', GraphViewSet, basename='graph')
@@ -11,6 +11,7 @@ router.register(r'cardlist', CardListViewSet, basename='cardlist')
 router.register(r'topiccard', TopicCardViewSet, basename='topiccard')
 router.register(r'chartdata', ChartDataViewSet, basename='chartdata')
 router.register(r'event', EventViewSet, basename='event')
+router.register(r'senti', SentimentByPostViewSet, basename='senti')
 urlpatterns = [
     path('', include(router.urls)),
 ]
