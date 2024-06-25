@@ -8,15 +8,9 @@ export interface ResultData<T = any> extends Result {
   data: T;
 }
 
-// 分页响应参数
+// 数组型响应参数
 export interface ResDataList<T> extends Result {
   data: T[];
-}
-
-// 分页请求参数
-export interface ReqPage {
-  pageNum: number;
-  pageSize: number;
 }
 
 // 登录模块
@@ -145,56 +139,130 @@ export namespace WhiteList {
 
 // 消息模块
 export namespace Messages {
-  export const titles = ["系统消息", "预警消息", "警告消息"];
-  export const platforms = ["Bilibili", "小红书", "微博"];
-  export interface Message {
-    id: number;
-    display: boolean;
-    /** 0表示系统消息，1表示预警消息，2表示警告消息 */
-    type: number;
-    starred: boolean;
-    unread: boolean;
-    time: string;
-    content: string;
-  }
-  export interface Event extends Message {
-    platform: number;
-    keywords: string;
-    title: string;
-  }
-  export const conds = ["👍点赞数", "❤喜爱数", "✨转发数"];
-  export const predicators = ["大于＞", "小于＜", "大于等于≥", "小于等于≤"];
-  export interface SingleCond {
-    /** 0表示点赞数，1表示喜爱数，2表示转发数，其它表示空 */
-    key: number;
-    /** 0表示大于，1表示小于，2表示大于等于，3表示小于等于 */
-    predicator: number;
-    limit: number;
+  export interface ReqMessageSetting {
+    allow_non_news: boolean;
+    warning_threshold: number;
+    info_threshold: number;
   }
   export interface ReqMessages {
     id: number;
-    starred?: boolean;
-    unread?: boolean;
+    is_starred: boolean;
+    is_read: boolean;
   }
-  export interface ResMessageSettings {
-    // use_danger_heat_limit: boolean;
-    // danger_heat_limit: number;
-    // use_warning_heat_limit: boolean;
-    // warning_heat_limit: number;
-    // heat_formula: string;
+  export enum MessageType {
+    WARN = "warn",
+    INFO = "info"
+  }
+  export interface ResMessage {
+    id: number;
+    type: MessageType;
+    is_starred: boolean;
+    is_read: boolean;
+    message: {
+      id: number;
+      title: string;
+      summary: string;
+      negative_sentiment_ratio: number;
+      is_news: boolean;
+      created_at: string;
+    };
+  }
+  export interface ResMessageSetting {
+    allow_non_news: boolean;
+    warning_threshold: number;
+    info_threshold: number;
+  }
+}
 
-    use_danger_composed_limits: boolean;
-    danger_composed_limits: SingleCond[];
-    use_warning_composed_limits: boolean;
-    warning_composed_limits: SingleCond[];
-    auto_star: boolean;
+// 事件分析模块
+export namespace EventAnalysis {
+  export interface ReqDate {
+    date: string;
   }
-  export interface ReqMessageSettings {
-    danger_heat_limit?: number;
-    danger_compsed_limit?: SingleCond[];
-    warning_heat_limit?: number;
-    warning_compsed_limit?: SingleCond[];
-    auto_star?: boolean;
-    heat_formula?: string;
+  export interface ReqTitle {
+    title: string;
+  }
+  /** 根据日期获取所有事件 */
+  export interface ResTopics {
+    num_of_topics: number;
+    num_of_posts: number;
+    num_of_comments: number;
+    topic_list: {
+      title: string;
+      summary: string;
+      posts: string[];
+      is_news: boolean;
+      progress: number;
+      num_of_posts: number;
+      date: string;
+      senti_count: { [key: string]: number };
+      word_count: {
+        name: string;
+        value: number;
+      }[];
+    }[];
+  }
+  /** 根据标题获取的事件数据 */
+  export interface ResEventAnalysis {
+    like_count: number;
+    forward_count: number;
+    comment_count: number;
+    graph: {
+      events: {
+        id: number;
+        event: string;
+        attributes: {
+          type: string;
+          value: string;
+        }[];
+      }[];
+      relationships: {
+        source: number;
+        target: number;
+        type: string;
+      }[];
+    };
+    word_count: {
+      name: string;
+      value: number;
+    }[];
+    senti_count: { [key: string]: number };
+  }
+  export interface ResDetailedSentiment {
+    [key: string]: number;
+  }
+  /** 获取上月及历史统计数据 */
+  export interface ResStatistics {
+    last_month: {
+      posts: number;
+      like_counts: number;
+      comment_counts: number;
+      forward_counts: number;
+    };
+    history: {
+      posts: number;
+      like_counts: number;
+      comment_counts: number;
+      forward_counts: number;
+    };
+  }
+  export interface ResLineChart {
+    x: string[];
+    y: number[];
+  }
+  export interface ResEmotionAnalysis {
+    emotion: string;
+    percentage: number;
+  }
+  export interface Res3DGraph {
+    node: {
+      id: string;
+      group: number;
+    }[];
+    links: {
+      source: string;
+      target: string;
+      description: string;
+    }[];
   }
 }

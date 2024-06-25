@@ -17,21 +17,21 @@
     </div>
     <div v-if="$props.displayIcon">
       <slot name="icon">
-        <icon v-if="!$props.selected"><Edit /></icon>
-        <icon v-else :size="20" @click="$emit('checked')"><Check /></icon>
+        <el-icon v-if="!$props.selected"><Edit /></el-icon>
+        <el-icon v-else :size="20" @click="$emit('checked')"><Check /></el-icon>
       </slot>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import icon from "@/components/el-icon/icon.vue";
 withDefaults(
   defineProps<{
     selected: boolean;
     displayText: string;
     displayValue?: string;
     displayIcon?: boolean;
+    cursor?: string;
     toolTipVisivle?: boolean;
     tipText?: string;
   }>(),
@@ -39,6 +39,7 @@ withDefaults(
     displayValue: "",
     displayIcon: true,
     toolTipVisivle: false,
+    cursor: "auto",
     tipText: ""
   }
 );
@@ -65,7 +66,7 @@ defineEmits<{
   height: fit-content;
   padding: 15px 20px;
   margin: 0;
-  cursor: pointer;
+  cursor: v-bind("cursor");
 }
 .single_info:hover {
   background-color: rgba($color: #afafaf, $alpha: 20%);

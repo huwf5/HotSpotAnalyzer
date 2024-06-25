@@ -30,7 +30,7 @@ export interface UserState {
   token_lifetime: number;
   timer?: NodeJS.Timeout;
   userInfo: {
-    messages: Messages.Message[];
+    messages: Messages.ResMessage[];
     basicInfo: UserInfo.BasicInfo;
     contactInfo: UserInfo.ContactInfo;
     accountInfo: UserInfo.AccountInfo;

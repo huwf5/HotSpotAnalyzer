@@ -4,6 +4,7 @@ from collections import Counter
 import json
 import pandas as pd
 from datetime import datetime
+import pymysql
 import time
 import sys
 import os
@@ -89,8 +90,13 @@ def keybert_e_result(texts,top_n = 20):
         key_words = [word for word in words if word in keywords]
         # 统计关键词的词频
         keyword_freq.update(key_words)
-        
-    return keyword_freq.most_common(top_n)
+
+    # return keyword_freq.most_common(top_n)
+    result = []
+    for word, freq in keyword_freq.most_common(top_n):
+        result.append({"name": word, "value": freq})
+
+    return {"data": result}
 
 def title_word_count(grouped_json_file, output_dir):
     with open(grouped_json_file, 'r', encoding='utf-8') as file:
@@ -100,7 +106,7 @@ def title_word_count(grouped_json_file, output_dir):
             title = json_obj['title']
             texts = json_obj['texts']
             result = keybert_e_result(texts)
-            df = pd.DataFrame(result, columns=['Keyword', 'Count'])
+            # df = pd.DataFrame(result, columns=['Keyword', 'Count'])
             # 获取当前脚本文件的路径
             current_file = os.path.abspath(__file__)
             # 获取当前文件所在目录的路径
@@ -113,12 +119,14 @@ def title_word_count(grouped_json_file, output_dir):
 
             output_file = ""
             if title_id is not None and title is not None:
-                output_file = os.path.join(result_dir, f"{title_id}_{title}_wordcount.csv")
+                output_file = os.path.join(result_dir, f"{title_id}_{title}_wordcount.json")
             else:
                 # 提供一个默认的文件名
-                output_file = os.path.join(result_dir, f"{title_id}_no_title__default_wordcount.csv")
+                output_file = os.path.join(result_dir, f"{title_id}_no_title__default_wordcount.json")
 
-            df.to_csv(output_file, index=False)
+            # df.to_csv(output_file, index=False)
+            with open(output_file, 'w', encoding='utf-8') as outfile:
+                json.dump(result, outfile, ensure_ascii=False, indent=2)
             print("结果已保存到", output_file)
     
     # 删除grouped_json_file文件

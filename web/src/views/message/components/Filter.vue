@@ -2,14 +2,15 @@
   <div class="filter-container">
     <el-popover :visible="filterVisible" placement="bottom">
       <template #reference>
-        <icon class="filter-icon" :color="color" @click="handleFilterClick">
+        <el-icon class="filter-icon" :color="color" @click="handleFilterClick">
           <Filter />
-        </icon>
+        </el-icon>
       </template>
       <template #default>
         <div v-click-outside="handleClickOutside">
-          <el-checkbox v-model="sysChecked" @change="displaySystemMessage" style="margin: 0 10px">显示系统消息</el-checkbox>
-          <el-checkbox v-model="readChecked" @change="displayReadMessage" style="margin: 0 10px">显示已读消息</el-checkbox>
+          <el-checkbox v-model="infoChecked" @change="displayInfoMsg" style="margin: 0 10px">显示提醒消息</el-checkbox>
+          <el-checkbox v-model="warnChecked" @change="displayWarnMsg" style="margin: 0 10px">显示预警消息</el-checkbox>
+          <el-checkbox v-model="readChecked" @change="displayReadMsg" style="margin: 0 10px">显示已读消息</el-checkbox>
         </div>
       </template>
     </el-popover>
@@ -18,16 +19,17 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import icon from "../../../components/el-icon/icon.vue";
 
 const color = ref("");
 const filterVisible = ref(false);
 const ignore = ref(false);
 const emits = defineEmits<{
-  systemMessageDisplay: [state: boolean];
-  readMessageDisplay: [state: boolean];
+  infoMsgDisplay: [state: boolean];
+  warnMsgDisplay: [state: boolean];
+  readMsgDisplay: [state: boolean];
 }>();
-const sysChecked = ref(true);
+const infoChecked = ref(true);
+const warnChecked = ref(true);
 const readChecked = ref(true);
 
 function handleFilterClick() {
@@ -45,12 +47,14 @@ function handleClickOutside() {
   color.value = filterVisible.value ? "#3AACFF" : "";
 }
 
-function displaySystemMessage(val: boolean) {
-  emits("systemMessageDisplay", val);
+function displayInfoMsg(val: boolean) {
+  emits("infoMsgDisplay", val);
 }
-
-function displayReadMessage(val: boolean) {
-  emits("readMessageDisplay", val);
+function displayWarnMsg(val: boolean) {
+  emits("warnMsgDisplay", val);
+}
+function displayReadMsg(val: boolean) {
+  emits("readMsgDisplay", val);
 }
 </script>
 
