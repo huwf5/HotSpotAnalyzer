@@ -3,14 +3,8 @@
     <el-card>
       <el-row>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
-          <div class="title">事件标题</div>
-          <div class="keyword">
-            事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词事件关键词
-          </div>
-          <el-divider></el-divider>
-          <div class="content">
-            事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述事件描述
-          </div>
+          <div class="title"></div>
+          <div class="content"></div>
         </el-col>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
           <el-row class="statistic_container">
@@ -54,7 +48,12 @@ import BarChart from "./components/BarChart.vue";
 // import EventGraph3D from "@/components/Event3D/EventGraph3D.vue";
 import { computed, ref, watch } from "vue";
 import { useTransition } from "@vueuse/core";
+import { useRouter } from "vue-router";
+import { getDetail } from "@/api/modules/event_analysis";
+import { EventAnalysis } from "@/api/interface";
 
+const router = useRouter();
+const event_title = ref(router.currentRoute.value.query.title ? (router.currentRoute.value.query.title as string) : "");
 const loading = ref(false);
 
 interface EventAnalysisData {
@@ -63,76 +62,12 @@ interface EventAnalysisData {
   /** 帖子情感分析结果 */
   emotions: any;
   /** 帖子词频分析结果 */
-  wordFreq: any;
+  wordFreq: {
+    name: string;
+    value: number;
+  }[];
 }
-const datasource = ref<EventAnalysisData[]>([
-  {
-    title: "post1",
-    emotions: { 高兴: 10, 愤怒: 20 },
-    wordFreq: { VIVO: 30 }
-  },
-  {
-    title: "post2",
-    emotions: { 高兴: 1, 愤怒: 28 },
-    wordFreq: { OPPO: 29 }
-  },
-  {
-    title: "post3",
-    emotions: { 高兴: 27, 愤怒: 1 },
-    wordFreq: { HONOR: 28 }
-  },
-  {
-    title: "post4",
-    emotions: { 高兴: 7, 愤怒: 20 },
-    wordFreq: { "iPhone 12 pro max": 27 }
-  },
-  {
-    title: "post5",
-    emotions: { 高兴: 23, 愤怒: 2 },
-    wordFreq: { "HUAWEI MATE 10": 25 }
-  },
-  {
-    title: "post6",
-    emotions: { 高兴: 4, 愤怒: 20 },
-    wordFreq: { ONEPLUS: 24 }
-  },
-  {
-    title: "post7",
-    emotions: { 高兴: 3, 愤怒: 20 },
-    wordFreq: { "Lenova T470": 23 }
-  },
-  {
-    title: "post8",
-    emotions: { 高兴: 20, 愤怒: 2 },
-    wordFreq: { "MacBook Air": 22 }
-  },
-  {
-    title: "post9",
-    emotions: { 高兴: 14, 愤怒: 6 },
-    wordFreq: { "iPad mini": 20 }
-  },
-  {
-    title: "post10",
-    emotions: { 高兴: 14, 愤怒: 2 },
-    wordFreq: { BLACKBERRY: 16 }
-  },
-  {
-    title: "post11",
-    emotions: { 高兴: 10, 愤怒: 3 },
-    wordFreq: { SAMSUNG: 13 }
-  },
-  {
-    title: "post12",
-    emotions: { 高兴: 10, 愤怒: 2 },
-    wordFreq: { "361": 12 }
-  },
-  {
-    title: "post13",
-    emotions: { 高兴: 1, 愤怒: 9 },
-    wordFreq: { Lenova: 10 }
-  }
-]);
-const processedData = ref<{
+const dataSource = ref<{
   emotionStatisics: { value: number; name: string }[];
   wordFreqStatistics: { name: string; value: number }[];
   eventsData: { name: string; [key: string]: any }[];
@@ -141,49 +76,19 @@ const processedData = ref<{
   wordFreqStatistics: [],
   eventsData: []
 });
-const emotionData = computed(() => processedData.value.emotionStatisics);
-const wordFreqData = computed(() => processedData.value.wordFreqStatistics);
-const eventsData = computed(() => processedData.value.eventsData);
+const emotionData = computed(() => dataSource.value.emotionStatisics);
+const wordFreqData = computed(() => dataSource.value.wordFreqStatistics);
+const eventsData = computed(() => dataSource.value.eventsData);
 
-function processData() {
-  let emotions: any[] = [];
-  let emotionStatisics: { value: number; name: string }[] = [];
-  let wordFreq: any[] = [];
-  let wordFreqStatistics: { name: string; value: number }[] = [];
+function processEmotionData(origin_data: (EventAnalysis.ResDetailedSentiment & { title: string })[]) {
   let eventsData: { name: string; [key: string]: any }[] = [];
-  for (const data of datasource.value) {
-    eventsData.push({ name: data.title, ...data.emotions });
-    // 统计情感分析结果
-    for (const entry of Object.entries(data.emotions)) {
-      if (emotions[entry[0]] !== undefined) {
-        emotions[entry[0]] += entry[1];
-      } else {
-        emotions[entry[0]] = entry[1];
-      }
-    }
-    // 统计词频
-    for (const entry of Object.entries(data.wordFreq)) {
-      if (wordFreq[entry[0]] !== undefined) {
-        wordFreq[entry[0]] += entry[1];
-      } else {
-        wordFreq[entry[0]] = entry[1];
-      }
-    }
-  }
-  // 格式转换
-  for (const entry of Object.entries(emotions)) {
-    emotionStatisics.push({ name: entry[0], value: entry[1] });
-  }
-  for (const entry of Object.entries(wordFreq)) {
-    wordFreqStatistics.push({ name: entry[0], value: entry[1] });
-  }
-  processedData.value!.emotionStatisics = emotionStatisics;
-  processedData.value!.eventsData = eventsData;
-  processedData.value!.wordFreqStatistics = wordFreqStatistics;
+  for (const data of origin_data) eventsData.push({ name: data.title, ...data });
   loading.value = false;
 }
-processData();
-watch(datasource.value, processData);
+getDetail(event_title.value).then(response => {
+  dataSource.value.emotionStatisics = response.senti_count;
+  dataSource.value.wordFreqStatistics = response.word_count;
+});
 
 const expand_chart = ref(10);
 const expand_statistic = ref(0);
@@ -197,15 +102,6 @@ const upVoteValue = useTransition(upVotes, { duration: 1500 });
 const likeValue = useTransition(likes, { duration: 1500 });
 const collectValue = useTransition(collects, { duration: 1500 });
 const shareValue = useTransition(shares, { duration: 1500 });
-
-setTimeout(() => {
-  loading.value = true;
-  datasource.value.push({
-    title: "post14",
-    emotions: { 高兴: 16, 愤怒: 13 },
-    wordFreq: { Redmi: 29 }
-  });
-}, 2000);
 </script>
 
 <style scoped lang="scss">

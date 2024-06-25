@@ -9,7 +9,7 @@
             </template>
           </el-input>
         </el-col>
-        <el-col class="date_selector" :span="3">
+        <el-col class="date_selector" :span="3" :xs="6" :sm="6" :md="3" :lg="3" :xl="3">
           <el-select v-model="search_date">
             <el-option v-for="date in valid_dates" :key="date" :value="date"></el-option>
           </el-select>
@@ -20,7 +20,7 @@
       <li v-for="(event, index) in display_events" :key="index" class="list-item">
         <el-card shadow="hover">
           <div class="event-title">{{ event.title }}</div>
-          <div class="event-body">{{ event.desc }}</div>
+          <div class="event-body">{{ event.summary }}</div>
         </el-card>
       </li>
     </ul>
@@ -29,71 +29,37 @@
 </template>
 
 <script setup lang="ts">
+import { getAllEvents } from "@/api/modules/event_analysis";
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 interface EventData {
   title: string;
-  desc: string;
+  summary: string;
+  is_news: boolean;
+  num_of_posts: number;
+  date: string;
+  senti_count: { [key: string]: number };
+  word_count: {
+    name: string;
+    value: number;
+  }[];
 }
 
 const router = useRouter();
-const searchKeyWord = ref(router.currentRoute.value.query ? router.currentRoute.value.query.keyword : "");
+const searchKeyWord = ref<string>(
+  router.currentRoute.value.query.keyword ? (router.currentRoute.value.query.keyword! as string) : ""
+);
+const search_date = ref<string>(
+  router.currentRoute.value.query.date ? (router.currentRoute.value.query.date! as string) : "2024-06-18"
+);
+const prev_date = ref("");
 
 const affix_ref = ref<HTMLElement>();
 const affix_width = ref(0);
 const valid_dates = ref(["history"]);
-const search_date = ref("history");
-const all_events = ref<EventData[]>([
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  },
-  {
-    title: "#事件标题",
-    desc: "事件描述"
-  }
-]);
+const events_buffer = ref<EventData[]>([]);
+const all_events = ref<EventData[]>([]);
 const display_count = ref(10);
 const display_events = computed(() => all_events.value.slice(0, display_count.value));
 const loading = ref(false);
@@ -107,6 +73,7 @@ onMounted(async () => {
   input_height.value = document.getElementById("search_input")!.getBoundingClientRect().height;
   affix_width.value = affix_ref.value!.getBoundingClientRect().width;
   window.addEventListener("resize", adjustWidth);
+  fetchData();
 });
 onUnmounted(() => {
   window.removeEventListener("resize", adjustWidth);
@@ -121,8 +88,17 @@ function adjustWidth() {
     timerId.value = undefined;
   }, 250);
 }
-function fetchData() {
-  return;
+async function fetchData() {
+  if (prev_date.value !== search_date.value) {
+    await getAllEvents(search_date.value).then(response => {
+      events_buffer.value = response.topic_list;
+    });
+    prev_date.value = search_date.value;
+  }
+  if (searchKeyWord.value.length > 0) {
+    all_events.value = [];
+    for (const event of events_buffer.value) event.title.includes(searchKeyWord.value) && all_events.value.push(event);
+  } else all_events.value = events_buffer.value;
 }
 function loadMore() {
   loading.value = true;

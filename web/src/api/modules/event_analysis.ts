@@ -4,7 +4,7 @@ import { EventAnalysis, ResDataList } from "../interface";
 
 /** 根据日期获取所有事件 */
 export const getAllEvents = (date: string) => {
-  return http.get<EventAnalysis.ResTopics>(AnalysisPort.MAIN.TOPICS, { date: date }, { loading: false });
+  return http.get<EventAnalysis.ResTopics>(AnalysisPort.MAIN.TOPICS, { date: date }, { loading: true });
 };
 
 /** 获取统计数据 */
