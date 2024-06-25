@@ -228,6 +228,9 @@ export namespace EventAnalysis {
     }[];
     senti_count: { [key: string]: number };
   }
+  export interface ResDetailedSentiment {
+    [key: string]: number;
+  }
   /** 获取上月及历史统计数据 */
   export interface ResStatistics {
     last_month: {

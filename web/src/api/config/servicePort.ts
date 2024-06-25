@@ -1,4 +1,4 @@
-// 后端微服务模块前缀
+// 后端微服务模块
 
 /** 身份验证接口 */
 export namespace AuthPort {
@@ -55,5 +55,23 @@ export namespace MessagePort {
   export enum MSG_SETTINGS {
     BASE = MESSAGE_SETTINGS_BASE_PORT + "/",
     UPDATE = MESSAGE_SETTINGS_BASE_PORT + "/update/"
+  }
+}
+
+/** 事件分析接口 */
+export namespace AnalysisPort {
+  /** 数据大屏接口 */
+  export enum MAIN {
+    STATISTICS = "/cardlist/fetch_card_list/",
+    LINE_CHART = "/chartdata/fetch_chart_data/",
+    EMOTION = "/emotion/fetch_emotions/",
+    WORD_CLOUD = "/wordcloud/fetch_word_cloud",
+    TOPICS = "/topiccard/fetch_topic_card/",
+    GRAPH3D = "/graphs/fetch_graph/"
+  }
+  /** 详细页面接口 */
+  export enum DETAIL {
+    EVENT = "/event/fetch_event/",
+    SENTIMENT = "/senti/fetch_sentiment/"
   }
 }
