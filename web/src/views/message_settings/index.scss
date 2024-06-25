@@ -1,4 +1,4 @@
-.message_settings {
+.message-settings {
   position: static;
 
   /* 自动布局 */
@@ -13,7 +13,7 @@
   min-height: 100%;
   padding: 10px;
 }
-.single_setting {
+.single-setting {
   position: static;
 
   /* 自动布局 */
@@ -30,10 +30,10 @@
   padding: 15px 20px;
   margin: 0;
 }
-.single_setting:hover {
+.single-setting:hover {
   background-color: rgba($color: #afafaf, $alpha: 20%);
 }
-.setting_row {
+.setting-row {
   position: static;
 
   /* 自动布局 */
@@ -50,7 +50,7 @@
   padding: 0;
   margin: 5px 0;
 }
-.setting_text {
+.setting-text {
   padding: 5px;
   font-size: 13px;
   font-weight: 300;

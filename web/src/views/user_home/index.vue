@@ -7,6 +7,7 @@
           :display-value="basicInfo.name"
           :tool-tip-visivle="invalidName"
           display-text="名称"
+          cursor="pointer"
           tip-text="用户名仅由大小写英文字符与数字0~9组成"
           @checked="confirm(0)"
           @row-clicked="handleClick(0)"
@@ -18,6 +19,7 @@
           display-value="*****"
           :tool-tip-visivle="invalidPassword || invalidRepeatPwd"
           display-text="密码"
+          cursor="pointer"
           :tip-text="invalidPassword ? '密码仅由大小写英文字符与数字0~9组成' : invalidRepeatPwd ? '两次输入的密码不一致' : ''"
           @checked="confirm(1)"
           @row-clicked="handleClick(1)"
@@ -60,20 +62,24 @@
         <InfoRow
           :selected="true"
           :tool-tip-visivle="role_tip_visible"
+          :display-icon="false"
           display-text="权限等级"
           :tip-text="role_tip"
-          @row-clicked="confirm(2), handleClick(-1)"
+          @row-clicked="handleClick(-1)"
         >
           <template #default>
             <div class="role_text" @mouseenter="toggleRoleTipVisibility(true)" @mouseleave="toggleRoleTipVisibility(false)">
               {{ role_name }}
             </div>
           </template>
-          <template #icon>
-            <icon><Top /></icon>
-          </template>
         </InfoRow>
-        <InfoRow :selected="true" :display-icon="false" display-text="" @row-clicked="confirm(3), handleClick(-1)">
+        <InfoRow
+          :selected="true"
+          :display-icon="false"
+          cursor="pointer"
+          display-text=""
+          @row-clicked="confirm(2), handleClick(-1)"
+        >
           <div class="delete_account">删除账号</div>
         </InfoRow>
       </div>
@@ -82,8 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import icon from "./../../components/el-icon/icon.vue";
-import { applyMandateApi, confirmDeleteApi, getUserInfoApi, uploadUserInfoApi } from "@/api/modules/user_info";
+import { confirmDeleteApi, getUserInfoApi, uploadUserInfoApi } from "@/api/modules/user_info";
 import SettingPanel from "@/components/SettingPanel/index.vue";
 import { useUserStore } from "@/stores/modules/user";
 import InfoRow from "./components/InfoRow.vue";
@@ -213,12 +218,8 @@ function confirm(index: number) {
         });
       }
       break;
-    // Apply for Mandate
-    case 2:
-      useHandleData(applyMandateApi, { email: contactInfo.value.email }, "申请提升权限");
-      break;
     // Delete Account
-    case 3:
+    case 2:
       useHandleData(confirmDeleteApi, { emailList: [contactInfo.value.email] }, "删除账号（包含所有账号记录）").then(() => {
         store.setTokens("", "", -1);
         router.replace(LOGIN_URL);

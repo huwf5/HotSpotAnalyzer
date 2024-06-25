@@ -57,7 +57,7 @@ export const useUserStore = defineStore({
     setUserRole(accountInfo: UserInfo.AccountInfo) {
       this.userInfo.accountInfo = accountInfo;
     },
-    setUserMsg(msg: Messages.Message[]) {
+    setUserMsg(msg: Messages.ResMessage[]) {
       this.userInfo.messages = msg;
     }
   },
