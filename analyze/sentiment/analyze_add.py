@@ -1,8 +1,12 @@
 import json
 import sys
-def add_sentiments(analyze_reslut_file, post_senti_file, output_file):
+from pathlib import Path
+import argparse
+
+
+def add_sentiments(analyze_result_file, post_senti_file, output_file):
     # 读取文件A
-    with open(analyze_reslut_file, 'r', encoding='utf-8') as file:
+    with open(analyze_result_file, 'r', encoding='utf-8') as file:
         analyze_data = json.load(file)
 
     # 读取文件B
@@ -30,10 +34,20 @@ def add_sentiments(analyze_reslut_file, post_senti_file, output_file):
 
 
 if __name__ == '__main__':
-    # 示例用法
-    analyze_result = sys.argv[1] # 'analyze_result_0527.json'  
-    post_sentiment_counts = sys.argv[2] # 'sentiments_counts_eng.json'  
-    output_file = analyze_result[:-5]+'_with_sentiment.json'
-    add_sentiments(analyze_result, post_sentiment_counts, output_file)
+
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-topic_result_file', type=str, required=True,
+    help='热点topic分析结果文件的路径。')
+    parser.add_argument('-post_senti_result_file', type=str, required=True,
+    help='帖子情感分析结果文件路径')
+    parser.add_argument('-topic_sentiment_target_file', type=str, required=True,
+    help='topic+情感结果文件的保存路径。')
+
+    args = parser.parse_args()
+    topic_result = args.topic_result_file 
+    post_sentiment_counts = args.post_senti_result_file 
+    output_file = args.topic_sentiment_target_file
+
+    add_sentiments(topic_result, post_sentiment_counts, output_file)
 
         

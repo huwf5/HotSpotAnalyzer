@@ -7,6 +7,7 @@ from datetime import datetime
 import re
 import json
 import sys
+import argparse
 print("loading...")
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 model_dir = snapshot_download("ZhipuAI/chatglm3-6b", revision = "v1.0.0")
@@ -129,13 +130,13 @@ def get_comments(json_file):
                     wid_comments[wid] = []
     return wid_comments, min_publish_time, max_publish_time
 
-def get_senti_counts(json_file, keyword):
+def get_senti_counts(json_file, output_file):
     
     his = get_senti_history()
     w_c, min_time, max_time = get_comments(json_file)
     df, senti_count = get_sentiments_multi(w_c, his)
     # 将情感计数结果写入JSON文件
-    output_file = 'post_sentiment_counts'+json_file[:-5]+'.json'
+    # output_file = 'post_sentiment_counts'+json_file[:-5]+'.json'
     with open(output_file, 'w', encoding='utf-8') as file:
         json.dump(senti_count, file, ensure_ascii=False, indent=4)
 
@@ -145,10 +146,17 @@ def get_senti_counts(json_file, keyword):
 
 if __name__ == '__main__':
 
-    json_file = sys.argv[1] # 'data_2024-05-27.json'
+
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-source_data_file', type=str, required=True,
+    help='源数据文件的路径')
+    parser.add_argument('-post_senti_target_file', type=str, required=True,
+    help='帖子情感分析结果保存路径')
+
+    args = parser.parse_args()
+    json_file = args.source_data_file
+    post_senti_target_file = args.post_senti_target_file 
     
-    keyword = 1
-    
-    df, senti_count, min_time, max_time = get_senti_counts(json_file, keyword)
+    df, senti_count, min_time, max_time = get_senti_counts(json_file, post_senti_target_file)
     # print(senti_count)
     # print(min_time, max_time)

@@ -1,0 +1,2 @@
+crawler:
+  target: "test" #"latest" # latest or large_batch
