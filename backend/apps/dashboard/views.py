@@ -485,3 +485,42 @@ class SentimentByPostViewSet(viewsets.ViewSet):
             return Response(content)
         except Exception as e:
             return Response({'error': f'发生意外错误：{str(e)}'}, status=500)
+
+class FetchAllEventsViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method='get',
+        operation_summary="Fetch All Events Data",
+        operation_description="Fetches data about every event, including its title and summary.",
+        manual_parameters=[
+        ],
+        responses={
+            200: openapi.Response('Data retrieved successfully'),
+            404: 'File not found',
+            500: 'Internal server error'
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def fetch_events(self, request):
+        file_dir = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data')
+        content = {"data": []}
+        for filename in os.listdir(file_dir):
+            file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data', filename)
+
+            if not os.path.exists(file_path):
+                return Response({'error': 'Topic data file not found.'}, status=404)
+
+            with open(file_path, 'r', encoding='utf-8') as file:
+                topic_data = json.load(file)
+
+            for key, value in topic_data.items():
+                content["data"].append({"title": value["title"], "summary": value["summary"]})
+
+        return Response(content)
+        # Check if the file exists
+
+
+
+
