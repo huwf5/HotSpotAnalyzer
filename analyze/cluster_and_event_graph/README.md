@@ -16,14 +16,12 @@ python cluster.py -source_file 2024-05-27.json -target_file 2024-05-27.json
 完成聚类分析后，需要为每个聚类判断是否为热点事件，并为热点事件提取标题和摘要
 运行时，需要指明数据文件和刚才分析的聚类结果文件
 ```shell
-python analyze.py -source_data_file 2024-05-27.json -clustering_result 2024-05-27.json
- -target_file 2024-05-27.json
+python analyze.py -source_data_file 2024-05-27.json -clustering_result 2024-05-27.json -target_file 2024-05-27.json
 ```
 
 如果需要进一步构建事件图谱，则运行build_event_graph.py，提供源数据文件，上一步的分析结果，以及输出文件地址
 ```shell
-python build_event_graph.py -source_data_file 2024-05-27.json -analyze_result 2024-05-27.json
--target_file 2024-05-27.json
+python build_event_graph.py -source_data_file 2024-05-27.json -analyze_result 2024-05-27.json -target_file 2024-05-27.json
 ```
 
 构建完事件图谱后，将事件图谱转化为3d-force-graph可以接受的格式：
