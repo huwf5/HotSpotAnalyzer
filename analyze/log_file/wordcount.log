@@ -1,0 +1,7 @@
+	Building prefix dict from the default dictionary ...
+	Loading model from cache /tmp/jieba.cache
+	Loading model cost 0.874 seconds.
+	Prefix dict has been built successfully.
+	已生成总词频文件：/home/zsdx/Desktop/hyj/result/word_cloud/jieba_wordcount/2024-06-25.json
+	...单事件词频已合并到：/home/zsdx/Desktop/hyj/result/topic_data/2024-06-25.json
+	1.92
