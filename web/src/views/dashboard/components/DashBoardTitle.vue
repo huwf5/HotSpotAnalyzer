@@ -24,7 +24,6 @@ const searchKeyWord = ref("");
 const router = useRouter();
 function jumpToSearch() {
   router.push({ path: "/event/search", query: { keyword: searchKeyWord.value } });
-  router.push({ path: "/event/event_analysis", query: { eventid: "dfmslmd" } });
 }
 </script>
 

@@ -3,15 +3,14 @@
     <el-card>
       <el-row>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
-          <div class="title"></div>
-          <div class="content"></div>
+          <div class="title">{{ event_title }}</div>
+          <div class="content">{{ event_content }}</div>
         </el-col>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
           <el-row class="statistic_container">
             <el-statistic class="statistic_col" :value="upVoteValue" title="点赞数"></el-statistic>
             <el-statistic class="statistic_col" :value="likeValue" title="喜爱数"></el-statistic>
-            <el-statistic class="statistic_col" :value="collectValue" title="收藏数"></el-statistic>
-            <el-statistic class="statistic_col" :value="shareValue" title="转发数"></el-statistic>
+            <el-statistic class="statistic_col" :value="commentValue" title="评论数"></el-statistic>
           </el-row>
         </el-col>
       </el-row>
@@ -46,31 +45,22 @@ import PieChart from "./components/PieChart.vue";
 import WordCloud from "./components/WordCloud.vue";
 import BarChart from "./components/BarChart.vue";
 // import EventGraph3D from "@/components/Event3D/EventGraph3D.vue";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useTransition } from "@vueuse/core";
 import { useRouter } from "vue-router";
-import { getDetail } from "@/api/modules/event_analysis";
-import { EventAnalysis } from "@/api/interface";
+import { getDetail, getDetailedSentiment } from "@/api/modules/event_analysis";
+import { useTabsStore } from "@/stores/modules/tabs";
 
 const router = useRouter();
 const event_title = ref(router.currentRoute.value.query.title ? (router.currentRoute.value.query.title as string) : "");
+const event_content = ref("");
 const loading = ref(false);
+const tabStore = useTabsStore();
 
-interface EventAnalysisData {
-  /** 帖子标题 */
-  title: string;
-  /** 帖子情感分析结果 */
-  emotions: any;
-  /** 帖子词频分析结果 */
-  wordFreq: {
-    name: string;
-    value: number;
-  }[];
-}
 const dataSource = ref<{
   emotionStatisics: { value: number; name: string }[];
   wordFreqStatistics: { name: string; value: number }[];
-  eventsData: { name: string; [key: string]: any }[];
+  eventsData: { [key: string]: number }[];
 }>({
   emotionStatisics: [],
   wordFreqStatistics: [],
@@ -80,14 +70,32 @@ const emotionData = computed(() => dataSource.value.emotionStatisics);
 const wordFreqData = computed(() => dataSource.value.wordFreqStatistics);
 const eventsData = computed(() => dataSource.value.eventsData);
 
-function processEmotionData(origin_data: (EventAnalysis.ResDetailedSentiment & { title: string })[]) {
-  let eventsData: { name: string; [key: string]: any }[] = [];
-  for (const data of origin_data) eventsData.push({ name: data.title, ...data });
-  loading.value = false;
-}
-getDetail(event_title.value).then(response => {
-  dataSource.value.emotionStatisics = response.senti_count;
-  dataSource.value.wordFreqStatistics = response.word_count;
+onMounted(() => {
+  getDetail(event_title.value)
+    .then(response => {
+      let err = false;
+      getDetailedSentiment(event_title.value)
+        .then(emotions => {
+          dataSource.value.eventsData = emotions.data;
+        })
+        .catch(() => {
+          err = true;
+        });
+      if (err) return;
+      let processed_sentiment_data: { value: number; name: string }[] = [];
+      for (const entry of Object.entries(response.senti_count)) {
+        processed_sentiment_data.push({ name: entry[0], value: entry[1] });
+      }
+      dataSource.value.emotionStatisics = processed_sentiment_data;
+      dataSource.value.wordFreqStatistics = response.word_count;
+      upVotes.value = response.forward_count;
+      likes.value = response.like_count;
+      comments.value = response.comment_count;
+    })
+    .catch(() => {
+      tabStore.removeTabs(router.currentRoute.value.fullPath);
+      router.back();
+    });
 });
 
 const expand_chart = ref(10);
@@ -96,12 +104,10 @@ const displayRightChart = ref(true);
 
 const upVotes = ref(0);
 const likes = ref(0);
-const collects = ref(0);
-const shares = ref(0);
+const comments = ref(0);
 const upVoteValue = useTransition(upVotes, { duration: 1500 });
 const likeValue = useTransition(likes, { duration: 1500 });
-const collectValue = useTransition(collects, { duration: 1500 });
-const shareValue = useTransition(shares, { duration: 1500 });
+const commentValue = useTransition(comments, { duration: 1500 });
 </script>
 
 <style scoped lang="scss">

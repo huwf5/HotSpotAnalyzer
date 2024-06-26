@@ -38,10 +38,8 @@ const logout = () => {
   }).then(async () => {
     // 1.执行退出登录接口
     try {
-      logoutApi({ refresh: userStore.refresh });
+      await logoutApi({ refresh: userStore.refresh });
     } finally {
-      console.log("here");
-
       // 2.清除 Token
       userStore.setTokens("", "", -1);
 

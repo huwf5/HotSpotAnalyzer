@@ -2,9 +2,9 @@ import http from "@/api";
 import { AnalysisPort } from "../config/servicePort";
 import { EventAnalysis, ResDataList } from "../interface";
 
-/** 根据日期获取所有事件 */
-export const getAllEvents = (date: string) => {
-  return http.get<EventAnalysis.ResTopics>(AnalysisPort.MAIN.TOPICS, { date: date }, { loading: true });
+/** 根据日期获取卡片数据 */
+export const getCardList = (date: string) => {
+  return http.get<EventAnalysis.ResTopics>(AnalysisPort.MAIN.TOPICS, { date: date }, { loading: false });
 };
 
 /** 获取统计数据 */
@@ -24,6 +24,10 @@ export const getMainSentiment = (date: string) => {
 
 export const getGraph3D = (date: string) => {
   return http.get<EventAnalysis.Res3DGraph>(AnalysisPort.MAIN.GRAPH3D, { date: date }, { loading: false });
+};
+
+export const getAllEvents = () => {
+  return http.get<ResDataList<EventAnalysis.ResEvent>>(AnalysisPort.SEARCH, undefined, { loading: true });
 };
 
 /** 获取详细页面数据 */

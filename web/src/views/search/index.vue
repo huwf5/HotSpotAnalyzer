@@ -16,9 +16,9 @@
         </el-col>
       </el-row>
     </div>
-    <ul v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" style="padding: 0">
+    <ul v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" :infinite-scroll-distance="300" style="padding: 0">
       <li v-for="(event, index) in display_events" :key="index" class="list-item">
-        <el-card shadow="hover">
+        <el-card shadow="hover" @click="handleClick(event.title)">
           <div class="event-title">{{ event.title }}</div>
           <div class="event-body">{{ event.summary }}</div>
         </el-card>
@@ -36,14 +36,6 @@ import { useRouter } from "vue-router";
 interface EventData {
   title: string;
   summary: string;
-  is_news: boolean;
-  num_of_posts: number;
-  date: string;
-  senti_count: { [key: string]: number };
-  word_count: {
-    name: string;
-    value: number;
-  }[];
 }
 
 const router = useRouter();
@@ -90,8 +82,8 @@ function adjustWidth() {
 }
 async function fetchData() {
   if (prev_date.value !== search_date.value) {
-    await getAllEvents(search_date.value).then(response => {
-      events_buffer.value = response.topic_list;
+    await getAllEvents().then(response => {
+      events_buffer.value = response.data;
     });
     prev_date.value = search_date.value;
   }
@@ -102,10 +94,11 @@ async function fetchData() {
 }
 function loadMore() {
   loading.value = true;
-  setTimeout(() => {
-    display_count.value = Math.min(display_count.value + 10, all_events.value.length);
-    loading.value = false;
-  }, 1000);
+  display_count.value = Math.min(display_count.value + 10, all_events.value.length);
+  loading.value = false;
+}
+function handleClick(title: string) {
+  router.push({ path: "/event/analysis", query: { title: title } });
 }
 </script>
 

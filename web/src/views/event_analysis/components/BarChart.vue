@@ -6,7 +6,7 @@
 import { use } from "echarts/core";
 import { BarChart } from "echarts/charts";
 import { GridComponent, DatasetComponent } from "echarts/components";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import VChart from "vue-echarts";
 
 use([GridComponent, BarChart, DatasetComponent]);
@@ -17,18 +17,25 @@ interface BarChartData {
 }
 
 const props = defineProps<{
-  data: BarChartData[];
+  data: any[];
   isLoading: boolean;
 }>();
+const chartData = ref<BarChartData[]>([]);
 
-const dataSetOptions = computed(() => {
+const dataSetOptions = ref<{ series: any[]; dimensions: string[]; legends: string[] }>({
+  series: [],
+  dimensions: [],
+  legends: []
+});
+
+function initDimensions() {
   let series: any[] = [];
   let dimensions: string[] = [];
   let legends: string[] = [];
-  if (props.data.length > 0) {
-    for (const key of Object.keys(props.data[0])) {
+  if (chartData.value.length > 0) {
+    for (const key of Object.keys(chartData.value[0])) {
       dimensions.push(key);
-      if (key !== "name" && key !== "value") {
+      if (key !== "name") {
         series.push({
           type: "bar",
           stack: "total",
@@ -48,9 +55,23 @@ const dataSetOptions = computed(() => {
       }
     }
   }
+  console.log(dimensions);
+  dataSetOptions.value.series = series;
+  dataSetOptions.value.dimensions = dimensions;
+  dataSetOptions.value.legends = legends;
+}
 
-  return { series, dimensions, legends };
-});
+function processData() {
+  let number = 0;
+  chartData.value = [];
+  for (const post_data of props.data) {
+    number++;
+    chartData.value.push({ name: "post" + number.toString(), ...post_data });
+  }
+  console.log(chartData.value);
+}
+processData();
+initDimensions();
 
 const barOption = ref({
   tooltip: {
@@ -58,7 +79,7 @@ const barOption = ref({
   },
   dataset: {
     dimensions: dataSetOptions.value.dimensions,
-    source: props.data
+    source: chartData.value
   },
   grid: {
     containLabel: true,
@@ -86,14 +107,19 @@ const barOption = ref({
 
 watch(
   () => props.data,
-  newVal => {
-    barOption.value.dataset.source = newVal;
+  () => {
+    processData();
+    initDimensions();
+    barOption.value.dataset.source = chartData.value;
+    barOption.value.dataset.dimensions = dataSetOptions.value.dimensions;
+    barOption.value.series = dataSetOptions.value.series;
+    barOption.value.legend.data = dataSetOptions.value.legends;
   }
 );
 </script>
 
 <style scoped lang="scss">
 .chart {
-  height: 300px;
+  height: 500px;
 }
 </style>

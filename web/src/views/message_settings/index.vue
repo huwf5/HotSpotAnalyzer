@@ -37,8 +37,10 @@ import { Messages } from "@/api/interface";
 import { ElNotification } from "element-plus";
 import { useHandleData } from "@/hooks/useHandleData";
 import { useRouter } from "vue-router";
+import { useTabsStore } from "@/stores/modules/tabs";
 
 const router = useRouter();
+const tabStore = useTabsStore();
 
 const userSettings = ref<Messages.ResMessageSetting>({
   allow_non_news: true,
@@ -80,6 +82,7 @@ localStorage.getItem("msg_settings") !== null
         initPage();
       })
       .catch(() => {
+        tabStore.removeTabs(router.currentRoute.value.fullPath);
         router.back();
       });
 </script>

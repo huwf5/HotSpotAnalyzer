@@ -16,6 +16,34 @@
       }
     },
     {
+      "path": "/dashboard",
+      "name": "dashboard",
+      "component": "/dashboard/index",
+      "meta": {
+        "icon": "DataBoard",
+        "title": "数据大屏",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": true,
+        "isKeepAlive": true
+      }
+    },
+    {
+      "path": "/event/search",
+      "name": "event_search",
+      "component": "/search/index",
+      "meta": {
+        "icon": "Search",
+        "title": "事件搜索",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": false,
+        "isKeepAlive": true
+      }
+    },
+    {
       "path": "/messages",
       "name": "messages",
       "redirect": "/messages/index",
@@ -132,20 +160,6 @@
       ]
     },
     {
-      "path": "/dashboard",
-      "name": "dashboard",
-      "component": "/dashboard/index",
-      "meta": {
-        "icon": "DataBoard",
-        "title": "数据大屏",
-        "isLink": "",
-        "isHide": false,
-        "isFull": false,
-        "isAffix": true,
-        "isKeepAlive": true
-      }
-    },
-    {
       "path": "/event/analysis",
       "name": "event_analysis",
       "component": "/event_analysis/index",
@@ -153,21 +167,7 @@
         "icon": "Histogram",
         "title": "事件分析",
         "isLink": "",
-        "isHide": false,
-        "isFull": false,
-        "isAffix": false,
-        "isKeepAlive": true
-      }
-    },
-    {
-      "path": "/event/search",
-      "name": "event_search",
-      "component": "/search/index",
-      "meta": {
-        "icon": "Search",
-        "title": "事件搜索",
-        "isLink": "",
-        "isHide": false,
+        "isHide": true,
         "isFull": false,
         "isAffix": false,
         "isKeepAlive": true

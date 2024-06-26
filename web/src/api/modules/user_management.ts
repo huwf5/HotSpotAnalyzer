@@ -46,7 +46,7 @@ export const resetUserPassWordApi = () => {
   let req = {
     password: "12345" // 默认密码12345
   };
-  return http.post<Result>(ManagePort.IGuest.UPDATE_PROFILE, req);
+  return http.patch<Result>(ManagePort.IGuest.UPDATE_PROFILE, req);
 };
 
 // 获取用户身份字典
