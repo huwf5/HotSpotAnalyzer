@@ -41,7 +41,7 @@ const wordCloudOption = ref({
       shape: "square",
       keepAspect: true,
       center: ["50%", "50%"],
-      sizeRange: [10, 50],
+      sizeRange: [30, 70],
       rotationRange: [-60, 60],
       rotationStep: 45,
       gridSize: 8,

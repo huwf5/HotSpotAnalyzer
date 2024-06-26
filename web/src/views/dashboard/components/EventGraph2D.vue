@@ -1,9 +1,11 @@
 <template>
+  <Chart :options="" />
   <div id="container"></div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { Chart } from "highcharts-vue";
 import Highcharts from "highcharts";
 import Networkgraph from "highcharts/modules/networkgraph";
 import Exporting from "highcharts/modules/exporting";
@@ -129,6 +131,94 @@ const graphData = ref({
 
 const groupColors = ["#FF6347", "#4682B4"];
 
+const chartOption = ref({
+  chart: {
+    type: "networkgraph",
+    height: "600px", // 设置高度
+    zoomType: "xy", // 启用 x 和 y 方向的缩放
+    panning: {
+      enabled: true,
+      type: "xy" // 启用 x 和 y 方向的拖动
+    },
+    panKey: "shift" // 拖动时需按住 Shift 键
+  },
+  tooltip: {
+    useHTML: true,
+    headerFormat: "<b>{point.key}</b><br>",
+    pointFormat: "{point.description}"
+  },
+  credits: {
+    enabled: false
+  },
+  exporting: {
+    enabled: false
+  },
+  title: {
+    text: "事件图谱2D"
+  },
+  subtitle: {
+    text: "事件节点"
+  },
+  plotOptions: {
+    networkgraph: {
+      keys: ["from", "to"],
+      layoutAlgorithm: {
+        enableSimulation: true
+      },
+      point: {
+        events: {
+          mouseOver: function () {
+            this.linksTo.forEach(function (link) {
+              link.graphic.attr({
+                stroke: "red", // 高亮颜色
+                strokeWidth: 5 // 高亮时的线宽
+              });
+            });
+            this.linksFrom.forEach(function (link) {
+              link.graphic.attr({
+                stroke: "red",
+                strokeWidth: 5
+              });
+            });
+          },
+          mouseOut: function () {
+            this.linksTo.forEach(function (link) {
+              link.graphic.attr({
+                stroke: "#cccccc", // 默认颜色
+                strokeWidth: 1 // 默认线宽
+              });
+            });
+            this.linksFrom.forEach(function (link) {
+              link.graphic.attr({
+                stroke: "#cccccc",
+                strokeWidth: 1
+              });
+            });
+          }
+        }
+      }
+    }
+  },
+  series: [
+    {
+      dataLabels: {
+        enabled: true,
+        linkFormat: "{point.description}",
+        format: "{point.id}",
+        style: {
+          width: "100px", // 限制标签的最大宽度
+          color: "#333", // 文本颜色
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap", // 不允许文本换行
+          overflow: "hidden" // 隐藏溢出的文本
+        }
+      },
+      nodes: nodes,
+      data: links
+    }
+  ]
+});
+
 onMounted(() => {
   const nodes = graphData.value.nodes.map(node => ({
     id: node.id,
@@ -144,93 +234,7 @@ onMounted(() => {
     description: link.description // 连接的描述信息
   }));
 
-  Highcharts.chart("container", {
-    chart: {
-      type: "networkgraph",
-      height: "600px", // 设置高度
-      zoomType: "xy", // 启用 x 和 y 方向的缩放
-      panning: {
-        enabled: true,
-        type: "xy" // 启用 x 和 y 方向的拖动
-      },
-      panKey: "shift" // 拖动时需按住 Shift 键
-    },
-    tooltip: {
-      useHTML: true,
-      headerFormat: "<b>{point.key}</b><br>",
-      pointFormat: "{point.description}"
-    },
-    credits: {
-      enabled: false
-    },
-    exporting: {
-      enabled: false
-    },
-    title: {
-      text: "事件图谱2D"
-    },
-    subtitle: {
-      text: "事件节点"
-    },
-    plotOptions: {
-      networkgraph: {
-        keys: ["from", "to"],
-        layoutAlgorithm: {
-          enableSimulation: true
-        },
-        point: {
-          events: {
-            mouseOver: function () {
-              this.linksTo.forEach(function (link) {
-                link.graphic.attr({
-                  stroke: "red", // 高亮颜色
-                  strokeWidth: 5 // 高亮时的线宽
-                });
-              });
-              this.linksFrom.forEach(function (link) {
-                link.graphic.attr({
-                  stroke: "red",
-                  strokeWidth: 5
-                });
-              });
-            },
-            mouseOut: function () {
-              this.linksTo.forEach(function (link) {
-                link.graphic.attr({
-                  stroke: "#cccccc", // 默认颜色
-                  strokeWidth: 1 // 默认线宽
-                });
-              });
-              this.linksFrom.forEach(function (link) {
-                link.graphic.attr({
-                  stroke: "#cccccc",
-                  strokeWidth: 1
-                });
-              });
-            }
-          }
-        }
-      }
-    },
-    series: [
-      {
-        dataLabels: {
-          enabled: true,
-          linkFormat: "{point.description}",
-          format: "{point.id}",
-          style: {
-            width: "100px", // 限制标签的最大宽度
-            color: "#333", // 文本颜色
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap", // 不允许文本换行
-            overflow: "hidden" // 隐藏溢出的文本
-          }
-        },
-        nodes: nodes,
-        data: links
-      }
-    ]
-  });
+  Highcharts.chart("container");
 });
 </script>
 
@@ -250,24 +254,23 @@ onMounted(() => {
   max-width: 800px;
   margin: 1em auto;
 }
-
 .highcharts-data-table table {
-  font-family: Verdana, sans-serif;
-  border-collapse: collapse;
-  border: 1px solid #ebebeb;
-  margin: 10px auto;
-  text-align: center;
   width: 100%;
   max-width: 500px;
+  margin: 10px auto;
+  font-family: Verdana, sans-serif;
+  text-align: center;
+  border-collapse: collapse;
+  border: 1px solid #ebebeb;
 }
 .highcharts-data-table caption {
   padding: 1em 0;
   font-size: 1.2em;
-  color: #555;
+  color: #555555;
 }
 .highcharts-data-table th {
-  font-weight: 600;
   padding: 0.5em;
+  font-weight: 600;
 }
 .highcharts-data-table td,
 .highcharts-data-table th,
@@ -281,5 +284,6 @@ onMounted(() => {
 .highcharts-data-table tr:hover {
   background: #f1f7ff;
 }
+
 /* Additional CSS here */
 </style>

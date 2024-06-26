@@ -39,9 +39,6 @@ function initDimensions() {
         series.push({
           type: "bar",
           stack: "total",
-          label: {
-            show: true
-          },
           emphasis: {
             focus: "series"
           },
@@ -49,13 +46,12 @@ function initDimensions() {
             x: "name",
             y: key
           },
-          name: key // 添加名称以供legend使用
+          name: key // 添加名称以供tooltip使用
         });
         legends.push(key);
       }
     }
   }
-  console.log(dimensions);
   dataSetOptions.value.series = series;
   dataSetOptions.value.dimensions = dimensions;
   dataSetOptions.value.legends = legends;
@@ -66,9 +62,16 @@ function processData() {
   chartData.value = [];
   for (const post_data of props.data) {
     number++;
-    chartData.value.push({ name: "post" + number.toString(), ...post_data });
+    let total_val = 0;
+    let processed_post_data = {};
+    for (const val of Object.values(post_data)) total_val += val as number;
+    if (total_val > 0) {
+      for (const entry of Object.entries(post_data)) {
+        processed_post_data[entry[0]] = ((entry[1] as number) / total_val) * 100;
+      }
+    } else processed_post_data = { ...post_data };
+    chartData.value.push({ name: "post" + number.toString(), ...processed_post_data });
   }
-  console.log(chartData.value);
 }
 processData();
 initDimensions();
@@ -120,6 +123,6 @@ watch(
 
 <style scoped lang="scss">
 .chart {
-  height: 500px;
+  height: 300px;
 }
 </style>

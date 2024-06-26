@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, ref, watch } from "vue";
+import { onBeforeUnmount, onUnmounted, ref, watch } from "vue";
 import SettingPanel from "@/components/SettingPanel/index.vue";
 import { createMessageSettingsApi, getMessageSettingsApi, uploadMessageSettingsApi } from "@/api/modules/message_settings";
 import { Messages } from "@/api/interface";
@@ -47,9 +47,9 @@ const userSettings = ref<Messages.ResMessageSetting>({
   warning_threshold: 0.5,
   info_threshold: 0.5
 });
-const timerId = ref<number | null>(null);
-function upload(params: Messages.ResMessageSetting) {
-  uploadMessageSettingsApi(params).then(() => {
+const timerId = ref<NodeJS.Timeout | null>(null);
+async function upload(params: Messages.ResMessageSetting) {
+  await uploadMessageSettingsApi(params).then(() => {
     ElNotification({
       title: "同步成功",
       type: "success",
@@ -66,14 +66,19 @@ function initPage() {
         if (timerId.value !== null) {
           clearTimeout(timerId.value);
         }
-        timerId.value = setTimeout(upload, 2000);
+        timerId.value = setTimeout(() => upload(userSettings.value), 2000);
       },
       { deep: true }
     );
     onUnmounted(unwatch);
   });
 }
-
+onBeforeUnmount(async () => {
+  if (timerId.value) {
+    clearTimeout(timerId.value);
+    await upload(userSettings.value);
+  }
+});
 localStorage.getItem("msg_settings") !== null
   ? initPage()
   : useHandleData(createMessageSettingsApi, null, "开启消息通知服务", "info")

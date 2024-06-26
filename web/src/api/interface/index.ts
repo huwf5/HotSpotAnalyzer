@@ -205,6 +205,7 @@ export namespace EventAnalysis {
   export interface ResEvent {
     title: string;
     summary: string;
+    date: string;
   }
   /** 根据标题获取的事件数据 */
   export interface ResEventAnalysis {

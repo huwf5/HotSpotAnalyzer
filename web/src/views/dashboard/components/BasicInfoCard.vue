@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { CountTo } from "vue3-count-to";
 import { reactive } from "vue";
+import { getStatistics } from "@/api/modules/event_analysis";
 
 const cardList = reactive([
   { title1: "上月帖子数量", unit: "月", value1: 6600, title2: "总帖子数量", value2: 7000 },
@@ -30,6 +31,8 @@ const cardList = reactive([
   { title1: "上月讨论量", unit: "月", value1: 66000, title2: "总讨论量", value2: 6666 },
   { title1: "上月转发数", unit: "月", value1: 66, title2: "总转发数", value2: 300 }
 ]);
+
+getStatistics();
 </script>
 
 <style lang="scss" scoped>
@@ -37,30 +40,24 @@ const cardList = reactive([
   border-radius: 8px;
   transition: box-shadow 0.3s;
 }
-
 .el-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 10%);
 }
-
 .el-tag {
   font-size: 12px;
 }
-
 .flex {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
-
 .text-sm {
   font-size: 14px;
 }
-
 .text-2xl {
   font-size: 24px;
   font-weight: bold;
 }
-
 .m-t-5px {
   margin-top: 5px;
 }

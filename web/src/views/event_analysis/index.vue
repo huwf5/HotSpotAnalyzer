@@ -3,8 +3,8 @@
     <el-card>
       <el-row>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
-          <div class="title">{{ event_title }}</div>
-          <div class="content">{{ event_content }}</div>
+          <div class="title">{{ props.title }}</div>
+          <div class="content">{{ props.summary }}</div>
         </el-col>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
           <el-row class="statistic_container">
@@ -52,8 +52,10 @@ import { getDetail, getDetailedSentiment } from "@/api/modules/event_analysis";
 import { useTabsStore } from "@/stores/modules/tabs";
 
 const router = useRouter();
-const event_title = ref(router.currentRoute.value.query.title ? (router.currentRoute.value.query.title as string) : "");
-const event_content = ref("");
+const props = defineProps<{
+  title: string;
+  summary: string;
+}>();
 const loading = ref(false);
 const tabStore = useTabsStore();
 
@@ -71,10 +73,11 @@ const wordFreqData = computed(() => dataSource.value.wordFreqStatistics);
 const eventsData = computed(() => dataSource.value.eventsData);
 
 onMounted(() => {
-  getDetail(event_title.value)
+  loading.value = true;
+  getDetail(props.title)
     .then(response => {
       let err = false;
-      getDetailedSentiment(event_title.value)
+      getDetailedSentiment(props.title)
         .then(emotions => {
           dataSource.value.eventsData = emotions.data;
         })
@@ -95,6 +98,9 @@ onMounted(() => {
     .catch(() => {
       tabStore.removeTabs(router.currentRoute.value.fullPath);
       router.back();
+    })
+    .finally(() => {
+      loading.value = false;
     });
 });
 

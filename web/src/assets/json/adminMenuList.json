@@ -160,7 +160,8 @@
       ]
     },
     {
-      "path": "/event/analysis",
+      "path": "/event/analysis/:title/:summary",
+      "props": true,
       "name": "event_analysis",
       "component": "/event_analysis/index",
       "meta": {
