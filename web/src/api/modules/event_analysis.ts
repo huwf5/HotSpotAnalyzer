@@ -8,8 +8,8 @@ export const getAllEvents = (date: string) => {
 };
 
 /** 获取统计数据 */
-export const getStatistics = (date: string) => {
-  return http.get<EventAnalysis.ResStatistics>(AnalysisPort.MAIN.STATISTICS, { date: date }, { loading: false });
+export const getStatistics = () => {
+  return http.get<EventAnalysis.ResStatistics>(AnalysisPort.MAIN.STATISTICS, { loading: false });
 };
 
 /** 获取折线表 */

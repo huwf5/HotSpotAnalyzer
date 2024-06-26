@@ -373,7 +373,7 @@ def find_event_by_title(title):
         for key, value in source_data.items():
             if value["title"] == title:
                 return (key, value, filename.split(".")[0])
-
+    return None, None, None
 def find_post_by_wid(wid, source):
     for item in source:
         if item["wid"] == wid:
@@ -407,6 +407,8 @@ class EventViewSet(viewsets.ViewSet):
             if not title:
                 return Response({"error": "标题参数是必需的。"}, status=400)
             key, value, date = find_event_by_title(title)
+            if value is None:
+                return Response({'error': f'该标题不存在'}, status=400)
             filepath = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
             with open(filepath, 'r', encoding='utf-8') as file:
                 source_data = json.load(file)
@@ -434,6 +436,55 @@ class EventViewSet(viewsets.ViewSet):
             content["word_count"] = value["word_count"]
             content["senti_count"] = value["senti_count"]
 
+            return Response(content)
+        except Exception as e:
+            return Response({'error': f'发生意外错误：{str(e)}'}, status=500)
+
+class SearchEventViewSet(viewsets.ViewSet):
+    """
+    ViewSet 获取标题或摘要中含有给定子串的事件。
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method='get',
+        operation_summary="获取包含给定子串的事件",
+        operation_description="获取标题或摘要中含有给定子串的事件，返回标题、摘要、时间",
+        manual_parameters=[
+            openapi.Parameter('query', openapi.IN_QUERY, description="搜索的内容", type=openapi.TYPE_STRING, required=True)
+        ],
+        responses={
+            200: openapi.Response('成功获取事件数据'),
+            400: '请求参数错误',
+            404: '未找到数据',
+            500: '服务器内部错误'
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def fetch_event(self, request):
+        try:
+            query = request.GET.get('query')
+            if not query:
+                return Response({"error": "query参数是必需的。"}, status=400)
+            content = {"data": []}
+
+            for topic_file in os.listdir(os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data')):
+                filepath = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data', topic_file)
+                with open(filepath, 'r', encoding='utf-8') as file:
+                    topic_data = json.load(file)
+                source = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', topic_file)
+                with open(source, 'r', encoding='utf-8') as file:
+                    source_data = json.load(file)
+
+                for key, value in topic_data.items():
+                    if query in value["title"] or query in value["summary"]:
+                        new_item = {"title": value["title"], "summary": value["summary"]}
+                        for item in source_data:
+                            if item["wid"] in value["posts"]:
+                                new_item["date"] = item["publish_time"].split('T')[0]
+                                break
+                        content["data"].append(new_item)
             return Response(content)
         except Exception as e:
             return Response({'error': f'发生意外错误：{str(e)}'}, status=500)
@@ -485,3 +536,46 @@ class SentimentByPostViewSet(viewsets.ViewSet):
             return Response(content)
         except Exception as e:
             return Response({'error': f'发生意外错误：{str(e)}'}, status=500)
+
+class FetchAllEventsViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method='get',
+        operation_summary="Fetch All Events Data",
+        operation_description="Fetches data about every event, including its title and summary.",
+        manual_parameters=[
+        ],
+        responses={
+            200: openapi.Response('Data retrieved successfully'),
+            404: 'File not found',
+            500: 'Internal server error'
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def fetch_events(self, request):
+        file_dir = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data')
+        content = {"data": []}
+        for filename in os.listdir(file_dir):
+            file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data', filename)
+
+            if not os.path.exists(file_path):
+                return Response({'error': 'Topic data file not found.'}, status=404)
+
+            with open(file_path, 'r', encoding='utf-8') as file:
+                topic_data = json.load(file)
+            source = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', filename)
+
+            with open(source, 'r', encoding='utf-8') as file:
+                source_data = json.load(file)
+
+            for key, value in topic_data.items():
+                for item in source_data:
+                    if item["wid"] in value["posts"]:
+                        date = item["publish_time"].split('T')[0]
+                        content["data"].append({"title": value["title"], "summary": value["summary"],
+                                                "date": date})
+                        break
+        return Response(content)
+        # Check if the file exists
