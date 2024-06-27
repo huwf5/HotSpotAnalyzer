@@ -6,7 +6,7 @@
 import { use } from "echarts/core";
 import { BarChart } from "echarts/charts";
 import { GridComponent, DatasetComponent } from "echarts/components";
-import { computed, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import VChart from "vue-echarts";
 
 use([GridComponent, BarChart, DatasetComponent]);
@@ -17,24 +17,43 @@ interface BarChartData {
 }
 
 const props = defineProps<{
-  data: BarChartData[];
+  data: any[];
   isLoading: boolean;
 }>();
 
-const dataSetOptions = computed(() => {
+const dataSetOptions = ref<{ series: any[]; dimensions: string[]; legends: string[] }>({
+  series: [],
+  dimensions: [],
+  legends: []
+});
+
+function processData() {
+  // calculate chart data
+  let number = 0;
+  let chartData: BarChartData[] = [];
+  for (const post_data of props.data) {
+    number++;
+    let total_val = 0;
+    let processed_post_data = {};
+    for (const val of Object.values(post_data)) total_val += val as number;
+    if (total_val > 0) {
+      for (const entry of Object.entries(post_data)) {
+        processed_post_data[entry[0]] = ((entry[1] as number) / total_val) * 100;
+      }
+    } else processed_post_data = { ...post_data };
+    chartData.push({ name: "post" + number.toString(), ...processed_post_data });
+  }
+  // calculate dimensions
   let series: any[] = [];
   let dimensions: string[] = [];
   let legends: string[] = [];
-  if (props.data.length > 0) {
-    for (const key of Object.keys(props.data[0])) {
+  if (chartData.length > 0) {
+    for (const key of Object.keys(chartData[0])) {
       dimensions.push(key);
-      if (key !== "name" && key !== "value") {
+      if (key !== "name") {
         series.push({
           type: "bar",
           stack: "total",
-          label: {
-            show: true
-          },
           emphasis: {
             focus: "series"
           },
@@ -42,23 +61,27 @@ const dataSetOptions = computed(() => {
             x: "name",
             y: key
           },
-          name: key // 添加名称以供legend使用
+          name: key // 添加名称以供tooltip使用
         });
         legends.push(key);
       }
     }
   }
+  barOption.value.dataset.source = chartData;
+  barOption.value.series = series;
+  barOption.value.legend.data = legends;
+  barOption.value.dataset.dimensions = dimensions;
+}
 
-  return { series, dimensions, legends };
-});
+onMounted(() => processData);
 
 const barOption = ref({
   tooltip: {
     trigger: "axis"
   },
   dataset: {
-    dimensions: dataSetOptions.value.dimensions,
-    source: props.data
+    dimensions: [] as string[],
+    source: [] as BarChartData[]
   },
   grid: {
     containLabel: true,
@@ -75,7 +98,9 @@ const barOption = ref({
     // 柱状图的y轴
     type: "value"
   },
-  series: dataSetOptions.value.series,
+  series: [] as any[],
+  barMaxWidth: 30,
+  barMinHeight: 100,
   legend: {
     // 添加图例配置
     orient: "horizontal", // 设置图例为垂直布局，通常放在右侧更合适
@@ -84,12 +109,7 @@ const barOption = ref({
   }
 });
 
-watch(
-  () => props.data,
-  newVal => {
-    barOption.value.dataset.source = newVal;
-  }
-);
+watch(() => props.data, processData);
 </script>
 
 <style scoped lang="scss">

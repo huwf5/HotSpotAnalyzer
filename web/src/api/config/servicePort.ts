@@ -69,6 +69,11 @@ export namespace AnalysisPort {
     TOPICS = "/topiccard/fetch_topic_card/",
     GRAPH3D = "/graphs/fetch_graph/"
   }
+  /** 搜索页面接口 */
+  export enum SEARCH {
+    ALL_EVENTS = "/allEvents/fetch_events/",
+    SEARCH_EVENTS = "searchEvents/fetch_event/"
+  }
   /** 详细页面接口 */
   export enum DETAIL {
     EVENT = "/event/fetch_event/",

@@ -579,3 +579,7 @@ class FetchAllEventsViewSet(viewsets.ViewSet):
                         break
         return Response(content)
         # Check if the file exists
+
+
+
+
