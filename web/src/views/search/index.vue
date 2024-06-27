@@ -1,15 +1,23 @@
 <template>
   <div class="card search_page_container">
     <div ref="affix_ref" class="affix-container">
-      <el-row class="search_component" :gutter="20">
-        <el-col :span="12" :offset="6">
-          <el-input id="search_input" @keyup.enter="fetchData" size="large" prefix-icon="Search" v-model="searchKeyWord">
-            <template #suffix>
-              <el-button type="primary" @click="fetchData">搜索</el-button>
-            </template>
+      <el-row class="search_component" :gutter="10">
+        <el-col :span="10" :offset="6">
+          <el-input
+            id="search_input"
+            size="large"
+            prefix-icon="Search"
+            v-model="searchKeyWord"
+            clearable
+            @keyup.enter="fetchData"
+            @clear="fetchData"
+          >
           </el-input>
         </el-col>
-        <el-col class="date_selector" :span="3" :xs="6" :sm="6" :md="3" :lg="3" :xl="3">
+        <el-col :span="2">
+          <el-button type="primary" @click="fetchData">搜索</el-button>
+        </el-col>
+        <el-col v-if="affix_width > 850" :span="3">
           <el-date-picker
             v-model="search_date"
             type="daterange"
@@ -101,7 +109,6 @@ const input_height = ref(0);
 onMounted(async () => {
   await nextTick();
   input_height.value = document.getElementById("search_input")!.getBoundingClientRect().height;
-  affix_width.value = affix_ref.value!.getBoundingClientRect().width;
   window.addEventListener("resize", adjustWidth);
   fetchData();
   adjustWidth();
@@ -116,7 +123,7 @@ function adjustWidth() {
     timerId.value = undefined;
   }
   timerId.value = setTimeout(() => {
-    affix_width.value = affix_ref.value!.getBoundingClientRect().width;
+    affix_width.value = Math.max(affix_ref.value!.getBoundingClientRect().width, 850);
     timerId.value = undefined;
   }, 250);
 }
@@ -165,6 +172,10 @@ function handleClick(title: string, summary: string) {
   flex: none;
   width: v-bind("affix_width + 'px'");
   transition: all 0.1s linear;
+}
+.search_component :deep(.el-col) {
+  display: flex;
+  align-items: center;
 }
 .affix-container {
   position: relative;

@@ -31,7 +31,7 @@
               <WordCloud :is-loading="loading" :data="wordFreqData" />
             </el-tab-pane>
             <el-tab-pane label="关系图">
-              <!-- <EventGraph3D /> -->
+              <Graph2D :data="graphData" />
             </el-tab-pane>
           </el-tabs>
         </el-card>
@@ -44,7 +44,7 @@
 import PieChart from "./components/PieChart.vue";
 import WordCloud from "./components/WordCloud.vue";
 import BarChart from "./components/BarChart.vue";
-// import EventGraph3D from "@/components/Event3D/EventGraph3D.vue";
+import Graph2D from "./components/Graph2D.vue";
 import { computed, onMounted, ref } from "vue";
 import { useTransition } from "@vueuse/core";
 import { useRouter } from "vue-router";
@@ -63,14 +63,34 @@ const dataSource = ref<{
   emotionStatisics: { value: number; name: string }[];
   wordFreqStatistics: { name: string; value: number }[];
   eventsData: { [key: string]: number }[];
+  graphData: {
+    nodes: {
+      id: number;
+      name: string;
+      attributes: {
+        type: string;
+        value: string;
+      }[];
+    }[];
+    links: {
+      source: number;
+      target: number;
+      type: string;
+    }[];
+  };
 }>({
   emotionStatisics: [],
   wordFreqStatistics: [],
-  eventsData: []
+  eventsData: [],
+  graphData: {
+    nodes: [],
+    links: []
+  }
 });
 const emotionData = computed(() => dataSource.value.emotionStatisics);
 const wordFreqData = computed(() => dataSource.value.wordFreqStatistics);
 const eventsData = computed(() => dataSource.value.eventsData);
+const graphData = computed(() => dataSource.value.graphData);
 
 onMounted(() => {
   loading.value = true;
@@ -89,6 +109,13 @@ onMounted(() => {
       for (const entry of Object.entries(response.senti_count)) {
         processed_sentiment_data.push({ name: entry[0], value: entry[1] });
       }
+      response.graph &&
+        (dataSource.value.graphData = {
+          nodes: response.graph.events.map(item => {
+            return { name: item.event, ...item };
+          }),
+          links: response.graph.relationships
+        });
       dataSource.value.emotionStatisics = processed_sentiment_data;
       dataSource.value.wordFreqStatistics = response.word_count;
       upVotes.value = response.forward_count;

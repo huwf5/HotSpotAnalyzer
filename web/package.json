@@ -39,7 +39,6 @@
     "echarts-wordcloud": "^2.1.0",
     "element-plus": "^2.7.2",
     "highcharts": "^11.4.3",
-    "highcharts-vue": "^2.0.1",
     "md5": "^2.3.0",
     "mitt": "^3.0.1",
     "nprogress": "^0.2.0",
@@ -55,7 +54,8 @@
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.3.2",
     "vue3-count-to": "^1.1.2",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",

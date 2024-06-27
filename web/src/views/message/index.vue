@@ -1,5 +1,5 @@
 <template>
-  <div class="message card">
+  <div v-if="messages.length > 0" class="message card">
     <div class="headline">
       <label class="message_title">消息列表</label>
       <div class="operations">
@@ -41,6 +41,10 @@
         </div>
       </div>
     </div>
+  </div>
+  <div v-else class="message card empty-page">
+    <el-icon :size="50"><MessageBox /></el-icon>
+    <span>没有消息</span>
   </div>
 </template>
 

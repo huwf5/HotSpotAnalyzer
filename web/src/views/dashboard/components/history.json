@@ -1247,6 +1247,36 @@
       "description": "因果关系"
     },
     {
+      "source": "赵某晨造谣事件-2",
+      "target": "受害者上报证据-2",
+      "description": "关联关系"
+    },
+    {
+      "source": "赵某晨造谣事件-2",
+      "target": "希望得到公开道歉-2",
+      "description": "关联关系"
+    },
+    {
+      "source": "赵某晨造谣事件-2",
+      "target": "受害者要求公开道歉-2",
+      "description": "关联关系"
+    },
+    {
+      "source": "赵某晨造谣事件-2",
+      "target": "2021年06月23日-2",
+      "description": "关联关系"
+    },
+    {
+      "source": "赵某晨造谣事件-2",
+      "target": "赵某晨造谣多名女生-2",
+      "description": "关联关系"
+    },
+    {
+      "source": "赵某晨造谣事件-2",
+      "target": "中山大学通报赵某晨造谣多名女生-2",
+      "description": "关联关系"
+    },
+    {
       "source": "中山大学-1",
       "target": "中山大学通报李某某出轨-3",
       "description": "关联"
@@ -1335,6 +1365,26 @@
       "source": "中山大学通报李某某出轨-3",
       "target": "杨某退出流动站-3",
       "description": "因果关系"
+    },
+    {
+      "source": "妻子发现丈夫出轨-3",
+      "target": "中山大学通报李某某出轨-3",
+      "description": "因果关系"
+    },
+    {
+      "source": "中山大学通报李某某出轨-3",
+      "target": "李某超的妻子-3",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学通报李某某出轨-3",
+      "target": "2021年-3",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学通报李某某出轨-3",
+      "target": "妻子发现丈夫出轨-3",
+      "description": "关联关系"
     },
     {
       "source": "中山大学-1",
@@ -1445,6 +1495,26 @@
       "source": "启动师德师风调查-4",
       "target": "暂停教学工作-4",
       "description": "因果关系"
+    },
+    {
+      "source": "教授被控夺女学生初夜-4",
+      "target": "法学院-4",
+      "description": "关联关系"
+    },
+    {
+      "source": "教授被控夺女学生初夜-4",
+      "target": "启动师德师风调查-4",
+      "description": "关联关系"
+    },
+    {
+      "source": "教授被控夺女学生初夜-4",
+      "target": "学校回应师德师风问题-4",
+      "description": "关联关系"
+    },
+    {
+      "source": "教授被控夺女学生初夜-4",
+      "target": "要求留下落红床单作纪念-4",
+      "description": "关联关系"
     },
     {
       "source": "中山大学-1",
@@ -1682,6 +1752,11 @@
       "description": "因果关系"
     },
     {
+      "source": "马克龙访问中山大学-7",
+      "target": "马克龙与冯德莱恩访华-7",
+      "description": "关联关系"
+    },
+    {
       "source": "中山大学-1",
       "target": "中山大学南校区发现古墓-8",
       "description": "关联"
@@ -1737,6 +1812,16 @@
       "description": "因果关系"
     },
     {
+      "source": "中山大学南校区发现古墓-8",
+      "target": "2021年12月13日-8",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学南校区发现古墓-8",
+      "target": "中山大学施工现场发现古墓-8",
+      "description": "关联关系"
+    },
+    {
       "source": "中山大学-1",
       "target": "中山大学极地号破冰船开展冰区试航-9",
       "description": "关联"
@@ -1770,6 +1855,16 @@
       "source": "中山大学极地号破冰船升级-9",
       "target": "中山大学极地号破冰船成功验证能力-9",
       "description": "因果关系"
+    },
+    {
+      "source": "中山大学极地号破冰船开展冰区试航-9",
+      "target": "配备先进的探测装备-9",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学极地号破冰船开展冰区试航-9",
+      "target": "中山大学极地号破冰船升级-9",
+      "description": "关联关系"
     },
     {
       "source": "中山大学-1",
@@ -1892,6 +1987,46 @@
       "description": "因果关系"
     },
     {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "刘某-11",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "滑膜肉瘤-11",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "2009年-11",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "2023年6月-11",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "乳腺外科医生患癌-11",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "进修人员-11",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "乳腺癌-11",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学孙逸仙纪念医院通报-11",
+      "target": "乳腺肿瘤中心实验室启用-11",
+      "description": "关联关系"
+    },
+    {
       "source": "中山大学-1",
       "target": "中山大学校方拉起性骚扰女学生横幅-12",
       "description": "关联"
@@ -1955,6 +2090,11 @@
       "source": "中山大学南方学院教师性侵女学生-12",
       "target": "刘某发表声明-12",
       "description": "因果关系"
+    },
+    {
+      "source": "中山大学校方拉起性骚扰女学生横幅-12",
+      "target": "中山大学南方学院教师性侵女学生-12",
+      "description": "关联关系"
     },
     {
       "source": "中山大学-1",
@@ -2212,6 +2352,11 @@
       "description": "因果关系"
     },
     {
+      "source": "国家航天局发放嫦娥五号任务月球科研样品-17",
+      "target": "中山大学建设嫦娥五号样品装置-17",
+      "description": "关联关系"
+    },
+    {
       "source": "中山大学-1",
       "target": "中山大学园东湖发现鳄雀鳝-18",
       "description": "关联"
@@ -2447,6 +2592,16 @@
       "description": "因果关系"
     },
     {
+      "source": "中山大学深圳校区一期全面建成-23",
+      "target": "2018年-23",
+      "description": "关联关系"
+    },
+    {
+      "source": "中山大学深圳校区一期全面建成-23",
+      "target": "中山大学深圳校区一期工程开工建设五周年-23",
+      "description": "关联关系"
+    },
+    {
       "source": "中山大学-1",
       "target": "蒋林否认燕窝智商税-24",
       "description": "关联"
@@ -2515,6 +2670,21 @@
       "source": "网友质疑教授-24",
       "target": "蒋林否认燕窝智商税-24",
       "description": "因果关系"
+    },
+    {
+      "source": "蒋林否认燕窝智商税-24",
+      "target": "辛巴售卖燕窝-24",
+      "description": "关联关系"
+    },
+    {
+      "source": "蒋林否认燕窝智商税-24",
+      "target": "教授-24",
+      "description": "关联关系"
+    },
+    {
+      "source": "蒋林否认燕窝智商税-24",
+      "target": "网友质疑教授-24",
+      "description": "关联关系"
     },
     {
       "source": "中山大学-1",
@@ -2617,6 +2787,21 @@
       "description": "因果关系"
     },
     {
+      "source": "罗俊卸任校长-26",
+      "target": "校园建设快速发展-26",
+      "description": "关联关系"
+    },
+    {
+      "source": "罗俊卸任校长-26",
+      "target": "校园生活体验降低-26",
+      "description": "关联关系"
+    },
+    {
+      "source": "罗俊卸任校长-26",
+      "target": "校园提速扩容-26",
+      "description": "关联关系"
+    },
+    {
       "source": "中山大学-1",
       "target": "治疗毒鹅膏菌新解药-27",
       "description": "关联"
@@ -2675,6 +2860,26 @@
       "source": "中山大学天琴计划-27",
       "target": "新冠病毒疫苗-27",
       "description": "因果关系"
+    },
+    {
+      "source": "治疗毒鹅膏菌新解药-27",
+      "target": "中山大学病毒学所-27",
+      "description": "关联关系"
+    },
+    {
+      "source": "治疗毒鹅膏菌新解药-27",
+      "target": "新冠病毒疫苗-27",
+      "description": "关联关系"
+    },
+    {
+      "source": "治疗毒鹅膏菌新解药-27",
+      "target": "中山大学-27",
+      "description": "关联关系"
+    },
+    {
+      "source": "治疗毒鹅膏菌新解药-27",
+      "target": "中山大学天琴计划-27",
+      "description": "关联关系"
     },
     {
       "source": "中山大学-1",
@@ -2865,6 +3070,21 @@
       "source": "南校园封控-31",
       "target": "南校园防疫-31",
       "description": "因果关系"
+    },
+    {
+      "source": "南校园封控-31",
+      "target": "广州-31",
+      "description": "关联关系"
+    },
+    {
+      "source": "南校园封控-31",
+      "target": "停止线下教学-31",
+      "description": "关联关系"
+    },
+    {
+      "source": "南校园封控-31",
+      "target": "广州封控通告-31",
+      "description": "关联关系"
     }
   ]
 }

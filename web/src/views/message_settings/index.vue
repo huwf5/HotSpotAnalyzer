@@ -4,7 +4,9 @@
       <div class="single-setting">
         <div class="setting-row">
           <span>高于{{ userSettings.warning_threshold * 100 }}%</span>
-          <el-slider v-model="userSettings.warning_threshold" :step="0.01" :min="0" :max="1"></el-slider>
+          <div class="slider-wrapper">
+            <el-slider v-model="userSettings.warning_threshold" :step="0.01" :min="0" :max="1" />
+          </div>
         </div>
       </div>
     </setting-panel>
@@ -12,12 +14,9 @@
       <div class="single-setting">
         <div class="setting-row">
           <span>高于{{ userSettings.info_threshold * 100 }}%</span>
-          <el-slider
-            v-model="userSettings.info_threshold"
-            :step="0.01"
-            :min="0"
-            :max="userSettings.warning_threshold"
-          ></el-slider>
+          <div class="slider-wrapper">
+            <el-slider v-model="userSettings.info_threshold" :step="0.01" :min="0" :max="userSettings.warning_threshold" />
+          </div>
         </div>
       </div>
     </setting-panel>

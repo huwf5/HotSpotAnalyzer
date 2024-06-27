@@ -212,7 +212,7 @@ export namespace EventAnalysis {
     like_count: number;
     forward_count: number;
     comment_count: number;
-    graph: {
+    graph?: {
       events: {
         id: number;
         event: string;

@@ -1,91 +1,112 @@
 <template>
   <div class="gaugechart-wrapper">
     <h1 class="gaugechart-title">👻热度仪表</h1>
-    <v-chart ref="myChart" class="gauge-chart" :option="option" autoresize />
+    <div ref="gaugeChartRef" class="gauge-chart"></div>
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref } from "vue";
-import VChart from "vue-echarts";
-import { ECharts } from "echarts";
+import { onMounted, ref, onBeforeUnmount } from "vue";
+import * as echarts from "echarts";
 
-const myChart = ref<ECharts>();
+const gaugeChartRef = ref(null);
+const myChart = ref<echarts.ECharts | null>(null);
 
-const option = ref({
-  tooltip: {
-    formatter: "{a} <br/>{b} : {c}%"
-  },
-  series: [
-    {
-      name: "热度指数",
-      type: "gauge",
-      radius: "100%",
-      startAngle: 180,
-      endAngle: 0,
-      axisLine: {
-        lineStyle: {
-          width: 30,
-          color: [
-            [0.2, "#91c7ae"],
-            [0.8, "#63869e"],
-            [1, "#c23531"]
-          ]
+onMounted(() => {
+  if (gaugeChartRef.value) {
+    myChart.value = echarts.init(gaugeChartRef.value);
+
+    const option = {
+      tooltip: {
+        formatter: "{a} <br/>{b} : {c}%"
+      },
+      series: [
+        {
+          name: "热度指数",
+          type: "gauge",
+          radius: "100%",
+          startAngle: 180,
+          endAngle: 0,
+          axisLine: {
+            lineStyle: {
+              width: 30,
+              color: [
+                [0.2, "#91c7ae"],
+                [0.8, "#63869e"],
+                [1, "#c23531"]
+              ]
+            }
+          },
+          pointer: {
+            width: 6,
+            length: "80%",
+            itemStyle: {
+              color: "auto"
+            }
+          },
+          axisTick: {
+            show: false
+          },
+          splitLine: {
+            length: 15,
+            lineStyle: {
+              width: 2,
+              color: "#fff"
+            }
+          },
+          axisLabel: {
+            distance: 25,
+            fontSize: 12,
+            color: "#fff"
+          },
+          detail: {
+            formatter: "{value}%",
+            fontSize: 20,
+            fontWeight: "bold",
+            color: "#fff"
+          },
+          data: [{ value: 50, name: "热度指数" }]
         }
-      },
-      pointer: {
-        width: 6,
-        length: "80%",
-        itemStyle: {
-          color: "auto"
-        }
-      },
-      axisTick: {
-        show: false
-      },
-      splitLine: {
-        length: 15,
-        lineStyle: {
-          width: 2,
-          color: "#fff"
-        }
-      },
-      axisLabel: {
-        distance: 25,
-        fontSize: 12,
-        color: "#fff"
-      },
-      detail: {
-        formatter: "{value}%",
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#fff"
-      },
-      data: [{ value: 50, name: "热度指数" }]
-    }
-  ]
+      ]
+    };
+
+    myChart.value.setOption(option);
+    window.addEventListener("resize", () => {
+      if (myChart.value) {
+        myChart.value.resize();
+      }
+    });
+  }
+});
+
+onBeforeUnmount(() => {
+  if (myChart.value) {
+    myChart.value.dispose();
+  }
 });
 </script>
-
 <style scoped>
 .gaugechart-wrapper {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Center the content vertically */
-  height: 100%; /* Ensure the wrapper takes full height */
-  padding: 0;
+  justify-content: center;
+  width: 100%;
   margin-bottom: 10px;
+  overflow: hidden;
+  background-color: #ffffff;
 }
 .gaugechart-title {
-  margin-bottom: 50px; /* Adjust this value to control the distance from the chart */
+  margin-bottom: 20px;
   font-size: 18px;
   color: #007bff;
+  text-align: center;
 }
 .gauge-chart {
   width: 100%;
-  height: 250px; /* Adjust the height as needed */
+  max-width: 500px;
+  height: 250px;
+  margin: 0 auto;
 }
 .echarts-tooltip {
   padding: 10px !important;

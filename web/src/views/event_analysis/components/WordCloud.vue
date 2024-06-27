@@ -1,5 +1,5 @@
 <template>
-  <v-chart class="word_chart" ref="chart" v-loading="props.isLoading" :option="wordCloudOption" autoresize />
+  <v-chart class="chart" ref="chart" v-loading="props.isLoading" :option="wordCloudOption" autoresize />
 </template>
 
 <script setup lang="ts">
@@ -80,7 +80,7 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.word_chart {
+.chart {
   width: 100%;
   height: 500px;
 }

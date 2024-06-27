@@ -19,24 +19,59 @@
     </el-col>
   </el-row>
 </template>
-
 <script setup lang="ts">
 import { CountTo } from "vue3-count-to";
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
 import { getStatistics } from "@/api/modules/event_analysis";
-
+import { EventAnalysis } from "@/api/interface";
 const cardList = reactive([
-  { title1: "上月帖子数量", unit: "月", value1: 6600, title2: "总帖子数量", value2: 7000 },
-  { title1: "上月点赞数", unit: "月", value1: 400, title2: "总点赞数", value2: 8000 },
-  { title1: "上月讨论量", unit: "月", value1: 66000, title2: "总讨论量", value2: 6666 },
-  { title1: "上月转发数", unit: "月", value1: 66, title2: "总转发数", value2: 300 }
+  {
+    title1: "上月帖子数量",
+    unit: "月",
+    value1: 0,
+    title2: "总帖子数量",
+    value2: 0
+  },
+  {
+    title1: "上月点赞数",
+    unit: "月",
+    value1: 0,
+    title2: "总点赞数",
+    value2: 0
+  },
+  {
+    title1: "上月讨论量",
+    unit: "月",
+    value1: 0,
+    title2: "总讨论量",
+    value2: 0
+  },
+  {
+    title1: "上月转发数",
+    unit: "月",
+    value1: 0,
+    title2: "总转发数",
+    value2: 0
+  }
 ]);
-
 getStatistics();
+onMounted(async () => {
+  const response: EventAnalysis.ResStatistics = await getStatistics();
+  console.log("API Response:", response);
+  cardList[0].value1 = response.last_month.posts;
+  cardList[0].value2 = response.history.posts;
+  cardList[1].value1 = response.last_month.like_counts;
+  cardList[1].value2 = response.history.like_counts;
+  cardList[2].value1 = response.last_month.comment_counts;
+  cardList[2].value2 = response.history.comment_counts;
+  cardList[3].value1 = response.last_month.forward_counts;
+  cardList[3].value2 = response.history.forward_counts;
+});
 </script>
 
 <style lang="scss" scoped>
 .el-card {
+  background-color: #ffffff;
   border-radius: 8px;
   transition: box-shadow 0.3s;
 }

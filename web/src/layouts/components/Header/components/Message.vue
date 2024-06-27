@@ -3,12 +3,12 @@
     <el-popover placement="bottom" :width="310" trigger="hover" @show="fetch_count">
       <template #reference>
         <el-badge :hidden="unreads === 0" :value="unreads" :max="99" class="item">
-          <i :class="'iconfont icon-xiaoxi'" class="toolBar-icon" @click="MsgIconClicked"></i>
+          <i :class="'iconfont icon-xiaoxi'" class="toolBar-icon" @click="Jump2Message"></i>
         </el-badge>
       </template>
       <div v-if="unreads > 0" class="message-list">
         <div v-for="(messaage, index) in messages" :key="index">
-          <div v-if="!messaage.is_read" class="message-item">
+          <div v-if="!messaage.is_read" class="message-item" @click="Jump2Message">
             <img src="@/assets/images/msg01.png" alt="" class="message-icon" />
             <div class="message-content">
               <span class="message-title">{{ messaage.message.title }}</span>
@@ -55,7 +55,7 @@ function count_unread() {
   });
   unreads.value = cnt;
 }
-function MsgIconClicked() {
+function Jump2Message() {
   router.push("/messages/index");
 }
 watch(store.userInfo, count_unread);
@@ -79,6 +79,8 @@ onMounted(fetch_count);
     align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid var(--el-border-color-light);
+    transition: all 0.25s ease-in-out;
+    cursor: pointer;
     &:hover {
       background-color: var(--el-menu-hover-bg-color);
     }

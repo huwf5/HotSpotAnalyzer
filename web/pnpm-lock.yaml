@@ -41,9 +41,6 @@ importers:
       highcharts:
         specifier: ^11.4.3
         version: 11.4.3
-      highcharts-vue:
-        specifier: ^2.0.1
-        version: 2.0.1(highcharts@11.4.3)(vue@3.4.26(typescript@5.4.5))
       md5:
         specifier: ^2.3.0
         version: 2.3.0
@@ -90,6 +87,9 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2(vue@3.4.26(typescript@5.4.5))
       vuedraggable:
+        specifier: ^4.1.0
+        version: 4.1.0(vue@3.4.26(typescript@5.4.5))
+      vuex:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.4.26(typescript@5.4.5))
     devDependencies:
@@ -2766,12 +2766,6 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  highcharts-vue@2.0.1:
-    resolution: {integrity: sha512-7yVaKvsWlx7OgmKFXE2D99fi/0tr2A85H4KUz3jL7CRQhAwvEvXgtDIyTBGLHJsOC5L9VlppAI7k6KfIi0j0hg==}
-    peerDependencies:
-      highcharts: '>=5.0.0'
-      vue: '>=3.0.0'
-
   highcharts@11.4.3:
     resolution: {integrity: sha512-rMmvYvcdwyUVfnRPfiZ0PnW6TgVhoS0FTBI8fc4Fp8l8ocoC9dMecvxS6E6tm7h7LrnSGoEo3b/0IRHuLatD2w==}
 
@@ -4696,6 +4690,11 @@ packages:
     resolution: {integrity: sha512-FU5HCWBmsf20GpP3eudURW3WdWTKIbEIQxh9/8GE806hydR9qZqRRxRE3RjqX7PkuLuMQG/A7n3cfj9rCEchww==}
     peerDependencies:
       vue: ^3.0.1
+
+  vuex@4.1.0:
+    resolution: {integrity: sha512-hmV6UerDrPcgbSy9ORAtNXDr9M4wlNP4pEFKye4ujJF8oqgFFuxDCdOLS3eNoRTtq5O3hoBDh9Doj1bQMYHRbQ==}
+    peerDependencies:
+      vue: ^3.2.0
 
   webidl-conversions@4.0.2:
     resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
@@ -7728,11 +7727,6 @@ snapshots:
 
   he@1.2.0: {}
 
-  highcharts-vue@2.0.1(highcharts@11.4.3)(vue@3.4.26(typescript@5.4.5)):
-    dependencies:
-      highcharts: 11.4.3
-      vue: 3.4.26(typescript@5.4.5)
-
   highcharts@11.4.3: {}
 
   hosted-git-info@2.8.9: {}
@@ -9702,6 +9696,11 @@ snapshots:
   vuedraggable@4.1.0(vue@3.4.26(typescript@5.4.5)):
     dependencies:
       sortablejs: 1.14.0
+      vue: 3.4.26(typescript@5.4.5)
+
+  vuex@4.1.0(vue@3.4.26(typescript@5.4.5)):
+    dependencies:
+      '@vue/devtools-api': 6.6.1
       vue: 3.4.26(typescript@5.4.5)
 
   webidl-conversions@4.0.2: {}
