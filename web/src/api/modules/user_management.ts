@@ -41,14 +41,6 @@ export const batchDeleteUserApi = (params: User.EmailList) => {
   return http.post<Result>(ManagePort.IAdmin.DELETE, params);
 };
 
-// 重置用户密码
-export const resetUserPassWordApi = () => {
-  let req = {
-    password: "12345" // 默认密码12345
-  };
-  return http.post<Result>(ManagePort.IGuest.UPDATE_PROFILE, req);
-};
-
 // 获取用户身份字典
 export const getRoleDictApi = () => {
   return http.get<ResDataList<User.RoleDict>>(AuthPort.ROLE_DICT);

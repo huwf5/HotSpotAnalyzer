@@ -1,5 +1,5 @@
 <template>
-  <v-chart class="word_chart" ref="chart" v-loading="props.isLoading" :option="wordCloudOption" autoresize />
+  <v-chart class="chart" ref="chart" v-loading="props.isLoading" :option="wordCloudOption" autoresize />
 </template>
 
 <script setup lang="ts">
@@ -41,7 +41,7 @@ const wordCloudOption = ref({
       shape: "square",
       keepAspect: true,
       center: ["50%", "50%"],
-      sizeRange: [10, 50],
+      sizeRange: [30, 70],
       rotationRange: [-60, 60],
       rotationStep: 45,
       gridSize: 8,
@@ -80,7 +80,7 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.word_chart {
+.chart {
   width: 100%;
   height: 500px;
 }

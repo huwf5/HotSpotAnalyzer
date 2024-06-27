@@ -148,7 +148,7 @@ function restartRotation() {
     timer.value = setInterval(() => {
       rotate.value = (rotate.value + 0.1) % 360;
       pieOption.value.series[0].startAngle = 360 - rotate.value;
-    }, 50);
+    }, 100);
   }
 }
 </script>

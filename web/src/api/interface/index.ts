@@ -182,7 +182,7 @@ export namespace EventAnalysis {
   export interface ReqTitle {
     title: string;
   }
-  /** 根据日期获取所有事件 */
+  /** 根据日期获取卡片数据 */
   export interface ResTopics {
     num_of_topics: number;
     num_of_posts: number;
@@ -202,12 +202,17 @@ export namespace EventAnalysis {
       }[];
     }[];
   }
+  export interface ResEvent {
+    title: string;
+    summary: string;
+    date: string;
+  }
   /** 根据标题获取的事件数据 */
   export interface ResEventAnalysis {
     like_count: number;
     forward_count: number;
     comment_count: number;
-    graph: {
+    graph?: {
       events: {
         id: number;
         event: string;
