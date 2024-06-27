@@ -4,7 +4,7 @@
     <BasicInfoCard></BasicInfoCard>
     <el-row :gutter="20" class="m-t-5px">
       <el-col :span="12" :lg="12" :md="12" :sm="24" :xs="24">
-        <el-card class="rounded-md dark:bg-black" shadow="hover">
+        <el-card class="rounded-md dark:bg-black m-d-10px" shadow="hover">
           <WordCloudChart></WordCloudChart>
         </el-card>
       </el-col>
@@ -39,7 +39,8 @@ import BasicInfoCard from "./components/BasicInfoCard.vue";
 import WordCloudChart from "./components/WordCloudChart.vue";
 import EmotionChart from "./components/EmotionChart.vue";
 import LineChart from "./components/LineChart.vue";
-import EventGraph3D from "../../components/Event3D/EventGraph3D.vue";
+import EventGraph3D from "./components/EventGraph3D.vue";
+// import EventGraph2D from "./components/EventGraph2D.vue";
 import TopicCard from "./components/TopicCard.vue";
 import DashBoardTitle from "./components/DashBoardTitle.vue";
 import GaugeChart from "./components/GaugeChart.vue";
@@ -77,5 +78,18 @@ import DivideLine from "./components/DivideLine.vue";
 }
 .m-t-10px {
   margin-top: 10px;
+}
+.m-d-10px {
+  margin-bottom: 0;
+}
+
+@media (width <= 1024px) {
+  .m-t-10px {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .m-d-10px {
+    margin-bottom: 10px;
+  }
 }
 </style>

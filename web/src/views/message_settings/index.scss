@@ -50,6 +50,16 @@
   padding: 0;
   margin: 5px 0;
 }
+.slider-wrapper {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.setting-row .el-slider {
+  max-width: 700px;
+}
 .setting-text {
   padding: 5px;
   font-size: 13px;

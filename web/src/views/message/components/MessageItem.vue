@@ -114,7 +114,7 @@ const shadow_color = computed(() => {
   line-height: 22px;
 
   /* Base/Base Normal */
-  color: rgb(115 115 115);
+  color: var(--el-text-color-secondary);
   text-align: start;
   letter-spacing: 0%;
   word-break: break-all;
@@ -134,6 +134,5 @@ const shadow_color = computed(() => {
   justify-content: center;
   width: 0;
   min-width: 200px;
-  padding: 10px;
 }
 </style>

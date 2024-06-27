@@ -4,11 +4,9 @@
   flex-direction: column;
 
   /* 撑满父容器 */
-  flex-grow: 1;
   align-items: center;
   justify-content: flex-start;
   height: 100%;
-  max-height: 100%;
   padding: 0;
   margin: 0;
   overflow: hidden;
@@ -131,4 +129,8 @@
 .reload {
   transition: all 0.75s ease-in-out 0.15s;
   transform: rotate(-2turn);
+}
+.empty-page {
+  justify-content: center;
+  color: var(--el-text-color-placeholder);
 }
