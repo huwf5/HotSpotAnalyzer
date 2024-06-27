@@ -425,10 +425,11 @@ class EventViewSet(viewsets.ViewSet):
                 content["forward_count"] += item["forward_count"]
                 content["comment_count"] += item["comment_count"]
 
-            if value["is_news"]:
-                graph_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'graph', f'{date}.json')
-                with open(graph_path, 'r', encoding='utf-8') as file:
-                    graphs = json.load(file)
+
+            graph_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'graph', f'{date}.json')
+            with open(graph_path, 'r', encoding='utf-8') as file:
+                graphs = json.load(file)
+            if key in graphs.keys():
                 content["graph"] = graphs[key]
             else:
                 content["graph"] = None
