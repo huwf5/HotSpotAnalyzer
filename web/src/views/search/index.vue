@@ -28,7 +28,7 @@
         </el-col>
       </el-row>
     </div>
-    <ul v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" :infinite-scroll-distance="300" style="padding: 0">
+    <ul v-infinite-scroll="loadMore" ref="ul_ref" :infinite-scroll-disabled="disabled" :infinite-scroll-distance="300">
       <li class="affix-item"></li>
       <li v-for="(event, index) in display_events" :key="index" class="list-item">
         <el-card shadow="hover" @click="handleClick(event.title, event.summary)">
@@ -37,15 +37,15 @@
           <div class="event-date">{{ event.date }}</div>
         </el-card>
       </li>
+      <li v-if="noMore"><span class="no-more">~ 已经到底啦 ~</span></li>
     </ul>
-    <div v-if="noMore" class="no-more">~ 已经到底啦 ~</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { getAllEvents, searchEvent } from "@/api/modules/event_analysis";
-import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { VNodeRef, computed, nextTick, onActivated, onMounted, onUnmounted, ref } from "vue";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 
 interface EventData {
   title: string;
@@ -90,6 +90,7 @@ const shortcuts = [
 ];
 
 const affix_ref = ref<HTMLElement>();
+const ul_ref = ref<VNodeRef>();
 const date_picker = ref(true);
 const events_buffer = ref<EventData[]>([]);
 
@@ -116,6 +117,16 @@ onUnmounted(() => {
   window.removeEventListener("resize", adjustWidth);
   if (buffer_timer.value) clearTimeout(buffer_timer.value);
 });
+const scroll_position = ref(0);
+onActivated(async () => {
+  await nextTick();
+  (ul_ref.value! as unknown as HTMLElement).scrollTo({ top: scroll_position.value });
+});
+onBeforeRouteLeave((to, from, next) => {
+  scroll_position.value = (ul_ref.value! as unknown as HTMLElement).scrollTop;
+  next();
+});
+
 function adjustWidth() {
   date_picker.value = affix_ref.value!.getBoundingClientRect().width > 850;
 }

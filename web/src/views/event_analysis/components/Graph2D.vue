@@ -54,15 +54,12 @@ function process_data() {
       }
     };
   });
-  let categories = props.data.nodes.map(node => {
+  graphOption.value.series[0].categories = props.data.nodes.map(node => {
     return { name: node.name };
   });
-  let legends = categories.map(item => item.name);
-  console.log(links);
   graphOption.value.series[0].data = nodes;
   graphOption.value.series[0].links = links;
-  graphOption.value.series[0].categories = categories;
-  graphOption.value.legend[0].data = legends;
+  graphOption.value.legend[0].data = graphOption.value.series[0].categories.map(item => item.name);
 }
 
 function breakDownStr(input: string, stopStr = "<br />", tooltipTextLength = 14) {
