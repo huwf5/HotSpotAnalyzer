@@ -1,10 +1,9 @@
 <template>
   <div class="card search_page_container">
     <div ref="affix_ref" class="affix-container">
-      <el-row class="search_component" :gutter="10">
+      <el-row id="search_input" class="search_component" :gutter="10">
         <el-col :span="10" :offset="6">
           <el-input
-            id="search_input"
             size="large"
             prefix-icon="Search"
             v-model="searchKeyWord"
@@ -17,7 +16,7 @@
         <el-col :span="2">
           <el-button type="primary" @click="fetchData">搜索</el-button>
         </el-col>
-        <el-col v-if="affix_width > 850" :span="3">
+        <el-col v-if="date_picker" :span="3">
           <el-date-picker
             v-model="search_date"
             type="daterange"
@@ -30,6 +29,7 @@
       </el-row>
     </div>
     <ul v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" :infinite-scroll-distance="300" style="padding: 0">
+      <li class="affix-item"></li>
       <li v-for="(event, index) in display_events" :key="index" class="list-item">
         <el-card shadow="hover" @click="handleClick(event.title, event.summary)">
           <div class="event-title">{{ event.title }}</div>
@@ -55,7 +55,7 @@ interface EventData {
 
 const router = useRouter();
 const searchKeyWord = ref<string>(
-  router.currentRoute.value.query.keyword ? (router.currentRoute.value.query.keyword! as string) : ""
+  router.currentRoute.value.query.keyword ? (router.currentRoute.value.query.keyword as string) : ""
 );
 const prev_keyword = ref("");
 const search_date = ref<[Date, Date] | null>(null);
@@ -90,7 +90,7 @@ const shortcuts = [
 ];
 
 const affix_ref = ref<HTMLElement>();
-const affix_width = ref(0);
+const date_picker = ref(true);
 const events_buffer = ref<EventData[]>([]);
 
 // 缓存全部事件结果，有效时长为10分钟
@@ -103,29 +103,21 @@ const display_events = computed(() => all_events.value.slice(0, display_count.va
 const loading = ref(false);
 const noMore = computed(() => display_events.value.length == all_events.value.length);
 const disabled = computed(() => loading.value || noMore.value);
-const timerId = ref<NodeJS.Timeout>();
 
 const input_height = ref(0);
 onMounted(async () => {
   await nextTick();
   input_height.value = document.getElementById("search_input")!.getBoundingClientRect().height;
-  window.addEventListener("resize", adjustWidth);
   fetchData();
   adjustWidth();
+  window.addEventListener("resize", adjustWidth);
 });
 onUnmounted(() => {
   window.removeEventListener("resize", adjustWidth);
   if (buffer_timer.value) clearTimeout(buffer_timer.value);
 });
 function adjustWidth() {
-  if (timerId.value) {
-    clearTimeout(timerId.value);
-    timerId.value = undefined;
-  }
-  timerId.value = setTimeout(() => {
-    affix_width.value = Math.max(affix_ref.value!.getBoundingClientRect().width, 850);
-    timerId.value = undefined;
-  }, 250);
+  date_picker.value = affix_ref.value!.getBoundingClientRect().width > 850;
 }
 async function fetchData() {
   searchKeyWord.value = searchKeyWord.value.trim();
@@ -165,19 +157,7 @@ function handleClick(title: string, summary: string) {
 
 <style scoped lang="scss">
 @import "./index.scss";
-.search_component {
-  position: fixed;
-  z-index: 100;
-  display: flex;
-  flex: none;
-  width: v-bind("affix_width + 'px'");
-  transition: all 0.1s linear;
-}
-.search_component :deep(.el-col) {
-  display: flex;
-  align-items: center;
-}
-.affix-container {
+.affix-item {
   position: relative;
   display: flex;
   flex: none;
