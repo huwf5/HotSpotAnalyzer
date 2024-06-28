@@ -5,13 +5,21 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount } from "vue";
+import { onMounted, onBeforeUnmount, computed, watch, ref } from "vue";
 import ForceGraph3D from "3d-force-graph";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { CSS2DRenderer, CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import SpriteText from "three-spritetext";
 import * as THREE from "three";
-import graphData from "../components/graph_dict.json";
+
+import DefaultGraphData from "../components/history.json";
+
+import axios from "axios";
+import { useStore } from "vuex";
+
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
+const graphContainer = ref<HTMLElement | null>(null);
 
 declare module "three-spritetext" {
   interface SpriteText extends THREE.Object3D {}
@@ -54,12 +62,34 @@ function getCSS2DObject(node: Node): CSS2DObject {
   return obj;
 }
 
-onMounted(() => {
-  const graphContainer = document.getElementById("3d-graph");
+const fetchGraphData = async (selectedDateValue: string) => {
+  const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
 
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/api/graphs/fetch_graph/?date=${date}`, {
+      headers: {
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
+        accept: "application/json"
+      }
+    });
+    const graphData = response.data ? response.data : DefaultGraphData;
+    initializeGraph(graphData);
+  } catch (error) {
+    console.error("Failed to fetch graph data from server, using default data", error);
+    initializeGraph(DefaultGraphData); // Fallback to default data on any error
+  }
+};
+
+const initializeGraph = graphData => {
+  const graphContainer = document.getElementById("graph-3d");
   if (!graphContainer) {
     console.error("Failed to find the container element for the 3D graph.");
     return;
+  }
+
+  if (Graph) {
+    Graph._destructor(); // 清除当前图形
   }
 
   Graph = ForceGraph3D({
@@ -111,12 +141,37 @@ onMounted(() => {
   bloomPass.layers = bloomLayer;
 
   Graph.postProcessingComposer().addPass(bloomPass);
+};
+
+const handleResize = () => {
+  if (Graph && graphContainer.value) {
+    Graph.width(graphContainer.value.clientWidth).height(graphContainer.value.clientHeight);
+    Graph.refresh();
+  }
+};
+
+watch(
+  selectedDate,
+  newDate => {
+    fetchGraphData(newDate);
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
+  fetchGraphData(selectedDate.value);
+  window.addEventListener("resize", handleResize);
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize);
   if (Graph) {
     Graph._destructor();
     Graph = null;
+  }
+  const graphContainer = document.getElementById("graph-3d");
+  if (graphContainer) {
+    graphContainer.innerHTML = ""; // 清空容器中的内容
   }
 });
 </script>
@@ -136,21 +191,37 @@ onBeforeUnmount(() => {
   border-radius: 4px;
 }
 .eventgraph3d-wrapper {
+  position: relative;
   display: flex;
-  align-items: center; /* Center the content vertically */
-  justify-content: center; /* Center the content horizontally */
-  width: 100%; /* Full width of the parent container */
-  height: 100%; /* Full height of the parent container */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin-top: 10px;
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 10%);
+}
+
+/* .eventgraph3d-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+  height: 100%;
   padding: 20px;
   margin-top: 10px;
-  overflow: hidden; /* Prevents any overflow from the 3D graph */
-  background-color: #ffffff; /* White background */
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 0 10px rgb(0 0 0 / 10%); /* Subtle shadow */
-}
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 10%);
+} */
 #graph-3d {
-  width: 80%; /* Adjusted to 80% of its parent container */
-  height: 80%; /* Height set to 600px for better visibility */
-  border: 10px solid #cccccc; /* Optional: adds a border around the graph area */
+  width: 100%; /* Adjusted to 80% of its parent container */
+  height: 100%; /* Height set to 600px for better visibility */
+  padding: 0;
+  margin: 0;
 }
 </style>

@@ -6,11 +6,11 @@
   <div class="projects-section-line">
     <div class="projects-status">
       <div class="item-status">
-        <span class="status-number">45</span>
+        <span class="status-number">{{ num_of_topics }}</span>
         <span class="status-type">热门话题</span>
       </div>
       <div class="item-status">
-        <span class="status-number">2400</span>
+        <span class="status-number">{{ num_of_comments }}</span>
         <span class="status-type">总讨论数</span>
       </div>
     </div>
@@ -103,11 +103,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
+
 const isGridView = ref(true);
 const setCurrentView = view => {
   isGridView.value = view === "grid";
 };
+
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
+const date = ref("");
+
+const fetchTopicCardData = async selectedDateValue => {
+  if (selectedDateValue === "earlier") {
+    date.value = "history";
+  } else {
+    date.value = selectedDateValue;
+  }
+
+  const response = await axios.get(`http://127.0.0.1:8000/api/topiccard/fetch_topic_card/?date=${date.value}`, {
+    headers: {
+      Authorization:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
+      accept: "application/json"
+    }
+  });
+  console.log(response);
+  const data = response.data;
+  topicCard.value = data;
+
+  num_of_topics.value = data["num_of_topics"];
+  num_of_comments.value = data["num_of_comments"];
+
+  projects.value = data["topic_list"].map((topicItem, index) => ({
+    id: index + 1,
+    date: topicItem.date,
+    title: "#" + topicItem.title + "#",
+    description: topicItem.summary,
+    progress: Math.round(topicItem.progress * 100),
+    progressType: "话题热度",
+    progressColor: colorPairs[index % colorPairs.length].progressColor,
+    footerText: "话题帖子数: " + topicItem.num_of_posts,
+    color: colorPairs[index % colorPairs.length].color
+  }));
+};
+
 interface Project {
   id: number;
   date: string;
@@ -120,6 +162,20 @@ interface Project {
   color: string;
 }
 
+// Watch for changes in selectedDate and fetch data accordingly
+watch(
+  selectedDate,
+  newDate => {
+    fetchTopicCardData(newDate);
+  },
+  { immediate: true }
+);
+
+// Define reactive variables for fetched data
+const topicCard = ref(null);
+const num_of_topics = ref(0);
+const num_of_comments = ref(0);
+
 const colorPairs = [
   { progressColor: "#ff942e", color: "#fee4cb" },
   { progressColor: "#4f3ff0", color: "#e9e7fd" },
@@ -129,37 +185,7 @@ const colorPairs = [
   { progressColor: "#4067f9", color: "#d5deff" }
 ];
 
-// const projects = ref<Project[]>([
-//   {
-//     id: 1,
-//     date: "December 10, 2020",
-//     title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-//     description:
-//       "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-//     progress: 60,
-//     progressType: "话题热度",
-//     progressColor: "#ff942e",
-//     footerText: "话题帖子数: 1000",
-//     color: "#fee4cb"
-//   },
-// ]);
 const projects = ref<Project[]>([]);
-
-for (let i = 0; i < 6; i++) {
-  const colorPair = colorPairs[i % colorPairs.length];
-  projects.value.push({
-    id: i + 1,
-    date: "December 10, 2020",
-    title: "#小米联合创始人夫妇向中山大学捐赠1亿元#",
-    description:
-      "据中山大学微博消息，今日下午，林斌刘向东校友伉俪向中山大学捐赠签约仪式在中山大学广州校区南校园怀士堂举行，林斌刘向东夫妇向中山大学捐赠现金1亿元人民币。",
-    progress: 60,
-    progressType: "话题热度",
-    progressColor: colorPair.progressColor,
-    footerText: "话题帖子数: 1000",
-    color: colorPair.color
-  });
-}
 
 const goToEventPage = (title: string) => {
   const encodedTitle = encodeURIComponent(title);
@@ -300,13 +326,20 @@ const goToEventPage = (title: string) => {
 .project-boxes.jsGridView {
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   overflow-y: auto;
 }
 .project-boxes.jsGridView .project-box-wrapper {
   width: 33.3%;
+
+  /* flex: 1 1 33%; */
 }
 .project-boxes.jsGridView .project-box {
-  height: 325px;
+  /* height: 325px; */
+  display: flex;
+  flex-direction: column; /* Makes items stack vertically */
+  justify-content: space-between; /* Distributes space around items */
+  margin-bottom: 16px;
 }
 .project-boxes.jsListView .project-box {
   position: relative;
@@ -410,10 +443,22 @@ const goToEventPage = (title: string) => {
   line-height: 24px;
   opacity: 0.7;
 }
-.box-content-subheader {
+
+/* .box-content-subheader {
   font-size: 14px;
   line-height: 24px;
   opacity: 0.7;
+} */
+.box-content-subheader {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  white-space: normal;
+  opacity: 0.7;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 .box-progress {
   display: block;

@@ -9,11 +9,54 @@
 // import * as echarts from "echarts";
 import { init as initECharts } from "echarts";
 import "echarts-wordcloud";
-import { ref, onMounted, onUnmounted } from "vue";
-
+import { ref, onMounted, onUnmounted, watch, computed } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
 const refChart = ref(null);
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
 
-onMounted(() => {
+// const defaultWordCloudData = [
+//   { name: "Example", value: 300 },
+//   { name: "Word", value: 260 },
+//   { name: "Cloud", value: 220 },
+//   { name: "Data", value: 180 },
+//   { name: "Analysis", value: 160 },
+//   { name: "Visualization", value: 140 },
+//   { name: "Vue.js", value: 120 },
+//   { name: "JavaScript", value: 100 },
+//   { name: "ECharts", value: 80 },
+//   { name: "Project", value: 60 }
+// ];
+const defaultWordCloudData = [{ name: "Example", value: 300 }];
+const wordCloudData = ref(defaultWordCloudData);
+
+async function fetchWordCloudData(selectedDateValue) {
+  const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/api/wordcloud/fetch_word_cloud/?date=${date}`, {
+      headers: {
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
+        accept: "application/json"
+      }
+    });
+
+    if (response.data && response.data.data) {
+      wordCloudData.value = response.data.data.map(item => ({
+        name: item.name,
+        value: Math.sqrt(item.value) * 10
+      }));
+      console.log(wordCloudData.value);
+    }
+  } catch (error) {
+    console.error("Failed to fetch word cloud data from server, using default data", error);
+    wordCloudData.value = defaultWordCloudData;
+  }
+  initChart();
+}
+
+const initChart = () => {
   if (refChart.value) {
     const chartInstance = initECharts(refChart.value, null, {
       devicePixelRatio: 2
@@ -45,35 +88,19 @@ onMounted(() => {
               );
             }
           },
-          data: [
-            { name: "JavaScript", value: 1000 },
-            { name: "Vue", value: 800 },
-            { name: "React", value: 600 },
-            { name: "Angular", value: 400 },
-            { name: "Svelte", value: 200 },
-            { name: "Python", value: 950 },
-            { name: "Ruby", value: 300 },
-            { name: "Java", value: 850 },
-            { name: "C#", value: 500 },
-            { name: "C++", value: 650 },
-            { name: "JavaScript", value: 100 },
-            { name: "Vue", value: 8000 },
-            { name: "React", value: 6000 },
-            { name: "Angular", value: 4000 },
-            { name: "Svelte", value: 2000 },
-            { name: "Python", value: 9050 },
-            { name: "Ruby", value: 3000 },
-            { name: "Java", value: 8050 },
-            { name: "C#", value: 5000 },
-            { name: "C++", value: 6500 }
-          ].map(item => ({
-            name: item.name,
-            value: Math.sqrt(item.value) * 10
-          }))
+          data: wordCloudData.value
         }
       ]
     });
   }
+};
+
+onMounted(() => {
+  fetchWordCloudData(selectedDate.value);
+});
+
+watch(selectedDate, newDate => {
+  fetchWordCloudData(newDate);
 });
 
 onUnmounted(() => {
