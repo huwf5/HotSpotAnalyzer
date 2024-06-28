@@ -5,28 +5,31 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { EChartsType } from "echarts";
 import { onMounted, ref, onBeforeUnmount, computed, watch } from "vue";
+import { getMainSentiment } from "@/api/modules/event_analysis";
 import * as echarts from "echarts";
 import { useStore } from "vuex";
-import axios from "axios";
+// import axios from "axios";
 
 const store = useStore();
 const selectedDate = computed(() => store.getters.getSelectedDate);
 
 const chartRef = ref(null);
-const chartInstance = ref(null);
-// const defaultEmotionData = [
-//   { emotion: "Joyful", percentage: 65.97 },
-//   { emotion: "Sad", percentage: 6.48 },
-//   { emotion: "Angry", percentage: 0.95 },
-//   { emotion: "Disgusted", percentage: 3.72 },
-//   { emotion: "Scared", percentage: 0 },
-//   { emotion: "Surprised", percentage: 10.77 },
-//   { emotion: "Calm", percentage: 11.25 },
-//   { emotion: "Disappointed", percentage: 0.86 }
-// ];
-const defaultEmotionData = [{ emotion: "Joyful", percentage: 65.97 }];
+// const chartInstance = ref(null);
+const chartInstance = ref<EChartsType | null>(null);
+
+const defaultEmotionData = [
+  { emotion: "Joyful", percentage: 65.97 },
+  { emotion: "Sad", percentage: 6.48 },
+  { emotion: "Angry", percentage: 0.95 },
+  { emotion: "Disgusted", percentage: 3.72 },
+  { emotion: "Scared", percentage: 0 },
+  { emotion: "Surprised", percentage: 10.77 },
+  { emotion: "Calm", percentage: 11.25 },
+  { emotion: "Disappointed", percentage: 0.86 }
+];
 const emotionData = ref(defaultEmotionData);
 
 // 随机颜色生成函数
@@ -42,16 +45,17 @@ const getRandomColor = () => {
 async function fetchEmotionData(selectedDateValue) {
   const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api/emotion/fetch_emotions/?date=${date}`, {
-      headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
-        accept: "application/json"
-      }
+    // const response = await axios.get(`http://127.0.0.1:8000/api/emotion/fetch_emotions/?date=${date}`, {
+    //   headers: {
+    //     Authorization:
+    //       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
+    //     accept: "application/json"
+    //   }
+    // });
+
+    await getMainSentiment(date).then(response => {
+      emotionData.value = response.data;
     });
-    if (response.data && response.data.data) {
-      emotionData.value = response.data.data;
-    }
   } catch (error) {
     console.error("Failed to fetch emotion data from server, using default data", error);
     emotionData.value = defaultEmotionData;

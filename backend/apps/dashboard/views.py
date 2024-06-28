@@ -15,6 +15,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from collections import defaultdict
 import heapq
 from dateutil import parser
+from datetime import datetime, timedelta
 
 def find_closest_date_file(directory):
     # 获取当前日期
@@ -330,40 +331,6 @@ class TopicCardViewSet(viewsets.ViewSet):
 
         return Response(message)
 
-class ChartDataViewSet(viewsets.ViewSet):
-    """
-    A ViewSet for handling requests to fetch chart data.
-    """
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        method='get',
-        operation_summary="Fetch Chart Data",
-        operation_description="Fetches chart data for a specific date.",
-        manual_parameters=[
-            openapi.Parameter('date', openapi.IN_QUERY, description="Date for which the chart data is requested in YYYY-MM-DD format.", type=openapi.TYPE_STRING, required=True)
-        ],
-        responses={
-            200: openapi.Response('Chart data retrieved successfully'),
-            404: 'File not found',
-            500: 'Internal server error'
-        }
-    )
-    @action(detail=False, methods=['get'])
-    def fetch_chart_data(self, request):
-        date = request.GET.get('date')
-        file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'chart_data', f"{date}.json")
-
-        # Check if the file exists
-        if not os.path.exists(file_path):
-            return Response({'error': 'Chart data file not found.'}, status=404)
-
-        with open(file_path, 'r', encoding='utf-8') as file:
-            data = json.load(file)
-
-        return Response(data)
-
 def find_event_by_title(title):
     dir = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data')
     for filename in os.listdir(dir):
@@ -581,6 +548,57 @@ class FetchAllEventsViewSet(viewsets.ViewSet):
         return Response(content)
         # Check if the file exists
 
+class FetchChartDataViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        method='get',
+        operation_summary="Fetch chart data",
+        operation_description="Fetches chart data about recent trend.",
+        manual_parameters=[openapi.Parameter('date', openapi.IN_QUERY, description="Date for which the chart data is requested in YYYY-MM-DD format.", type=openapi.TYPE_STRING, required=True)
+        ],
+        responses={
+            200: openapi.Response('Data retrieved successfully'),
+            404: 'File not found',
+            500: 'Internal server error'
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def fetch_chart_data(self, request):
+        date = request.GET.get('date')
+        file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
 
+        with open(file_path, 'r', encoding='utf-8') as file:
+            source_data = json.load(file)
 
+        # 获取所有日期并找到最晚的日期
+        dates = [item['publish_time'].split('T')[0] for item in source_data]
+        latest_date_str = max(dates)
+        latest_date = datetime.strptime(latest_date_str, "%Y-%m-%d")
+
+        content = {}
+
+        # 统计每个时间段的文章数、评论数和点赞数总和
+        for i in range(6):
+            start_date = latest_date - timedelta(days=(i+1) * 5)
+            end_date = latest_date - timedelta(days=i * 5)
+
+            article_count = 0
+            comment_count = 0
+            like_count = 0
+
+            for item in source_data:
+                publish_date_str = item['publish_time'].split('T')[0]
+                publish_date = datetime.strptime(publish_date_str, "%Y-%m-%d")
+
+                if start_date < publish_date <= end_date:
+                    article_count += 1
+                    comment_count += item.get('comment_count', 0)
+                    like_count += item.get('like_count', 0)
+
+            # 将结果存储到 content 中
+            content[start_date.strftime('%Y-%m-%d')] = article_count + comment_count + like_count
+
+        return Response(content)
+        # Check if the file exists

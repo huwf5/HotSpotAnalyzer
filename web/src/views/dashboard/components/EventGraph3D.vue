@@ -11,10 +11,10 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { CSS2DRenderer, CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import SpriteText from "three-spritetext";
 import * as THREE from "three";
-
+import { getGraph3D } from "@/api/modules/event_analysis";
 import DefaultGraphData from "../components/history.json";
 
-import axios from "axios";
+// import axios from "axios";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -66,14 +66,17 @@ const fetchGraphData = async (selectedDateValue: string) => {
   const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
 
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api/graphs/fetch_graph/?date=${date}`, {
-      headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
-        accept: "application/json"
-      }
-    });
-    const graphData = response.data ? response.data : DefaultGraphData;
+    // const response = await axios.get(`http://127.0.0.1:8000/api/graphs/fetch_graph/?date=${date}`, {
+    //   headers: {
+    //     Authorization:
+    //       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
+    //     accept: "application/json"
+    //   }
+    // });
+
+    const response = await getGraph3D(date);
+
+    const graphData = response ? response : DefaultGraphData;
     initializeGraph(graphData);
   } catch (error) {
     console.error("Failed to fetch graph data from server, using default data", error);

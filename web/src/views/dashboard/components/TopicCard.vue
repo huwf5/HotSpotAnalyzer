@@ -105,7 +105,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
-import axios from "axios";
+import { useRouter } from "vue-router";
+import { getCardList } from "@/api/modules/event_analysis";
+// import axios from "axios";
 
 const isGridView = ref(true);
 const setCurrentView = view => {
@@ -116,6 +118,28 @@ const store = useStore();
 const selectedDate = computed(() => store.getters.getSelectedDate);
 const date = ref("");
 
+const router = useRouter();
+
+const defaultProject = {
+  id: 1,
+  date: "2024-06-29",
+  title: "#默认话题#",
+  description: "这是一个默认话题描述，显示在数据请求失败时。",
+  progress: 50,
+  progressType: "话题热度",
+  progressColor: "#ff942e",
+  footerText: "话题帖子数: 10",
+  color: "#fee4cb"
+};
+
+// 使用 Array.fill 生成六个相同的默认项目
+const defaultProjects = Array(6)
+  .fill(defaultProject)
+  .map((item, index) => ({
+    ...item,
+    id: index + 1
+  }));
+
 const fetchTopicCardData = async selectedDateValue => {
   if (selectedDateValue === "earlier") {
     date.value = "history";
@@ -123,31 +147,34 @@ const fetchTopicCardData = async selectedDateValue => {
     date.value = selectedDateValue;
   }
 
-  const response = await axios.get(`http://127.0.0.1:8000/api/topiccard/fetch_topic_card/?date=${date.value}`, {
-    headers: {
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
-      accept: "application/json"
-    }
-  });
-  console.log(response);
-  const data = response.data;
-  topicCard.value = data;
+  // const response = await axios.get(`http://127.0.0.1:8000/api/topiccard/fetch_topic_card/?date=${date.value}`, {
+  //   headers: {
+  //     Authorization:
+  //       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
+  //     accept: "application/json"
+  //   }
+  // });
+  try {
+    const response = await getCardList(date.value);
+    // console.log(response);
+    const data = response;
+    num_of_topics.value = data["num_of_topics"];
+    num_of_comments.value = data["num_of_comments"];
 
-  num_of_topics.value = data["num_of_topics"];
-  num_of_comments.value = data["num_of_comments"];
-
-  projects.value = data["topic_list"].map((topicItem, index) => ({
-    id: index + 1,
-    date: topicItem.date,
-    title: "#" + topicItem.title + "#",
-    description: topicItem.summary,
-    progress: Math.round(topicItem.progress * 100),
-    progressType: "话题热度",
-    progressColor: colorPairs[index % colorPairs.length].progressColor,
-    footerText: "话题帖子数: " + topicItem.num_of_posts,
-    color: colorPairs[index % colorPairs.length].color
-  }));
+    projects.value = data["topic_list"].map((topicItem, index) => ({
+      id: index + 1,
+      date: topicItem.date,
+      title: "#" + topicItem.title + "#",
+      description: topicItem.summary,
+      progress: Math.round(topicItem.progress * 100),
+      progressType: "话题热度",
+      progressColor: colorPairs[index % colorPairs.length].progressColor,
+      footerText: "话题帖子数: " + topicItem.num_of_posts,
+      color: colorPairs[index % colorPairs.length].color
+    }));
+  } catch (error) {
+    projects.value = defaultProjects;
+  }
 };
 
 interface Project {
@@ -172,7 +199,6 @@ watch(
 );
 
 // Define reactive variables for fetched data
-const topicCard = ref(null);
 const num_of_topics = ref(0);
 const num_of_comments = ref(0);
 
@@ -189,7 +215,7 @@ const projects = ref<Project[]>([]);
 
 const goToEventPage = (title: string) => {
   const encodedTitle = encodeURIComponent(title);
-  window.location.href = `/event?id=${encodedTitle}`;
+  router.push(`/event?id=${encodedTitle}`);
 };
 </script>
 <style>
