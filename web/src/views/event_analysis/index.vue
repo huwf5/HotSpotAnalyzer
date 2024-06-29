@@ -4,7 +4,7 @@
       <el-row>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
           <div class="title">{{ props.title }}</div>
-          <div class="content">{{ props.summary }}</div>
+          <div class="content">{{ summary }}</div>
         </el-col>
         <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
           <el-row class="statistic_container">
@@ -54,8 +54,8 @@ import { useTabsStore } from "@/stores/modules/tabs";
 const router = useRouter();
 const props = defineProps<{
   title: string;
-  summary: string;
 }>();
+const summary = ref("");
 const loading = ref(false);
 const tabStore = useTabsStore();
 
@@ -121,6 +121,7 @@ onMounted(() => {
       upVotes.value = response.forward_count;
       likes.value = response.like_count;
       comments.value = response.comment_count;
+      summary.value = response.summary;
     })
     .catch(() => {
       tabStore.removeTabs(router.currentRoute.value.fullPath);

@@ -4,12 +4,12 @@ import { ResDataList, Result, WhiteList } from "../interface";
 
 // 获取白名单
 export const getWhiteListApi = () => {
-  return http.get<ResDataList<WhiteList.ResWhiteList>>(ManagePort.IWhiteList.GET_LIST);
+  return http.get<ResDataList<WhiteList.ResWhiteList>>(ManagePort.IWhiteList.GET_LIST, { loading: false });
 };
 
 // 获取tags列表
 export const getTagsApi = () => {
-  return http.get<ResDataList<WhiteList.ResTags>>(ManagePort.IWhiteList.GET_TAGS);
+  return http.get<ResDataList<WhiteList.ResTags>>(ManagePort.IWhiteList.GET_TAGS, { loading: false });
 };
 
 // 添加白名单

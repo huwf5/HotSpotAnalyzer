@@ -146,7 +146,7 @@
       ]
     },
     {
-      "path": "/event/analysis/:title/:summary",
+      "path": "/event/analysis/:title",
       "props": true,
       "name": "event_analysis",
       "component": "/event_analysis/index",

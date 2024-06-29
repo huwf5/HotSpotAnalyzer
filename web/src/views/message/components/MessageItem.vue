@@ -23,6 +23,7 @@ import { Messages } from "@/api/interface";
 import { computed } from "vue";
 const message = defineModel<Messages.ResMessage & { display: boolean }>({ required: true });
 const shadow_color = computed(() => {
+  console.log(message.value.type);
   if (message.value.is_read) return "163, 163, 163";
   switch (message.value.type) {
     case Messages.MessageType.WARN:
@@ -51,6 +52,7 @@ const shadow_color = computed(() => {
   min-width: 500px;
   height: fit-content;
   max-height: 100px;
+  cursor: pointer;
   padding: 10px;
   margin: 8px 0;
   box-shadow: 0 0 5px 1px v-bind("'rgba(' + shadow_color + ', 40%)'");

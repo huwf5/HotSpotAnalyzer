@@ -33,12 +33,14 @@ import { onBeforeUnmount, onUnmounted, ref, watch } from "vue";
 import SettingPanel from "@/components/SettingPanel/index.vue";
 import { createMessageSettingsApi, getMessageSettingsApi, uploadMessageSettingsApi } from "@/api/modules/message_settings";
 import { Messages } from "@/api/interface";
-import { ElNotification } from "element-plus";
+import { ElMessage, ElNotification } from "element-plus";
 import { useHandleData } from "@/hooks/useHandleData";
 import { useRouter } from "vue-router";
 import { useTabsStore } from "@/stores/modules/tabs";
+import { useUserStore } from "@/stores/modules/user";
 
 const router = useRouter();
+const store = useUserStore();
 const tabStore = useTabsStore();
 
 const userSettings = ref<Messages.ResMessageSetting>({
@@ -57,23 +59,32 @@ async function upload(params: Messages.ResMessageSetting) {
   });
 }
 function initPage() {
-  getMessageSettingsApi().then(response => {
-    userSettings.value = response.data;
-    const unwatch = watch(
-      userSettings,
-      () => {
-        if (timerId.value !== null) {
-          clearTimeout(timerId.value);
-        }
-        timerId.value = setTimeout(() => {
-          upload(userSettings.value);
-          timerId.value = undefined;
-        }, 2000);
-      },
-      { deep: true }
-    );
-    onUnmounted(unwatch);
-  });
+  getMessageSettingsApi()
+    .then(response => {
+      userSettings.value = response.data;
+      const unwatch = watch(
+        userSettings,
+        () => {
+          if (timerId.value !== null) {
+            clearTimeout(timerId.value);
+          }
+          timerId.value = setTimeout(() => {
+            upload(userSettings.value);
+            timerId.value = undefined;
+          }, 2000);
+        },
+        { deep: true }
+      );
+      onUnmounted(unwatch);
+    })
+    .catch(e => {
+      if (e.response.data.message && (e.response.data.message as string).includes("消息设置不存在")) {
+        ElMessage.success({ message: "已同步数据" });
+        localStorage.removeItem(`msg_settings_${store.userInfo.contactInfo.email}`);
+        tabStore.removeTabs(router.currentRoute.value.fullPath);
+        router.back();
+      }
+    });
 }
 onBeforeUnmount(async () => {
   if (timerId.value) {
@@ -81,16 +92,22 @@ onBeforeUnmount(async () => {
     await upload(userSettings.value);
   }
 });
-localStorage.getItem("msg_settings") !== null
+localStorage.getItem(`msg_settings_${store.userInfo.contactInfo.email}`) !== null
   ? initPage()
   : useHandleData(createMessageSettingsApi, null, "开启消息通知服务", "info")
       .then(() => {
-        localStorage.setItem("msg_settings", "y");
+        localStorage.setItem(`msg_settings_${store.userInfo.contactInfo.email}`, "y");
         initPage();
       })
-      .catch(() => {
-        tabStore.removeTabs(router.currentRoute.value.fullPath);
-        router.back();
+      .catch(e => {
+        if (e && e.response.data.message && (e.response.data.message as string).includes("消息设置已存在")) {
+          ElMessage.success({ message: "已同步数据" });
+          localStorage.setItem(`msg_settings_${store.userInfo.contactInfo.email}`, "y");
+          initPage();
+        } else {
+          tabStore.removeTabs(router.currentRoute.value.fullPath);
+          router.back();
+        }
       });
 </script>
 
