@@ -9,7 +9,7 @@ import json
 import sys
 import argparse
 print("loading...")
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 model_dir = snapshot_download("ZhipuAI/chatglm3-6b", revision = "v1.0.0")
 tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
 model = AutoModel.from_pretrained(model_dir, trust_remote_code=True).half().cuda()
@@ -20,7 +20,8 @@ print("finished")
 def get_senti_history():
     prompt = '''你是一个分析文本情感倾向的专家，能够很好地分析文本的情感（你只能选择以下其中之一：愤怒、厌恶、害怕、喜悦、悲伤、惊讶、平和、失望）。
     对于给定的文本：“我很喜欢这里，风景如画，空气清新，大家都很友善，这里简直就是个世外桃源。”，你能认真分析文本所表达的情感，并给出这样的格式输出：{"analysis_sentiment": "喜悦"}
-    又比如，文本：“分手后心碎和孤独的感觉难以忍受。” 你能输出：{"analysis_sentiment": "悲伤"}
+    又比如，文本：“分手后心碎和孤独的感觉难以忍受。” 你能输出：{"analysis_sentiment": "悲伤"}.
+    对于愤怒、厌恶、害怕、惊讶、平和、失望这些情感，你也按照例子分析。
     下面我将给出一段文本，请你不要直接回答文本的问题，而是按照上面的例子回答。
     请确保只返回与上面的"analysis_sentiment"格式一致的json格式的结果，而不是其他文字内容。你准备好了吗？
     '''
@@ -59,6 +60,8 @@ def get_sentiments_multi(wid_comments, his):
 
     s_time = time.time()
 
+    incorrect_num = 0
+    correct_num = 0
     for wid, comments in wid_comments.items():
         senti_count = {
             '愤怒': 0,
@@ -74,21 +77,25 @@ def get_sentiments_multi(wid_comments, his):
         for text in comments:            
             prompt = '分析以下文本：' + text
             response, hisss = model.chat(tokenizer, query=prompt, temperature=0.4, history=copy.deepcopy(his))
+            
             match = re.search(pattern, response)
             if match:
                 sentiment = match.group()
                 df.loc[len(df)] = [text, sentiment]
                 senti_count[sentiment] += 1
+                correct_num += 1
             else:
                 print('response is:', response, "///", 'its text is:', text)
                 df.loc[len(df)] = [text, None]
+                incorrect_num = incorrect_num + 1
+                
 
         sentiment_counts[wid] = replace_chinese_keys(senti_count)
     
     e_time = time.time()
     
     elapsed_time = "{:.2f}".format(e_time - s_time)
-    print("elapsed time:", elapsed_time, "秒")
+    print("elapsed time:", elapsed_time, "秒。","情感外的计数：", incorrect_num,"，情感计数：",correct_num)
 
     return df, sentiment_counts
 
