@@ -38,6 +38,12 @@ run_server: enter_virtualEnv
 	@echo "Running server..."
 	@cd $(backend_base_dir) && python manage.py runserver
 
+.PHONY: analyze
+analyze: 
+	@echo "doing analyze process..."
+	@cd $(analyze_dir) && poetry install
+	@$(MAKE) -C analyze
+
 .PHONY: clean
 clean:
 	@echo "Cleaning up..."
