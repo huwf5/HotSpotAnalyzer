@@ -42,23 +42,29 @@
 snap install yq
 ```
 
+---
+
 ## makefile命令详细介绍
 
 ### 1、爬虫
 
-[HotSpotAnalyzer/crawler/README.md at main · huwf5/HotSpotAnalyzer · GitHub](https://github.com/huwf5/HotSpotAnalyzer/blob/main/crawler/README.md)
+##### [介绍](crawler/weibo_crawler/README.md)
 
 ----
 
 ### 2、事件图谱
 
-[HotSpotAnalyzer/analyze/README.md at event_analysis · huwf5/HotSpotAnalyzer · GitHub](https://github.com/huwf5/HotSpotAnalyzer/blob/event_analysis/analyze/README.md)
+##### [介绍](cluster_and_event_graph/README.md)
 
 ---
 
 ### 3、情感分析和关键词词频分析
 
-----
+##### [情感分析介绍](sentiment/README.md)
+
+##### [关键词词频分析介绍](wordcount/README.md)
+
+---
 
 ## 在服务器测试部署
 

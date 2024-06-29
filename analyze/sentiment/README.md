@@ -1,4 +1,10 @@
-情感分析
+#### 环境
+
+情感分析过程采用了[ZhipuAI/chatglm3-6b]([魔搭社区](https://www.modelscope.cn/models/ZhipuAI/chatglm3-6b))大模型辅助进行。
+
+使用到的环境依赖已在analyze目录下的poetry虚拟环境依赖文件`pyproject.toml`包含。
+
+目前进行情感分析的python文件中采用cuda加载使用大模型，需要一定的GPU环境。如果需要更改为cpu环境，可以参考[ZhipuAI/chatglm3-6b]([魔搭社区](https://www.modelscope.cn/models/ZhipuAI/chatglm3-6b#%E4%BB%A3%E7%A0%81%E8%B0%83%E7%94%A8))并修改python文件。
 
 #### 单独运行
 
