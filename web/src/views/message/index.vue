@@ -26,6 +26,7 @@
         :checkbox-visible="checkboxVisible"
         @item-checked="dealMsgCheck"
         @item-starred="dealMsgStarred"
+        @item-clicked="dealReadOne"
       />
     </div>
     <div class="bottom-wrapper">
@@ -70,7 +71,7 @@ const loading = ref(false);
 
 const state = ref({
   info: true,
-  warn: true,
+  warning: true,
   read: true
 });
 
@@ -167,6 +168,19 @@ function dealStarAll() {
     if (checked.value.has(msg.id)) msg.is_starred = starAll;
   });
   messages.value.sort(comp);
+}
+function dealReadOne(msg: Messages.ResMessage) {
+  batchUpdateMsgApi([
+    {
+      id: msg.id,
+      is_starred: msg.is_starred,
+      is_read: true
+    }
+  ]);
+  msg.is_read = true;
+  messages.value.sort(comp);
+  store.userInfo.messages = messages.value;
+  router.push({ path: `/event/analysis/${msg.message.title}` });
 }
 function dealReadAll() {
   if (checked.value.size === 0) return;

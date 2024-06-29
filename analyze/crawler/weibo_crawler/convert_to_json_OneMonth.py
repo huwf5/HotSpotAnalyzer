@@ -2,6 +2,7 @@ import datetime
 import pymysql
 import json
 import os  # 添加 os 模块来处理文件路径
+import argparse
 
 def connect_db():
     return pymysql.connect(host='localhost',
@@ -17,7 +18,7 @@ def json_serial(obj):
         return obj.isoformat()
     raise TypeError("Type not serializable")
 
-def export_data():
+def export_data(target_file):
     connection = connect_db()
     try:
         with connection.cursor() as cursor:
@@ -48,14 +49,21 @@ def export_data():
 
             # 使用当前日期命名 JSON 文件
             today_date = datetime.datetime.now().strftime("%Y-%m-%d")
-            filename = f"data/data_{today_date}.json"
+            # filename = f"data/data_{today_date}.json"
             
             # 导出到 JSON 文件
-            with open(filename, 'w', encoding='utf-8') as jsonfile:
+            with open(target_file, 'w', encoding='utf-8') as jsonfile:
                 json.dump(posts, jsonfile, ensure_ascii=False, indent=4, default=json_serial)
                 
     finally:
         connection.close()
 
 if __name__ == '__main__':
-    export_data()
+    
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-target_file', type=str, required=True,
+    help='输出文件的路径')
+    
+    args = parser.parse_args()
+    target_file = args.target_file
+    export_data(target_file)

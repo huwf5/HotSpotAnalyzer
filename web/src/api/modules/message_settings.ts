@@ -3,11 +3,11 @@ import { Messages, ResultData } from "../interface";
 import http from "@/api";
 
 export const createMessageSettingsApi = () => {
-  return http.post(MessagePort.MSG_SETTINGS.BASE);
+  return http.post(MessagePort.MSG_SETTINGS.BASE, { loading: false });
 };
 
 export const getMessageSettingsApi = () => {
-  return http.get<ResultData<Messages.ResMessageSetting>>(MessagePort.MSG_SETTINGS.BASE);
+  return http.get<ResultData<Messages.ResMessageSetting>>(MessagePort.MSG_SETTINGS.BASE, { loading: false });
 };
 
 export const uploadMessageSettingsApi = (params: Messages.ReqMessageSetting) => {

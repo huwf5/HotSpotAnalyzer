@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import re
 
 import requests
 
@@ -17,6 +18,7 @@ def save_json_file(json_dict, file_path):
         json.dump(json_dict, outfile, ensure_ascii=False, indent=4)
 
 def parse_api_response(response):
+    print("response:______________________-______________\n",response)
     """
     解析 API 响应字符串，剥去可能存在的 `json` 标注，并返回 JSON 数据。
 
@@ -24,13 +26,14 @@ def parse_api_response(response):
     :return: 解析后的 JSON 数据
     :raises: json.JSONDecodeError 如果解析失败
     """
-    # 检查是否存在 `json` 标注
-    if response.startswith("```json") and response.endswith("```"):
-        # 去掉外层的 `json` 标注
-        response = response[len("```json"): -len("```")].strip()
+    # 使用正则表达式匹配从第一个 '{' 到最后一个 '}' 的内容
+    match = re.search(r'\{.*\}', response, re.DOTALL)
 
-    # 解析 JSON 数据
-    return json.loads(response)
+    if match:
+        json_str = match.group(0)
+        return json.loads(json_str)
+    else:
+        raise json.JSONDecodeError("No valid JSON object found", response, 0)
 
 def update_dictionary(dict_a, dict_b):
     # 更新或添加事件
@@ -78,6 +81,7 @@ def build_event_graph(text, publish_time):
     事件关系可选择的有：因果关系、共指关系、时序关系、包含关系，注意识别这些关系
     source是原因，target是结果，例子如下：
    {example}    
+   注意，必须返回json格式！！
     ''',
         "previous_history": [],
         "temperature": 0.0,

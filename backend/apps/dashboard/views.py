@@ -381,6 +381,7 @@ class EventViewSet(viewsets.ViewSet):
                 source_data = json.load(file)
 
             content = {
+                "summary": value["summary"],
                 "like_count": 0,
                 "forward_count": 0,
                 "comment_count": 0,

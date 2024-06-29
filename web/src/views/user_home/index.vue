@@ -94,15 +94,16 @@ import { useUserStore } from "@/stores/modules/user";
 import InfoRow from "./components/InfoRow.vue";
 import { Ref, nextTick, onMounted, onUnmounted, ref } from "vue";
 import { useHandleData } from "@/hooks/useHandleData";
-import router from "@/routers";
-import { LOGIN_URL } from "@/config";
+import { HOME_URL } from "@/config";
 import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 const store = useUserStore();
 
 const edit = ref(-1);
 const basicInfo = ref(store.userInfo.basicInfo);
 const contactInfo = ref(store.userInfo.contactInfo);
 
+const router = useRouter();
 const newName = ref(basicInfo.value.name);
 const newPassword = ref("");
 const repeatPassword = ref("");
@@ -222,7 +223,8 @@ function confirm(index: number) {
     case 2:
       useHandleData(confirmDeleteApi, { emailList: [contactInfo.value.email] }, "删除账号（包含所有账号记录）").then(() => {
         store.setTokens("", "", -1);
-        router.replace(LOGIN_URL);
+        store.userInfo.contactInfo.email = "";
+        router.replace(HOME_URL);
       });
       break;
     default:
