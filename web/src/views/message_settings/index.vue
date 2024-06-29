@@ -46,7 +46,7 @@ const userSettings = ref<Messages.ResMessageSetting>({
   warning_threshold: 0.5,
   info_threshold: 0.5
 });
-const timerId = ref<NodeJS.Timeout | null>(null);
+const timerId = ref<NodeJS.Timeout>();
 async function upload(params: Messages.ResMessageSetting) {
   await uploadMessageSettingsApi(params).then(() => {
     ElNotification({
@@ -65,7 +65,10 @@ function initPage() {
         if (timerId.value !== null) {
           clearTimeout(timerId.value);
         }
-        timerId.value = setTimeout(() => upload(userSettings.value), 2000);
+        timerId.value = setTimeout(() => {
+          upload(userSettings.value);
+          timerId.value = undefined;
+        }, 2000);
       },
       { deep: true }
     );
