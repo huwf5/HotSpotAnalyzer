@@ -31,7 +31,7 @@
     <ul v-infinite-scroll="loadMore" ref="ul_ref" :infinite-scroll-disabled="disabled" :infinite-scroll-distance="300">
       <li class="affix-item"></li>
       <li v-for="(event, index) in display_events" :key="index" class="list-item">
-        <el-card shadow="hover" @click="handleClick(event.title, event.summary)">
+        <el-card shadow="hover" @click="handleClick(event.title)">
           <div class="event-title">{{ event.title }}</div>
           <div class="event-body">{{ event.summary }}</div>
           <div class="event-date">{{ event.date }}</div>
@@ -161,8 +161,8 @@ function loadMore() {
   display_count.value = Math.min(display_count.value + 10, all_events.value.length);
   loading.value = false;
 }
-function handleClick(title: string, summary: string) {
-  router.push({ path: `/event/analysis/${title}/${summary}` });
+function handleClick(title: string) {
+  router.push({ path: `/event/analysis/${title}` });
 }
 </script>
 

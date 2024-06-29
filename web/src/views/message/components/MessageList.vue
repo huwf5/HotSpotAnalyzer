@@ -1,5 +1,5 @@
 <template>
-  <MessageItem v-for="(message, index) in messages" v-model="messages[index]" :key="message.id">
+  <MessageItem v-for="(message, index) in messages" v-model="messages[index]" :key="message.id" @click="msgClicked(message)">
     <template #prefix>
       <div class="check-box">
         <el-checkbox v-model="message.selected" @change="itemChecked(message)" />
@@ -7,7 +7,7 @@
     </template>
     <template #suffix>
       <div class="side-bar">
-        <div class="star">
+        <div class="star" @click.stop>
           <el-icon :color="message.is_starred ? '#FFF102' : ''" @click="itemStarred(message)">
             <StarFilled />
           </el-icon>
@@ -33,6 +33,7 @@ const current = new Date();
 const emits = defineEmits<{
   itemChecked: [msg: Messages.ResMessage];
   itemStarred: [msg: Messages.ResMessage];
+  itemClicked: [msg: Messages.ResMessage];
 }>();
 function itemChecked(msg: Messages.ResMessage) {
   emits("itemChecked", msg);
@@ -49,6 +50,9 @@ function transferTime(time: string) {
     msg_created_at.getDate() < current.getDate()
     ? time.split("T")[0]
     : time.split("T")[1].split("+")[0];
+}
+function msgClicked(msg: Messages.ResMessage) {
+  emits("itemClicked", msg);
 }
 </script>
 
@@ -72,7 +76,7 @@ function transferTime(time: string) {
   align-items: flex-end;
   align-self: stretch;
   justify-content: flex-end;
-  width: 80px;
+  width: 100px;
   padding: 0 15px 0 0;
 }
 .side-bar span {

@@ -88,7 +88,7 @@
       }
     },
     {
-      "path": "/event/analysis/:summary",
+      "path": "/event/analysis/:title",
       "props": true,
       "name": "event_analysis",
       "component": "/event_analysis/index",
