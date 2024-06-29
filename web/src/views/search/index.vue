@@ -109,9 +109,9 @@ const input_height = ref(0);
 onMounted(async () => {
   await nextTick();
   input_height.value = document.getElementById("search_input")!.getBoundingClientRect().height;
+  window.addEventListener("resize", adjustWidth);
   fetchData();
   adjustWidth();
-  window.addEventListener("resize", adjustWidth);
 });
 onUnmounted(() => {
   window.removeEventListener("resize", adjustWidth);

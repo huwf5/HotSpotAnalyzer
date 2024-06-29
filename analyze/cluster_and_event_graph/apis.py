@@ -55,55 +55,7 @@ def update_dictionary(dict_a, dict_b):
 
     return dict_a
 
-
-def revise_event_graph(text, graph, publish_time, target_file):
-    # 修改下面这一行
-    # api_key = read_json_file("documents/api_key.json")["key"]
-    # 修改为下面三行（行数不包括注释）：
-    # 获取当前脚本所在的目录
-    cur_dir = os.path.dirname(os.path.abspath(__file__))
-    # 构建 key.json 文件的路径
-    json_file_path = os.path.join(cur_dir, 'documents', 'api_key.json')
-    api_key = read_json_file(json_file_path)["key"]
-
-    headers = {
-        "Authorization": api_key}
-    url = "https://api.edenai.run/v2/text/chat"
-    payload = {
-        "providers": "openai",
-        "text": text,
-        "chatbot_global_action": f'''
-        请根据text中的信息，向graph中添加新的节点和边，保留原有的信息，要求event.id必须不超过12，每个event的属性不超过3个，总的relationship边不超过10条
-        返回修改后的graph
-        graph如下：
-        {graph}
-        返回json格式，必须使用中文
-        ''',
-        "previous_history": [],
-        "temperature": 0.0,
-        "max_tokens": 4096,
-        "fallback_providers": "gpt-4"
-    }
-
-    response = requests.post(url, json=payload, headers=headers)
-
-    result = json.loads(response.text)
-    print(result)
-    print(result['openai']['generated_text'])
-    target_graph = json.loads(graph)
-    print(type(target_graph))
-    new_graph = json.loads(result['openai']['generated_text'])
-    update_dictionary(target_graph, new_graph)
-    # 将结果写入新的 JSON 文件
-    with open(target_file, 'w', encoding='utf-8') as outfile:
-        json.dump(target_graph, outfile, ensure_ascii=False, indent=4)
-
-
 def build_event_graph(text, publish_time):
-
-    # 修改下面这两行
-    # example = read_json_file("documents/example.json")
-    # api_key = read_json_file("documents/api_key.json")["key"]
     # 修改为下面五行（行数不包括注释）：
     # 获取当前脚本所在的目录
     cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -141,48 +93,6 @@ def build_event_graph(text, publish_time):
     graph = parse_api_response(result['openai']['generated_text'])
     time.sleep(15)
     return graph
-
-
-def prune_event_graph(graph, target_file):
-    # 修改下面这一行
-    # api_key = read_json_file("documents/api_key.json")["key"]
-    # 修改为下面三行（行数不包括注释）：
-    # 获取当前脚本所在的目录
-    cur_dir = os.path.dirname(os.path.abspath(__file__))
-    # 构建 key.json 文件的路径
-    json_file_path = os.path.join(cur_dir, 'documents', 'api_key.json')
-    api_key = read_json_file(json_file_path)["key"]
-    headers = {
-        "Authorization": api_key}
-    url = "https://api.edenai.run/v2/text/chat"
-    payload = {
-        "providers": "openai",
-        "text": f"{graph}",
-        "chatbot_global_action": '''
-        请简化text中提供的知识图谱，返回json格式，要求如下:
-        1.所有属性的value不超过12个字符
-        2.所有event不超过16个字符
-        ''',
-        "previous_history": [],
-        "temperature": 0.0,
-        "max_tokens": 4096,
-        "fallback_providers": "gpt-4"
-    }
-
-    response = requests.post(url, json=payload, headers=headers)
-
-    result = json.loads(response.text)
-    print(result)
-    print(result['openai']['generated_text'])
-    graph = json.loads(result['openai']['generated_text'])
-    # 将结果写入新的 JSON 文件
-    time.sleep(15)
-    with open(target_file, 'w', encoding='utf-8') as outfile:
-        json.dump(graph, outfile, ensure_ascii=False, indent=4)
-
-# graph = read_json_file("赵某晨造谣事件.json")
-# prune_event_graph(graph, "赵某晨造谣事件.json")
-
 
 def generate_title(text):
     # 修改下面这一行
@@ -302,47 +212,3 @@ def get_item(wid, data):
 
 if __name__ == "__main__":
     pass
-    # data = read_json_file("documents/data_2024-05-27.json")
-    # clusters = read_json_file("documents/2024-05-27.json")
-    # is_news_result = read_json_file("documents/is_news.json")
-    # summary_target_file = "documents/summaries_0527.json"
-    # summaries = read_json_file(summary_target_file)
-    # clusters = read_json_file("documents/2024-05-27.json")
-    # analyze_target_file = "documents/analyze_result_0527.json"
-    # analyze_result = read_json_file(analyze_target_file)
-    # for key, value in clusters.items():
-    #     if not is_news_result[key]:
-    #         continue
-    #     analyze_result[key] = {"posts": [item for item in value], "joy": 0}
-    #     save_json_file(analyze_result, analyze_target_file)
-    #     if key in summaries.keys():
-    #         analyze_result[key]["summary"] = summaries[key]
-    #
-    #     text = ""
-    #
-    #     for wid in value:
-    #         dataItem = get_item(wid, data)
-    #         text += dataItem["text"]
-    #         if len(text) >= 4096:
-    #             text = text[:4096]
-    #             break
-    #     generate_title(text, key, analyze_target_file)
-    #     time.sleep(10)
-
-
-    # data = read_json_file("documents/data_2024-05-27.json")
-    # clusters = read_json_file("documents/2024-05-27.json")
-    # target_file = "documents/is_news.json"
-    # is_news_result = read_json_file(target_file)
-    # for key, value in clusters.items():
-    #     if key in is_news_result.keys():
-    #         continue
-    #     text = ""
-    #     for wid in value:
-    #         dataItem = get_item(wid, data)
-    #         text += dataItem["text"]
-    #         if len(text) >= 4096:
-    #             text = text[:4096]
-    #             break
-    #     is_news(text, key, target_file)
-    #     time.sleep(10)
