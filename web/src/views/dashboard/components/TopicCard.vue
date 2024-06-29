@@ -214,8 +214,9 @@ const colorPairs = [
 const projects = ref<Project[]>([]);
 
 const goToEventPage = (title: string) => {
-  const encodedTitle = encodeURIComponent(title);
-  router.push(`/event?id=${encodedTitle}`);
+  // const encodedTitle = encodeURIComponent(title);
+  // router.push(`/event?id=${encodedTitle}`);
+  router.push(`/event/analysis/${title}`);
 };
 </script>
 <style>

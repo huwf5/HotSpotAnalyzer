@@ -4,7 +4,7 @@
 DATABASES_ENGINE = "django.db.backends.mysql"
 DATABASES_NAME = "HotSpotAnalyzerDB"
 DATABASES_USER = "root"
-DATABASES_PASSWORD = "huchp6"
+DATABASES_PASSWORD = "yourpassword"
 DATABASES_HOST = "localhost"
 DATABASES_PORT = "3306"
 
@@ -12,8 +12,7 @@ DATABASES_PORT = "3306"
 TABLE_PREFIX = "hotspot_sys_"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 # EMAIL SETTINGS
