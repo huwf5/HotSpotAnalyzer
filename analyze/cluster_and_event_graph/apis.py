@@ -24,13 +24,14 @@ def parse_api_response(response):
     :return: 解析后的 JSON 数据
     :raises: json.JSONDecodeError 如果解析失败
     """
-    # 检查是否存在 `json` 标注
-    if response.startswith("```json") and response.endswith("```"):
-        # 去掉外层的 `json` 标注
-        response = response[len("```json"): -len("```")].strip()
+    # 使用正则表达式匹配从第一个 '{' 到最后一个 '}' 的内容
+    match = re.search(r'\{.*\}', response, re.DOTALL)
 
-    # 解析 JSON 数据
-    return json.loads(response)
+    if match:
+        json_str = match.group(0)
+        return json.loads(json_str)
+    else:
+        raise json.JSONDecodeError("No valid JSON object found", response, 0)
 
 def update_dictionary(dict_a, dict_b):
     # 更新或添加事件
