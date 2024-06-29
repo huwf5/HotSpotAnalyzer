@@ -30,7 +30,14 @@ def parse_api_response(response):
 
     if match:
         json_str = match.group(0)
-        return json.loads(json_str)
+
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            # 在出现解析错误时打印调试信息
+            print(f"Failed to parse JSON. Error: {e}")
+            print(f"Invalid JSON string: {json_str}")
+            raise e
     else:
         raise json.JSONDecodeError("No valid JSON object found", response, 0)
 
@@ -80,6 +87,7 @@ def build_event_graph(text, publish_time):
     事件关系可选择的有：因果关系、共指关系、时序关系、包含关系，注意识别这些关系
     source是原因，target是结果，例子如下：
    {example}    
+   注意：请检查字符串格式，返回的字符串必须严格满足json格式，可以被json.loads解析
     ''',
         "previous_history": [],
         "temperature": 0.0,
@@ -213,4 +221,29 @@ def get_item(wid, data):
 
 
 if __name__ == "__main__":
-    pass
+    parse_api_response('''
+    {
+    "events": [
+        {
+            "id": 1,
+            "event": "中国大学生在线校媒云享荟第九期直播",
+            "attributes": [
+                {"type": "时间", "value": "2023年6月18日"},
+                {"type": "主办方", "value": "河北美术学院"},
+                {"type": "参与老师", "value": "杨美偲、陈颖、张笑迷、操一铭"}
+            ]
+        },
+        {
+            "id": 2,
+            "event": "四位老师分享优秀原创作品创作经验",
+            "attributes": [
+                {"type": "参与老师", "value": "杨美偲、陈颖、张笑迷、操一铭"}
+            ]
+        }
+    ],
+    "relationships": [
+        {"source": 1, "target": 2, "type": "包含关系"}
+    ]
+}
+    '''
+                       )
