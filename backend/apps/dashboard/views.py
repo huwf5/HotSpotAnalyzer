@@ -604,4 +604,28 @@ class FetchChartDataViewSet(viewsets.ViewSet):
         return Response(content)
         # Check if the file exists
 
+class DateViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        method='get',
+        operation_summary="Get Dates",
+        operation_description="Get all available dates.",
+        manual_parameters=[],
+        responses={
+            200: openapi.Response('Data retrieved successfully'),
+            404: 'File not found',
+            500: 'Internal server error'
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def fetch_dates(self, request):
+        file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data')
+        date_list = os.listdir(file_path)
+        date_list = [filename.split(".")[0] for filename in date_list]
+
+        content = {"dates": date_list}
+
+        return Response(content)
+        # Check if the file exists
