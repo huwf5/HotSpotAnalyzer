@@ -28,14 +28,12 @@ async function fetchLineChartData(selectedDateValue) {
   const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
   try {
     const response = await getLineChart(date);
-    if (response) {
-      const data = response;
-      const dates = Object.keys(data);
-      const values = Object.values(data).map(value => Number(value));
-      lineChartData.value = { dates, values };
-    } else {
-      lineChartData.value = defaultLineChartData;
-    }
+    // const dates = Object.keys(data);
+    // const values = Object.values(data).map(value => Number(value));
+    const entries = Object.entries(response).sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime());
+    const dates = entries.map(entry => entry[0]);
+    const values = entries.map(entry => entry[1]);
+    lineChartData.value = { dates, values };
   } catch (error) {
     console.error("Failed to fetch emotion data from server, using default data", error);
     lineChartData.value = defaultLineChartData;

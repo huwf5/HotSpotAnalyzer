@@ -156,7 +156,7 @@ const fetchTopicCardData = async selectedDateValue => {
     projects.value = data["topic_list"].map((topicItem, index) => ({
       id: index + 1,
       date: topicItem.date,
-      title: "#" + topicItem.title + "#",
+      title: topicItem.title,
       description: topicItem.summary,
       progress: Math.round(topicItem.progress * 100),
       progressType: "话题热度",

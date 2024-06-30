@@ -6,12 +6,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, onBeforeUnmount, computed, watch } from "vue";
-import { getStatistics } from "@/api/modules/event_analysis";
+import { ref, onBeforeUnmount, computed, watch, defineProps } from "vue";
 import { EventAnalysis } from "@/api/interface";
+import { getStatistics } from "@/api/modules/event_analysis";
 import * as echarts from "echarts";
 import { useStore } from "vuex";
 // import axios from "axios";
+
+const props = defineProps({
+  statistics: Object as () => EventAnalysis.ResStatistics | null
+});
 
 const store = useStore();
 const selectedDate = computed(() => store.getters.getSelectedDate);
@@ -19,39 +23,67 @@ const selectedDate = computed(() => store.getters.getSelectedDate);
 const gaugeChartRef = ref(null);
 const myChart = ref<echarts.ECharts | null>(null);
 
-async function fetchGaugeData(selectedDateValue) {
-  const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
-  try {
-    const response: EventAnalysis.ResStatistics = await getStatistics();
-    // 计算热度指数
-    const lastMonth = response.last_month;
-    const history = response.history;
+const calculateHotnessIndex = data => {
+  const likePerPost = data.like_counts / data.posts;
+  const commentPerPost = data.comment_counts / data.posts;
+  const forwardPerPost = data.forward_counts / data.posts;
+  return likePerPost + commentPerPost + forwardPerPost;
+};
 
-    const calculateHotnessIndex = data => {
-      const likePerPost = data.like_counts / data.posts;
-      const commentPerPost = data.comment_counts / data.posts;
-      const forwardPerPost = data.forward_counts / data.posts;
-      const rawIndex = likePerPost + commentPerPost + forwardPerPost;
-      return rawIndex;
-    };
-
-    const lastMonthHotness = calculateHotnessIndex(lastMonth);
-    const historyHotness = calculateHotnessIndex(history);
-
-    // 标准化热度指数
-    const maxHotness = Math.max(lastMonthHotness, historyHotness);
-    const lastMonthHotnessNormalized = (lastMonthHotness / maxHotness) * 100;
-    const historyHotnessNormalized = (historyHotness / maxHotness) * 100;
-
-    // 选择合适的热度指数
-    const hotnessIndex = date === "history" ? historyHotnessNormalized : lastMonthHotnessNormalized;
-    // 初始化或更新图表
-    initChart(hotnessIndex);
-  } catch (error) {
-    console.error("Failed to fetch gauge data from server, using default data", error);
-    initChart(50);
+async function fetchGaugeData() {
+  const date = selectedDate.value === "earlier" ? "history" : selectedDate.value;
+  let stats = props.statistics;
+  if (!stats) {
+    try {
+      stats = await getStatistics();
+    } catch (error) {
+      console.error("Failed to fetch gauge data from server, using default data", error);
+      initChart(50);
+      return;
+    }
   }
+
+  const lastMonthHotness = calculateHotnessIndex(stats.last_month);
+  const historyHotness = calculateHotnessIndex(stats.history);
+  const maxHotness = Math.max(lastMonthHotness, historyHotness);
+  const hotnessIndex = date === "history" ? (historyHotness / maxHotness) * 100 : (lastMonthHotness / maxHotness) * 100;
+
+  initChart(hotnessIndex);
 }
+
+// async function fetchGaugeData(selectedDateValue) {
+//   const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
+//   try {
+//     const response: EventAnalysis.ResStatistics = await getStatistics();
+//     // 计算热度指数
+//     const lastMonth = response.last_month;
+//     const history = response.history;
+
+//     const calculateHotnessIndex = data => {
+//       const likePerPost = data.like_counts / data.posts;
+//       const commentPerPost = data.comment_counts / data.posts;
+//       const forwardPerPost = data.forward_counts / data.posts;
+//       const rawIndex = likePerPost + commentPerPost + forwardPerPost;
+//       return rawIndex;
+//     };
+
+//     const lastMonthHotness = calculateHotnessIndex(lastMonth);
+//     const historyHotness = calculateHotnessIndex(history);
+
+//     // 标准化热度指数
+//     const maxHotness = Math.max(lastMonthHotness, historyHotness);
+//     const lastMonthHotnessNormalized = (lastMonthHotness / maxHotness) * 100;
+//     const historyHotnessNormalized = (historyHotness / maxHotness) * 100;
+
+//     // 选择合适的热度指数
+//     const hotnessIndex = date === "history" ? historyHotnessNormalized : lastMonthHotnessNormalized;
+//     // 初始化或更新图表
+//     initChart(hotnessIndex);
+//   } catch (error) {
+//     console.error("Failed to fetch gauge data from server, using default data", error);
+//     initChart(50);
+//   }
+// }
 
 const initChart = hotnessIndex => {
   if (gaugeChartRef.value) {
@@ -60,7 +92,7 @@ const initChart = hotnessIndex => {
     const option = {
       tooltip: {
         formatter: function (params) {
-          return `${params.seriesName} <br/>${params.name} : ${params.value.toFixed(3)}%`;
+          return `${params.seriesName} <br/>${params.name} : ${params.value.toFixed(1)}%`;
         }
       },
       series: [
@@ -122,13 +154,17 @@ const initChart = hotnessIndex => {
   }
 };
 
-onMounted(() => {
-  fetchGaugeData(selectedDate.value);
-});
+// onMounted(() => {
+//   fetchGaugeData(selectedDate.value);
+// });
 
-watch(selectedDate, newDate => {
-  fetchGaugeData(newDate);
-});
+watch(
+  () => [selectedDate.value, props.statistics],
+  () => {
+    fetchGaugeData();
+  },
+  { immediate: true }
+);
 
 onBeforeUnmount(() => {
   if (myChart.value) {

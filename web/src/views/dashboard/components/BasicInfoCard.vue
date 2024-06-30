@@ -21,9 +21,14 @@
 </template>
 <script setup lang="ts">
 import { CountTo } from "vue3-count-to";
-import { reactive, onMounted } from "vue";
-import { getStatistics } from "@/api/modules/event_analysis";
+import { reactive, defineProps, watch } from "vue";
 import { EventAnalysis } from "@/api/interface";
+
+// 接收来自父组件的统计数据
+const props = defineProps({
+  statistics: Object as () => EventAnalysis.ResStatistics | null
+});
+
 const cardList = reactive([
   {
     title1: "上月帖子数量",
@@ -54,17 +59,34 @@ const cardList = reactive([
     value2: 0
   }
 ]);
-onMounted(async () => {
-  const response: EventAnalysis.ResStatistics = await getStatistics();
-  cardList[0].value1 = response.last_month.posts;
-  cardList[0].value2 = response.history.posts;
-  cardList[1].value1 = response.last_month.like_counts;
-  cardList[1].value2 = response.history.like_counts;
-  cardList[2].value1 = response.last_month.comment_counts;
-  cardList[2].value2 = response.history.comment_counts;
-  cardList[3].value1 = response.last_month.forward_counts;
-  cardList[3].value2 = response.history.forward_counts;
-});
+// onMounted(async () => {
+//   const response: EventAnalysis.ResStatistics = await getStatistics();
+//   cardList[0].value1 = response.last_month.posts;
+//   cardList[0].value2 = response.history.posts;
+//   cardList[1].value1 = response.last_month.like_counts;
+//   cardList[1].value2 = response.history.like_counts;
+//   cardList[2].value1 = response.last_month.comment_counts;
+//   cardList[2].value2 = response.history.comment_counts;
+//   cardList[3].value1 = response.last_month.forward_counts;
+//   cardList[3].value2 = response.history.forward_counts;
+// });
+
+watch(
+  () => props.statistics,
+  newStats => {
+    if (newStats) {
+      cardList[0].value1 = newStats.last_month.posts;
+      cardList[0].value2 = newStats.history.posts;
+      cardList[1].value1 = newStats.last_month.like_counts;
+      cardList[1].value2 = newStats.history.like_counts;
+      cardList[2].value1 = newStats.last_month.comment_counts;
+      cardList[2].value2 = newStats.history.comment_counts;
+      cardList[3].value1 = newStats.last_month.forward_counts;
+      cardList[3].value2 = newStats.history.forward_counts;
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>
