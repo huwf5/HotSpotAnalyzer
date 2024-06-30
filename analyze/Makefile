@@ -1,7 +1,7 @@
 # 1、脚本文件路径
 
 # 爬虫部分
-crawler_dir := crawler/weibo_crawler
+crawler_dir := ../crawler/weibocrawler/weibo_crawler
 # 事件处理部分
 event_dir := cluster_and_event_graph
 # 情感分析和词频部分
@@ -139,7 +139,8 @@ import_data: sentiment_and_wordcount
 ifeq ($(shell yq eval '.remain_outputs' $(config)), true)
 	@echo "remain output logfiles"
 else
-	find . -name "*.log" -type f -delete
+	@find . -name "*.log" -type f -delete
+	@find $(crawler_dir) \( -name "post.log" -o -name "comment.log" \) -type f -delete
 	@echo "delete output logfiles"
 endif
 
