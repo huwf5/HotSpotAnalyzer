@@ -23,13 +23,6 @@ async function fetchGaugeData(selectedDateValue) {
   const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
   try {
     const response: EventAnalysis.ResStatistics = await getStatistics();
-    // const response = await axios.get(`http://127.0.0.1:8000/api/cardlist/fetch_card_list/`, {
-    //   headers: {
-    //     Authorization:
-    //       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTk3MjE1LCJpYXQiOjE3MTk1NzU2MTUsImp0aSI6ImQ0NTZkMjI5OTIxMzRlOWJiMDAzYmU2NThlMGFlYjBmIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.x5kyqhscJ-nOrUi9pf-H4G5EogifkB_ftUvsq2-sIUc", // 替换为你的JWT令牌
-    //     accept: "application/json"
-    //   }
-    // });
     // 计算热度指数
     const lastMonth = response.last_month;
     const history = response.history;

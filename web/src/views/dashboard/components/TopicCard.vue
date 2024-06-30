@@ -147,16 +147,8 @@ const fetchTopicCardData = async selectedDateValue => {
     date.value = selectedDateValue;
   }
 
-  // const response = await axios.get(`http://127.0.0.1:8000/api/topiccard/fetch_topic_card/?date=${date.value}`, {
-  //   headers: {
-  //     Authorization:
-  //       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
-  //     accept: "application/json"
-  //   }
-  // });
   try {
     const response = await getCardList(date.value);
-    // console.log(response);
     const data = response;
     num_of_topics.value = data["num_of_topics"];
     num_of_comments.value = data["num_of_comments"];

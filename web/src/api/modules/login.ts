@@ -1,7 +1,6 @@
 import { Login, Result, ResultData } from "@/api/interface/index";
 import adminMenuList from "@/assets/json/adminMenuList.json";
 import userMenuList from "@/assets/json/userMenuList.json";
-// import authMenuList from "@/assets/json/adminMenuList.json";
 import authButtonList from "@/assets/json/authButtonList.json";
 import http from "@/api";
 import { AuthPort, ManagePort } from "../config/servicePort";
@@ -25,12 +24,6 @@ export const getAuthMenuListApi = async (role: string) => {
   return role.toLowerCase().includes("admin") ? adminMenuList : userMenuList;
 };
 
-// export const getAuthMenuListApi = () => {
-//   // return http.get<Menu.MenuOptions[]>(PORT1 + `/menu/list`, {}, { loading: false });
-//   // 如果想让菜单变为本地数据，注释上一行代码，并引入本地 authMenuList.json 数据
-//   return authMenuList;
-// };
-
 // 获取按钮权限
 export const getAuthButtonListApi = () => {
   // return http.get<Login.ResAuthButtons>(PORT1 + `/auth/buttons`, {}, { loading: false });
@@ -45,7 +38,7 @@ export const forgetPwdApi = (params: Login.ReqForgetPwd) => {
 
 // 刷新token
 export const refreshTokenApi = (params: Login.ReqRefresh) => {
-  return http.post<ResultData<Login.ResRefresh>>(AuthPort.REFRESH, params, { loading: false });
+  return http.post<Login.ResRefresh>(AuthPort.REFRESH, params, { loading: false });
 };
 
 // 用户退出登录

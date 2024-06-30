@@ -4,7 +4,7 @@
 DATABASES_ENGINE = "django.db.backends.mysql"
 DATABASES_NAME = "HotSpotAnalyzerDB"
 DATABASES_USER = "root"
-DATABASES_PASSWORD = "yourpassword"
+DATABASES_PASSWORD = "Unufo.0325"
 DATABASES_HOST = "localhost"
 DATABASES_PORT = "3306"
 
@@ -12,7 +12,9 @@ DATABASES_PORT = "3306"
 TABLE_PREFIX = "hotspot_sys_"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# DEBUG = False
+DEBUG = True
+
 ALLOWED_HOSTS = ["*"]
 
 # EMAIL SETTINGS
@@ -25,6 +27,6 @@ EMAIL_WHITELIST = ["@example.com"]
 # EMAIL_WHITELIST = ['@*'] # if not specified, all emails are allowed, other regex aren't allowed
 
 # SUPER ADMIN SETTINGS
-SUPER_ADMIN_EMAIL = "admin@example.com" # this email also should follow the whitelist format
+SUPER_ADMIN_EMAIL = "hotspot_analyzer@163.com" # this email also should follow the whitelist format
 SUPER_ADMIN_USERNAME = "super_admin"
-SUPER_ADMIN_PASSWORD = "superadminpassword"
+SUPER_ADMIN_PASSWORD = "NFQDQDSTXFBBBCQN"

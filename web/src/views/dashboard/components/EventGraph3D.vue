@@ -66,14 +66,6 @@ const fetchGraphData = async (selectedDateValue: string) => {
   const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
 
   try {
-    // const response = await axios.get(`http://127.0.0.1:8000/api/graphs/fetch_graph/?date=${date}`, {
-    //   headers: {
-    //     Authorization:
-    //       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTY5MzI3LCJpYXQiOjE3MTk1NDc3MjcsImp0aSI6IjRiMzQxY2NhYmRiYjQ3YTA5NmUyNTJhYWU0NDA5MjlhIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.SUWOSeM-Dq-cevFsq_rUCuSH5I3IG4Qi9alcp00DCXk", // 替换为你的JWT令牌
-    //     accept: "application/json"
-    //   }
-    // });
-
     const response = await getGraph3D(date);
 
     const graphData = response ? response : DefaultGraphData;
