@@ -315,7 +315,7 @@ class TopicCardViewSet(viewsets.ViewSet):
         topic_list = [topicItem[1] for topicItem in topic_data.items() if topicItem[1]["is_news"]]
         topic_list = sorted(topic_list, key=lambda topicItem: len(topicItem["posts"]), reverse=True)
 
-        message["topic_list"] = topic_list[:6]
+        message["topic_list"] = topic_list[:12]
         total_discussion = sum(
             int(np.sum([dataItem["comment_count"] for dataItem in source_data if dataItem["wid"] == postId])) + 1
             for topic in message["topic_list"] for postId in topic["posts"]
@@ -379,8 +379,8 @@ class EventViewSet(viewsets.ViewSet):
             filepath = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
             with open(filepath, 'r', encoding='utf-8') as file:
                 source_data = json.load(file)
-
             content = {
+                "title": value["title"],
                 "summary": value["summary"],
                 "like_count": 0,
                 "forward_count": 0,
@@ -603,3 +603,5 @@ class FetchChartDataViewSet(viewsets.ViewSet):
 
         return Response(content)
         # Check if the file exists
+
+

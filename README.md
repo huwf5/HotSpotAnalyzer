@@ -26,7 +26,9 @@
    
    3. ##### 进行事件分析过程
       
-      在事件分析过程之前，建议先查看[事件分析介绍](analyze/README.md)
+      在事件分析过程之前，先查看[事件分析介绍](analyze/README.md)。
+      
+      一定先查看[爬虫文档](crawler/weibocrawler/weibo_crawler/README.md)，需要在代码文件中修改数据库相关配置。
       
       ```shell
       make analyze

@@ -33,6 +33,7 @@ run:
 .PHONY: analyze
 analyze: 
 	@echo "doing analyze process..."
+	@cd crawler && poetry install
 	@cd $(analyze_dir) && poetry install
 	@$(MAKE) -C analyze
 
