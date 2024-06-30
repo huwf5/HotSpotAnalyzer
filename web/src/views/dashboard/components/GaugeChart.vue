@@ -4,20 +4,60 @@
     <div ref="gaugeChartRef" class="gauge-chart"></div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { onMounted, ref, onBeforeUnmount } from "vue";
+import { ref, onBeforeUnmount, computed, watch, defineProps } from "vue";
+import { EventAnalysis } from "@/api/interface";
+import { getStatistics } from "@/api/modules/event_analysis";
 import * as echarts from "echarts";
+import { useStore } from "vuex";
+
+const props = defineProps({
+  statistics: Object as () => EventAnalysis.ResStatistics | null
+});
+
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
 
 const gaugeChartRef = ref(null);
 const myChart = ref<echarts.ECharts | null>(null);
 
-onMounted(() => {
+const calculateHotnessIndex = data => {
+  const likePerPost = data.like_counts / data.posts;
+  const commentPerPost = data.comment_counts / data.posts;
+  const forwardPerPost = data.forward_counts / data.posts;
+  return likePerPost + commentPerPost + forwardPerPost;
+};
+
+async function fetchGaugeData() {
+  const date = selectedDate.value === "earlier" ? "history" : selectedDate.value;
+  let stats = props.statistics;
+  if (!stats) {
+    try {
+      stats = await getStatistics();
+    } catch (error) {
+      initChart(50);
+      return;
+    }
+  }
+
+  const lastMonthHotness = calculateHotnessIndex(stats.last_month);
+  const historyHotness = calculateHotnessIndex(stats.history);
+  const maxHotness = Math.max(lastMonthHotness, historyHotness);
+  const hotnessIndex = date === "history" ? (historyHotness / maxHotness) * 100 : (lastMonthHotness / maxHotness) * 100;
+
+  initChart(hotnessIndex);
+}
+
+const initChart = hotnessIndex => {
   if (gaugeChartRef.value) {
     myChart.value = echarts.init(gaugeChartRef.value);
 
     const option = {
       tooltip: {
-        formatter: "{a} <br/>{b} : {c}%"
+        formatter: function (params) {
+          return `${params.seriesName} <br/>${params.name} : ${params.value.toFixed(1)}%`;
+        }
       },
       series: [
         {
@@ -64,7 +104,7 @@ onMounted(() => {
             fontWeight: "bold",
             color: "#fff"
           },
-          data: [{ value: 50, name: "热度指数" }]
+          data: [{ value: hotnessIndex, name: "热度指数" }]
         }
       ]
     };
@@ -76,7 +116,15 @@ onMounted(() => {
       }
     });
   }
-});
+};
+
+watch(
+  () => [selectedDate.value, props.statistics],
+  () => {
+    fetchGaugeData();
+  },
+  { immediate: true }
+);
 
 onBeforeUnmount(() => {
   if (myChart.value) {
@@ -84,6 +132,7 @@ onBeforeUnmount(() => {
   }
 });
 </script>
+
 <style scoped>
 .gaugechart-wrapper {
   position: relative;

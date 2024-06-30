@@ -52,10 +52,10 @@
 }
 .slider-wrapper {
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
-  justify-content: center;
+  flex-grow: 1;
   align-items: center;
+  justify-content: center;
 }
 .setting-row .el-slider {
   max-width: 700px;

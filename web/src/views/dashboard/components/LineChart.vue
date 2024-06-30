@@ -5,11 +5,38 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { init as initECharts, ECharts, EChartsOption, graphic } from "echarts";
+import { useStore } from "vuex";
+import { getLineChart } from "@/api/modules/event_analysis";
+// import axios from "axios";
+
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
 
 const chartContainer = ref<HTMLDivElement | null>(null);
 let myChart: ECharts | null = null;
+
+// default data
+const defaultLineChartData = {
+  dates: ["2021-09-01", "2021-09-06", "2021-09-11", "2021-09-16", "2021-09-21", "2021-09-26"],
+  values: [120, 200, 150, 80, 180, 230]
+};
+const lineChartData = ref<{ dates: string[]; values: number[] }>(defaultLineChartData);
+
+async function fetchLineChartData(selectedDateValue) {
+  const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
+  try {
+    const response = await getLineChart(date);
+    const entries = Object.entries(response).sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime());
+    const dates = entries.map(entry => entry[0]);
+    const values = entries.map(entry => entry[1]);
+    lineChartData.value = { dates, values };
+  } catch (error) {
+    lineChartData.value = defaultLineChartData;
+  }
+  initChart(); // 初始化或更新图表
+}
 
 const initChart = () => {
   if (chartContainer.value) {
@@ -20,7 +47,7 @@ const initChart = () => {
       },
       xAxis: {
         type: "category",
-        data: ["2021-09-01", "2021-09-06", "2021-09-11", "2021-09-16", "2021-09-21", "2021-09-26"],
+        data: lineChartData.value.dates,
         axisLabel: {
           rotate: 45, // 旋转标签以更好地适应
           color: "#6c757d" // 更改文字颜色
@@ -34,7 +61,7 @@ const initChart = () => {
       },
       series: [
         {
-          data: [120, 200, 150, 80, 180, 230],
+          data: lineChartData.value.values,
           type: "line",
           smooth: true,
           lineStyle: {
@@ -73,10 +100,14 @@ const initChart = () => {
 };
 
 onMounted(() => {
-  initChart();
+  fetchLineChartData(selectedDate.value);
   window.addEventListener("resize", () => {
     myChart?.resize();
   });
+});
+
+watch(selectedDate, newDate => {
+  fetchLineChartData(newDate);
 });
 
 onUnmounted(() => {

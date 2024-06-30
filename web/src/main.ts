@@ -28,7 +28,7 @@ import i18n from "@/languages/index";
 import pinia from "@/stores";
 // errorHandler
 import errorHandler from "@/utils/errorHandler";
-
+import { store } from "./store";
 const app = createApp(App);
 
 app.config.errorHandler = errorHandler;
@@ -38,4 +38,4 @@ Object.keys(Icons).forEach(key => {
   app.component(key, Icons[key as keyof typeof Icons]);
 });
 
-app.use(ElementPlus).use(directives).use(router).use(i18n).use(pinia).mount("#app");
+app.use(ElementPlus).use(directives).use(router).use(i18n).use(pinia).use(store).mount("#app");

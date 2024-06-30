@@ -55,6 +55,7 @@ const shadow_color = computed(() => {
   cursor: pointer;
   padding: 10px;
   margin: 8px 0;
+  cursor: pointer;
   box-shadow: 0 0 5px 1px v-bind("'rgba(' + shadow_color + ', 40%)'");
   &:hover {
     box-shadow: 0 0 5px 1px v-bind("'rgba(' + shadow_color + ', 100%)'");

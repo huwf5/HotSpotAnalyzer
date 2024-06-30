@@ -253,12 +253,15 @@ export namespace EventAnalysis {
     };
   }
   export interface ResLineChart {
-    x: string[];
-    y: number[];
+    [key: string]: number;
   }
   export interface ResEmotionAnalysis {
     emotion: string;
     percentage: number;
+  }
+  export interface ResWordCloudAnalysis {
+    name: string;
+    value: number;
   }
   export interface Res3DGraph {
     node: {

@@ -7,7 +7,7 @@
         </div>
         <!-- 添加下拉框 -->
         <el-select v-model="selectedDate" @change="updateDate" placeholder="选择日期" class="p-t-8px">
-          <el-option label="一个月" value="one-month"></el-option>
+          <el-option label="一个月" value="2024-06-18"></el-option>
           <el-option label="更早" value="earlier"></el-option>
         </el-select>
       </div>
@@ -47,6 +47,7 @@ watch(
 .flex {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 14px;
 }
 .p-l-20px {
