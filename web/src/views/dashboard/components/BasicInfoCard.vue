@@ -59,17 +59,6 @@ const cardList = reactive([
     value2: 0
   }
 ]);
-// onMounted(async () => {
-//   const response: EventAnalysis.ResStatistics = await getStatistics();
-//   cardList[0].value1 = response.last_month.posts;
-//   cardList[0].value2 = response.history.posts;
-//   cardList[1].value1 = response.last_month.like_counts;
-//   cardList[1].value2 = response.history.like_counts;
-//   cardList[2].value1 = response.last_month.comment_counts;
-//   cardList[2].value2 = response.history.comment_counts;
-//   cardList[3].value1 = response.last_month.forward_counts;
-//   cardList[3].value2 = response.history.forward_counts;
-// });
 
 watch(
   () => props.statistics,

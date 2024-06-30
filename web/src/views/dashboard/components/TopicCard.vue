@@ -107,8 +107,6 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { getCardList } from "@/api/modules/event_analysis";
-// import axios from "axios";
-
 const isGridView = ref(true);
 const setCurrentView = view => {
   isGridView.value = view === "grid";
@@ -206,8 +204,6 @@ const colorPairs = [
 const projects = ref<Project[]>([]);
 
 const goToEventPage = (title: string) => {
-  // const encodedTitle = encodeURIComponent(title);
-  // router.push(`/event?id=${encodedTitle}`);
   router.push(`/event/analysis/${title}`);
 };
 </script>
