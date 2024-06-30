@@ -107,8 +107,6 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { getCardList } from "@/api/modules/event_analysis";
-// import axios from "axios";
-
 const isGridView = ref(true);
 const setCurrentView = view => {
   isGridView.value = view === "grid";
@@ -156,7 +154,7 @@ const fetchTopicCardData = async selectedDateValue => {
     projects.value = data["topic_list"].map((topicItem, index) => ({
       id: index + 1,
       date: topicItem.date,
-      title: "#" + topicItem.title + "#",
+      title: topicItem.title,
       description: topicItem.summary,
       progress: Math.round(topicItem.progress * 100),
       progressType: "话题热度",
@@ -206,8 +204,6 @@ const colorPairs = [
 const projects = ref<Project[]>([]);
 
 const goToEventPage = (title: string) => {
-  // const encodedTitle = encodeURIComponent(title);
-  // router.push(`/event?id=${encodedTitle}`);
   router.push(`/event/analysis/${title}`);
 };
 </script>
