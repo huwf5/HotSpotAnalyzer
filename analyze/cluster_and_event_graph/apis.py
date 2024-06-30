@@ -221,29 +221,5 @@ def get_item(wid, data):
 
 
 if __name__ == "__main__":
-    parse_api_response('''
-    {
-    "events": [
-        {
-            "id": 1,
-            "event": "中国大学生在线校媒云享荟第九期直播",
-            "attributes": [
-                {"type": "时间", "value": "2023年6月18日"},
-                {"type": "主办方", "value": "河北美术学院"},
-                {"type": "参与老师", "value": "杨美偲、陈颖、张笑迷、操一铭"}
-            ]
-        },
-        {
-            "id": 2,
-            "event": "四位老师分享优秀原创作品创作经验",
-            "attributes": [
-                {"type": "参与老师", "value": "杨美偲、陈颖、张笑迷、操一铭"}
-            ]
-        }
-    ],
-    "relationships": [
-        {"source": 1, "target": 2, "type": "包含关系"}
-    ]
-}
-    '''
+    pass
                        )
