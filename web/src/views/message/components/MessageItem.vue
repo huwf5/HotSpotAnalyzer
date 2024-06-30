@@ -52,6 +52,7 @@ const shadow_color = computed(() => {
   min-width: 500px;
   height: fit-content;
   max-height: 100px;
+  cursor: pointer;
   padding: 10px;
   margin: 8px 0;
   cursor: pointer;

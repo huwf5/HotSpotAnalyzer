@@ -16,7 +16,7 @@
       </el-row>
     </el-card>
     <el-row class="event_analysis" :gutter="20">
-      <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
+      <el-col v-if="emotionData.length > 0" :span="12" :lg="12" :md="24" :sm="24" :xs="24">
         <el-space fill wrap direction="vertical" :fill-ratio="100" style="width: 100%; height: 100%">
           <el-card>
             <PieChart :is-loading="loading" :data="emotionData" chart-title="情感分析" />
@@ -24,7 +24,7 @@
           <el-card> <BarChart :is-loading="loading" :data="eventsData" /></el-card>
         </el-space>
       </el-col>
-      <el-col :span="12" :lg="12" :md="24" :sm="24" :xs="24">
+      <el-col :span="rightChartSpan" :lg="rightChartSpan" :md="24" :sm="24" :xs="24">
         <el-card>
           <el-tabs v-if="displayRightChart" class="map_container">
             <el-tab-pane label="词云图">
@@ -87,6 +87,7 @@ const dataSource = ref<{
     links: []
   }
 });
+const rightChartSpan = computed(() => (emotionData.value.length > 0 ? 12 : 24));
 const emotionData = computed(() => dataSource.value.emotionStatisics);
 const wordFreqData = computed(() => dataSource.value.wordFreqStatistics);
 const eventsData = computed(() => dataSource.value.eventsData);
@@ -106,9 +107,12 @@ onMounted(() => {
         });
       if (err) return;
       let processed_sentiment_data: { value: number; name: string }[] = [];
+      let sentiment_count = 0;
       for (const entry of Object.entries(response.senti_count)) {
         processed_sentiment_data.push({ name: entry[0], value: entry[1] });
+        sentiment_count += entry[1];
       }
+      sentiment_count == 0 && (processed_sentiment_data = []);
       response.graph &&
         (dataSource.value.graphData = {
           nodes: response.graph.events.map(item => {

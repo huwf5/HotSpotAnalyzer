@@ -380,7 +380,6 @@ class EventViewSet(viewsets.ViewSet):
             with open(filepath, 'r', encoding='utf-8') as file:
                 source_data = json.load(file)
             content = {
-                "title": value["title"],
                 "summary": value["summary"],
                 "like_count": 0,
                 "forward_count": 0,
