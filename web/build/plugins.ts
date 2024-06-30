@@ -88,19 +88,19 @@ const createVitePwa = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
       theme_color: "#ffffff",
       icons: [
         {
-          src: "/logo.png",
+          src: "logo.svg",
           sizes: "192x192",
-          type: "image/png"
+          type: "image/svg+xml"
         },
         {
-          src: "/logo.png",
+          src: "logo.svg",
           sizes: "512x512",
-          type: "image/png"
+          type: "image/svg+xml"
         },
         {
-          src: "/logo.png",
+          src: "logo.svg",
           sizes: "512x512",
-          type: "image/png",
+          type: "image/svg+xml",
           purpose: "any maskable"
         }
       ]
