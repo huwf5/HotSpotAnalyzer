@@ -63,7 +63,7 @@ export namespace AnalysisPort {
   /** 数据大屏接口 */
   export enum MAIN {
     STATISTICS = "/cardlist/fetch_card_list/",
-    LINE_CHART = "/chartdata/fetch_chart_data/",
+    LINE_CHART = "/chartData/fetch_chart_data/",
     EMOTION = "/emotion/fetch_emotions/",
     WORD_CLOUD = "/wordcloud/fetch_word_cloud",
     TOPICS = "/topiccard/fetch_topic_card/",

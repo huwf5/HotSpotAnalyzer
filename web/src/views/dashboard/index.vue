@@ -1,7 +1,7 @@
 <template>
   <div class="p-6px">
     <DashBoardTitle></DashBoardTitle>
-    <BasicInfoCard></BasicInfoCard>
+    <BasicInfoCard :statistics="statistics" />
     <el-row :gutter="20" class="m-t-5px">
       <el-col :span="12" :lg="12" :md="12" :sm="24" :xs="24">
         <el-card class="rounded-md dark:bg-black m-d-10px" shadow="hover">
@@ -17,7 +17,7 @@
     <el-row :gutter="20" class="m-t-5px">
       <el-col :span="6" :lg="6" :md="6" :sm="24" :xs="24" class="column-height">
         <el-card class="rounded-md dark:bg-black gauge-card" shadow="hover">
-          <GaugeChart></GaugeChart>
+          <GaugeChart :statistics="statistics" />
         </el-card>
         <el-card class="rounded-md dark:bg-black line-card m-t-10px" shadow="hover">
           <LineChart></LineChart>
@@ -35,6 +35,9 @@
 </template>
 
 <script setup lang="ts" name="home">
+import { onMounted, ref } from "vue";
+import { getStatistics } from "@/api/modules/event_analysis";
+import { EventAnalysis } from "@/api/interface";
 import BasicInfoCard from "./components/BasicInfoCard.vue";
 import WordCloudChart from "./components/WordCloudChart.vue";
 import EmotionChart from "./components/EmotionChart.vue";
@@ -45,6 +48,12 @@ import TopicCard from "./components/TopicCard.vue";
 import DashBoardTitle from "./components/DashBoardTitle.vue";
 import GaugeChart from "./components/GaugeChart.vue";
 import DivideLine from "./components/DivideLine.vue";
+
+const statistics = ref<EventAnalysis.ResStatistics | null>(null);
+
+onMounted(async () => {
+  statistics.value = await getStatistics();
+});
 </script>
 
 <style lang="scss" scoped>
