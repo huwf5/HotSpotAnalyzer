@@ -18,7 +18,6 @@ def save_json_file(json_dict, file_path):
         json.dump(json_dict, outfile, ensure_ascii=False, indent=4)
 
 def parse_api_response(response):
-    print("response:______________________-______________\n",response)
     """
     解析 API 响应字符串，剥去可能存在的 `json` 标注，并返回 JSON 数据。
 
@@ -31,7 +30,14 @@ def parse_api_response(response):
 
     if match:
         json_str = match.group(0)
-        return json.loads(json_str)
+
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            # 在出现解析错误时打印调试信息
+            print(f"Failed to parse JSON. Error: {e}")
+            print(f"Invalid JSON string: {json_str}")
+            raise e
     else:
         raise json.JSONDecodeError("No valid JSON object found", response, 0)
 
@@ -81,7 +87,7 @@ def build_event_graph(text, publish_time):
     事件关系可选择的有：因果关系、共指关系、时序关系、包含关系，注意识别这些关系
     source是原因，target是结果，例子如下：
    {example}    
-   注意，必须返回json格式！！
+   注意：请检查字符串格式，返回的字符串必须严格满足json格式，可以被json.loads解析
     ''',
         "previous_history": [],
         "temperature": 0.0,
