@@ -1,7 +1,6 @@
 import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 import { useUserStore } from "@/stores/modules/user";
 import { useAuthStore } from "@/stores/modules/auth";
-// import { LOGIN_URL, REGISTER_URL, ROUTER_WHITE_LIST } from "@/config";
 import { LOGIN_URL, REGISTER_URL, ROUTER_WHITE_LIST } from "@/config";
 import { initDynamicRouter } from "@/routers/modules/dynamicRouter";
 import { staticRouter, errorRouter } from "@/routers/modules/staticRouter";

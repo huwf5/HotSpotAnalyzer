@@ -260,6 +260,10 @@ export namespace EventAnalysis {
     emotion: string;
     percentage: number;
   }
+  export interface ResWordCloudAnalysis {
+    name: string;
+    value: number;
+  }
   export interface Res3DGraph {
     node: {
       id: string;

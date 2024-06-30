@@ -5,11 +5,50 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { init as initECharts, ECharts, EChartsOption, graphic } from "echarts";
+import { useStore } from "vuex";
+import { getLineChart } from "@/api/modules/event_analysis";
+// import axios from "axios";
+
+const store = useStore();
+const selectedDate = computed(() => store.getters.getSelectedDate);
 
 const chartContainer = ref<HTMLDivElement | null>(null);
 let myChart: ECharts | null = null;
+
+// default data
+const defaultLineChartData = {
+  dates: ["2021-09-01", "2021-09-06", "2021-09-11", "2021-09-16", "2021-09-21", "2021-09-26"],
+  values: [120, 200, 150, 80, 180, 230]
+};
+const lineChartData = ref<{ dates: string[]; values: number[] }>(defaultLineChartData);
+
+async function fetchLineChartData(selectedDateValue) {
+  const date = selectedDateValue === "earlier" ? "history" : selectedDateValue;
+  try {
+    // const response = await axios.get(`http://127.0.0.1:8000/api/chartData/fetch_chart_data/?date=${date}`, {
+    //   headers: {
+    //     Authorization:
+    //       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NTk3MjE1LCJpYXQiOjE3MTk1NzU2MTUsImp0aSI6ImQ0NTZkMjI5OTIxMzRlOWJiMDAzYmU2NThlMGFlYjBmIiwidXNlcl9lbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIn0.x5kyqhscJ-nOrUi9pf-H4G5EogifkB_ftUvsq2-sIUc", // 替换为你的JWT令牌
+    //     accept: "application/json"
+    //   }
+    // });
+    const response = await getLineChart(date);
+    if (response) {
+      const data = response;
+      const dates = Object.keys(data);
+      const values = Object.values(data).map(value => Number(value));
+      lineChartData.value = { dates, values };
+    } else {
+      lineChartData.value = defaultLineChartData;
+    }
+  } catch (error) {
+    console.error("Failed to fetch emotion data from server, using default data", error);
+    lineChartData.value = defaultLineChartData;
+  }
+  initChart(); // 初始化或更新图表
+}
 
 const initChart = () => {
   if (chartContainer.value) {
@@ -20,7 +59,7 @@ const initChart = () => {
       },
       xAxis: {
         type: "category",
-        data: ["2021-09-01", "2021-09-06", "2021-09-11", "2021-09-16", "2021-09-21", "2021-09-26"],
+        data: lineChartData.value.dates,
         axisLabel: {
           rotate: 45, // 旋转标签以更好地适应
           color: "#6c757d" // 更改文字颜色
@@ -34,7 +73,7 @@ const initChart = () => {
       },
       series: [
         {
-          data: [120, 200, 150, 80, 180, 230],
+          data: lineChartData.value.values,
           type: "line",
           smooth: true,
           lineStyle: {
@@ -73,10 +112,14 @@ const initChart = () => {
 };
 
 onMounted(() => {
-  initChart();
+  fetchLineChartData(selectedDate.value);
   window.addEventListener("resize", () => {
     myChart?.resize();
   });
+});
+
+watch(selectedDate, newDate => {
+  fetchLineChartData(newDate);
 });
 
 onUnmounted(() => {

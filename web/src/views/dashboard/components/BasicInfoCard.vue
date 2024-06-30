@@ -54,10 +54,8 @@ const cardList = reactive([
     value2: 0
   }
 ]);
-getStatistics();
 onMounted(async () => {
   const response: EventAnalysis.ResStatistics = await getStatistics();
-  console.log("API Response:", response);
   cardList[0].value1 = response.last_month.posts;
   cardList[0].value2 = response.history.posts;
   cardList[1].value1 = response.last_month.like_counts;
