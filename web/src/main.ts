@@ -6,8 +6,6 @@ import "@/styles/reset.scss";
 import "@/styles/common.scss";
 // iconfont css
 import "@/assets/iconfont/iconfont.scss";
-// font css
-import "@/assets/fonts/font.scss";
 // element css
 import "element-plus/dist/index.css";
 // element dark css
@@ -30,7 +28,7 @@ import i18n from "@/languages/index";
 import pinia from "@/stores";
 // errorHandler
 import errorHandler from "@/utils/errorHandler";
-
+import { store } from "./store";
 const app = createApp(App);
 
 app.config.errorHandler = errorHandler;
@@ -40,4 +38,4 @@ Object.keys(Icons).forEach(key => {
   app.component(key, Icons[key as keyof typeof Icons]);
 });
 
-app.use(ElementPlus).use(directives).use(router).use(i18n).use(pinia).mount("#app");
+app.use(ElementPlus).use(directives).use(router).use(i18n).use(pinia).use(store).mount("#app");

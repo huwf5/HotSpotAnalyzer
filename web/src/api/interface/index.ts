@@ -150,7 +150,7 @@ export namespace Messages {
     is_read: boolean;
   }
   export enum MessageType {
-    WARN = "warn",
+    WARN = "warning",
     INFO = "info"
   }
   export interface ResMessage {
@@ -212,6 +212,7 @@ export namespace EventAnalysis {
     like_count: number;
     forward_count: number;
     comment_count: number;
+    summary: string;
     graph?: {
       events: {
         id: number;
@@ -258,6 +259,10 @@ export namespace EventAnalysis {
   export interface ResEmotionAnalysis {
     emotion: string;
     percentage: number;
+  }
+  export interface ResWordCloudAnalysis {
+    name: string;
+    value: number;
   }
   export interface Res3DGraph {
     node: {

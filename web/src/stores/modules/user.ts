@@ -30,21 +30,17 @@ export const useUserStore = defineStore({
     setTokens(token: string, refresh: string, token_lifetime: number) {
       this.token = token;
       this.refresh = refresh;
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = undefined;
+      }
       if (token_lifetime > 0) {
-        if (this.timer) {
-          clearTimeout(this.timer);
-        }
         this.token_lifetime = token_lifetime;
         this.timer = setTimeout(() => {
           refreshTokenApi({ refresh: this.refresh }).then(res => {
             this.setTokens(res.access, res.refresh, this.token_lifetime);
           });
         }, token_lifetime);
-      } else {
-        if (this.timer) {
-          clearTimeout(this.timer);
-          this.timer = undefined;
-        }
       }
     },
     // Set setUserInfo

@@ -50,7 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -68,7 +68,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             os.path.join(BASE_DIR, "static"),
-            os.path.join(PROJECT_DIR, "web/dist/"), # for debug enabled
+            os.path.join(PROJECT_DIR, "web/dist/"),  # for debug enabled
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -93,7 +93,7 @@ STATICFILES_DIRS = [
 
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder"
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
 WSGI_APPLICATION = "application.wsgi.application"

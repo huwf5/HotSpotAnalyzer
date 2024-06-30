@@ -60,7 +60,7 @@ def main():
     target_path = os.path.join(BASE_DIR, 'result', 'cluster_result', args.target_file)
 
     # 加载数据
-    data = load_data(args.source_file)
+    data = load_data(source_path)
     # 提取文本
     items = extract_texts(data)
     # 获取嵌入向量
@@ -68,8 +68,8 @@ def main():
     # 执行 DBSCAN 聚类
     cluster_labels = apply_dbscan(embeddings)
     # 保存聚类结果到 JSON 文件
-    save_cluster_results_to_json(cluster_labels, items, [item[0] for item in items], args.target_file)
-    print(f"聚类结果已保存到 {args.target_file} 文件中。")
+    save_cluster_results_to_json(cluster_labels, items, [item[0] for item in items], target_path)
+    print(f"聚类结果已保存到 {target_path} 文件中。")
 
 
 if __name__ == "__main__":

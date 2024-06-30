@@ -74,21 +74,7 @@
       ]
     },
     {
-      "path": "/user/self",
-      "name": "user_infos",
-      "component": "/user_home/index",
-      "meta": {
-        "icon": "User",
-        "title": "个人信息",
-        "isLink": "",
-        "isHide": false,
-        "isFull": false,
-        "isAffix": false,
-        "isKeepAlive": true
-      }
-    },
-    {
-      "path": "/event/analysis/:summary",
+      "path": "/event/analysis/:title",
       "props": true,
       "name": "event_analysis",
       "component": "/event_analysis/index",
@@ -97,6 +83,20 @@
         "title": "事件分析",
         "isLink": "",
         "isHide": true,
+        "isFull": false,
+        "isAffix": false,
+        "isKeepAlive": true
+      }
+    },
+    {
+      "path": "/user/self",
+      "name": "user_infos",
+      "component": "/user_home/index",
+      "meta": {
+        "icon": "User",
+        "title": "个人信息",
+        "isLink": "",
+        "isHide": false,
         "isFull": false,
         "isAffix": false,
         "isKeepAlive": true

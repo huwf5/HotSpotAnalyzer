@@ -22,6 +22,14 @@ export const getMainSentiment = (date: string) => {
   return http.get<ResDataList<EventAnalysis.ResEmotionAnalysis>>(AnalysisPort.MAIN.EMOTION, { date: date }, { loading: false });
 };
 
+export const getWordCloud = (date: string) => {
+  return http.get<ResDataList<EventAnalysis.ResWordCloudAnalysis>>(
+    AnalysisPort.MAIN.WORD_CLOUD,
+    { date: date },
+    { loading: false }
+  );
+};
+
 export const getGraph3D = (date: string) => {
   return http.get<EventAnalysis.Res3DGraph>(AnalysisPort.MAIN.GRAPH3D, { date: date }, { loading: false });
 };

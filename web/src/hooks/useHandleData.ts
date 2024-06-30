@@ -31,9 +31,9 @@ export const useHandleData = <T>(
             });
             resolve(response);
           })
-          .catch(() => {
+          .catch(e => {
             // API Error
-            reject();
+            reject(e);
           });
       })
       .catch(() => {

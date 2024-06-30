@@ -78,9 +78,9 @@ onMounted(fetch_count);
     display: flex;
     align-items: center;
     padding: 10px 0;
+    cursor: pointer;
     border-bottom: 1px solid var(--el-border-color-light);
     transition: all 0.25s ease-in-out;
-    cursor: pointer;
     &:hover {
       background-color: var(--el-menu-hover-bg-color);
     }
