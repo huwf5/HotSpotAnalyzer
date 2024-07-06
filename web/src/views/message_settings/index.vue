@@ -3,9 +3,9 @@
     <setting-panel setting-title="预警消息阈值">
       <div class="single-setting">
         <div class="setting-row">
-          <span>高于{{ userSettings.warning_threshold * 100 }}%</span>
+          <span>高于{{ userSettings.warning_threshold }}%</span>
           <div class="slider-wrapper">
-            <el-slider v-model="userSettings.warning_threshold" :step="0.01" :min="0" :max="1" />
+            <el-slider v-model="userSettings.warning_threshold" :step="1" :min="0" :max="100" @input="handleInput(0)" />
           </div>
         </div>
       </div>
@@ -13,9 +13,9 @@
     <setting-panel setting-title="提醒消息阈值">
       <div class="single-setting">
         <div class="setting-row">
-          <span>高于{{ userSettings.info_threshold * 100 }}%</span>
+          <span>高于{{ userSettings.info_threshold }}%</span>
           <div class="slider-wrapper">
-            <el-slider v-model="userSettings.info_threshold" :step="0.01" :min="0" :max="userSettings.warning_threshold" />
+            <el-slider v-model="userSettings.info_threshold" :step="1" :min="0" :max="100" @input="handleInput(1)" />
           </div>
         </div>
       </div>
@@ -45,12 +45,16 @@ const tabStore = useTabsStore();
 
 const userSettings = ref<Messages.ResMessageSetting>({
   allow_non_news: true,
-  warning_threshold: 0.5,
-  info_threshold: 0.5
+  warning_threshold: 70,
+  info_threshold: 50
 });
 const timerId = ref<NodeJS.Timeout>();
 async function upload(params: Messages.ResMessageSetting) {
-  await uploadMessageSettingsApi(params).then(() => {
+  await uploadMessageSettingsApi({
+    allow_non_news: params.allow_non_news,
+    warning_threshold: params.warning_threshold / 100,
+    info_threshold: params.info_threshold / 100
+  }).then(() => {
     ElNotification({
       title: "同步成功",
       type: "success",
@@ -61,7 +65,11 @@ async function upload(params: Messages.ResMessageSetting) {
 function initPage() {
   getMessageSettingsApi()
     .then(response => {
-      userSettings.value = response.data;
+      userSettings.value = {
+        allow_non_news: response.data.allow_non_news,
+        warning_threshold: response.data.warning_threshold * 100,
+        info_threshold: response.data.info_threshold * 100
+      };
       const unwatch = watch(
         userSettings,
         () => {
@@ -85,6 +93,22 @@ function initPage() {
         router.back();
       }
     });
+}
+function handleInput(target: number) {
+  if (userSettings.value.warning_threshold < userSettings.value.info_threshold) {
+    switch (target) {
+      case 0:
+        // warning changed
+        userSettings.value.info_threshold = userSettings.value.warning_threshold;
+        break;
+      case 1:
+        // info changed
+        userSettings.value.warning_threshold = userSettings.value.info_threshold;
+        break;
+      default:
+        break;
+    }
+  }
 }
 onBeforeUnmount(async () => {
   if (timerId.value) {
