@@ -229,9 +229,9 @@ class CardListViewSet(viewsets.ViewSet):
 
             # Current month data
             num_of_posts = len(data)
-            like_counts = int(np.sum([dataItem["like_count"] for dataItem in data]))
-            comment_counts = int(np.sum(dataItem["comment_count"] for dataItem in data))
-            forward_counts = int(np.sum(dataItem["forward_count"] for dataItem in data))
+            like_counts = int(np.sum([dataItem["like_count"] for dataItem in data if "like_count" in dataItem.keys()]))
+            comment_counts = int(np.sum(dataItem["comment_count"] for dataItem in data if "comment_count" in dataItem.keys()))
+            forward_counts = int(np.sum(dataItem["forward_count"] for dataItem in data if "forward_count" in dataItem.keys()))
 
             # Historical data
             history_num_of_posts = 0
@@ -243,9 +243,12 @@ class CardListViewSet(viewsets.ViewSet):
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
                 history_num_of_posts += len(data)
-                history_like_counts += int(np.sum(dataItem["like_count"] for dataItem in data))
-                history_comment_counts += int(np.sum(dataItem["comment_count"] for dataItem in data))
-                history_forward_counts += int(np.sum(dataItem["forward_count"] for dataItem in data))
+                history_like_counts += int(np.sum(dataItem["like_count"] for dataItem in data
+                                                  if "like_count" in dataItem.keys()))
+                history_comment_counts += int(np.sum(dataItem["comment_count"] for dataItem in data
+                                                     if "comment_count" in dataItem.keys()))
+                history_forward_counts += int(np.sum(dataItem["forward_count"] for dataItem in data
+                                                     if "forward_count" in dataItem.keys()))
 
             message = {
                 "last_month": {
@@ -295,41 +298,43 @@ class TopicCardViewSet(viewsets.ViewSet):
         # Check if the file exists
         if not os.path.exists(file_path):
             return Response({'error': 'Topic data file not found.'}, status=404)
+        try:
+            # Load topic data
+            with open(file_path, 'r', encoding='utf-8') as file:
+                topic_data = json.load(file)
 
-        # Load topic data
-        with open(file_path, 'r', encoding='utf-8') as file:
-            topic_data = json.load(file)
+            source_data_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
+            # Load source data
+            with open(source_data_path, 'r', encoding='utf-8') as file:
+                source_data = json.load(file)
 
-        source_data_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data', f'{date}.json')
-        # Load source data
-        with open(source_data_path, 'r', encoding='utf-8') as file:
-            source_data = json.load(file)
+            message = {
+                "num_of_topics": len(topic_data.keys()),
+                "num_of_posts": len(source_data),
+                "num_of_comments": int(np.sum(dataItem["comment_count"] for dataItem in source_data))
+            }
 
-        message = {
-            "num_of_topics": len(topic_data.keys()),
-            "num_of_posts": len(source_data),
-            "num_of_comments": int(np.sum(dataItem["comment_count"] for dataItem in source_data))
-        }
+            # Process topics
+            topic_list = [topicItem[1] for topicItem in topic_data.items() if topicItem[1]["is_news"]]
+            topic_list = sorted(topic_list, key=lambda topicItem: len(topicItem["posts"]), reverse=True)
 
-        # Process topics
-        topic_list = [topicItem[1] for topicItem in topic_data.items() if topicItem[1]["is_news"]]
-        topic_list = sorted(topic_list, key=lambda topicItem: len(topicItem["posts"]), reverse=True)
+            message["topic_list"] = topic_list[:12]
+            total_discussion = sum(
+                int(np.sum([dataItem["comment_count"] for dataItem in source_data if dataItem["wid"] == postId])) + 1
+                for topic in message["topic_list"] for postId in topic["posts"]
+            )
 
-        message["topic_list"] = topic_list[:12]
-        total_discussion = sum(
-            int(np.sum([dataItem["comment_count"] for dataItem in source_data if dataItem["wid"] == postId])) + 1
-            for topic in message["topic_list"] for postId in topic["posts"]
-        )
+            for topic in message["topic_list"]:
+                topic_comment_counts = int(np.sum([dataItem["comment_count"] for dataItem in source_data
+                                                   if dataItem["wid"] in topic["posts"]]))
+                topic["progress"] = (topic_comment_counts + len(topic["posts"])) / total_discussion
+                topic["num_of_posts"] = len(topic["posts"])
+                topic["date"] = [dataItem["publish_time"] for dataItem in source_data if dataItem["wid"]
+                                 in topic["posts"]][0].split('T')[0]
 
-        for topic in message["topic_list"]:
-            topic_comment_counts = int(np.sum([dataItem["comment_count"] for dataItem in source_data
-                                               if dataItem["wid"] in topic["posts"]]))
-            topic["progress"] = (topic_comment_counts + len(topic["posts"])) / total_discussion
-            topic["num_of_posts"] = len(topic["posts"])
-            topic["date"] = [dataItem["publish_time"] for dataItem in source_data if dataItem["wid"]
-                             in topic["posts"]][0].split('T')[0]
-
-        return Response(message)
+            return Response(message)
+        except Exception as e:
+            return Response({'error': f'发生意外错误：{str(e)}'}, status=500)
 
 def find_event_by_title(title):
     dir = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'topic_data')
