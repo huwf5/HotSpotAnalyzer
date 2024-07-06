@@ -11,6 +11,9 @@ server_build_deps:
 	@echo "Building backend dependencies..."
 	@cd $(backend_base_dir) && poetry install
 
+	@echo "Building frontend..."
+	@cd $(web_base_dir) && pnpm run build:pro
+
 .PHONY: server_init_db
 server_init_db: server_build_deps
 	@echo "Initializing database..."
@@ -20,9 +23,6 @@ server_init_db: server_build_deps
 
 .PHONY: run
 run: 
-	@echo "Building frontend..."
-	@cd $(web_base_dir) && pnpm run build:pro
-
 	@echo "collecting static files..."
 	@mkdir -p $(backend_base_dir)/static
 	@cd $(backend_base_dir) && poetry run python manage.py collectstatic --noinput
@@ -40,3 +40,6 @@ analyze:
 .PHONY: clean
 clean:
 	@echo "Cleaning up..."
+	rm -rf $(backend_base_dir)/static
+	rm -rf $(backend_base_dir)/log
+	rm -rf $(web_base_dir)/dist

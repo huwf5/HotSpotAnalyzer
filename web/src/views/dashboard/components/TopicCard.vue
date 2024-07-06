@@ -1,7 +1,7 @@
 <template>
   <div class="projects-section-header">
     <p>👻概览</p>
-    <p class="time">December, 12</p>
+    <p class="time">{{ selectedDate }}</p>
   </div>
   <div class="projects-section-line">
     <div class="projects-status">

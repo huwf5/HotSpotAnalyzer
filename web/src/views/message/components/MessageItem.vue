@@ -8,7 +8,7 @@
     <div class="message_head">
       <span class="title">{{ message.message.title }}</span>
       <span class="content" style="margin: 0 10px; overflow: hidden">
-        负面指数：{{ message.message.negative_sentiment_ratio }}
+        负面指数：{{ message.message.negative_sentiment_ratio.toFixed(2) }}
       </span>
     </div>
     <div class="event_body">
@@ -48,7 +48,7 @@ const shadow_color = computed(() => {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  width: 70%;
+  width: 95%;
   min-width: 500px;
   height: fit-content;
   max-height: 100px;
@@ -74,7 +74,7 @@ const shadow_color = computed(() => {
   width: 0;
   width: 110px;
   padding: 0;
-  margin: 0 0 0 10px;
+  margin: 0 10px;
   overflow: hidden;
 }
 .title {

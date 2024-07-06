@@ -59,6 +59,12 @@ const initChart = () => {
           color: "#6c757d"
         }
       },
+      grid: {
+        left: "3%",
+        right: "3%",
+        bottom: "3%",
+        containLabel: true
+      },
       series: [
         {
           data: lineChartData.value.values,
@@ -117,8 +123,11 @@ onUnmounted(() => {
 
 <style scoped>
 .chart-container {
+  display: flex;
+  justify-content: center;
   width: 100%; /* 使用100%宽度以适应父容器 */
   height: 375px; /* 保持图表为方形，可以调整为100%或固定尺寸 */
+  margin: auto;
 }
 .linechart-wrapper {
   position: relative;

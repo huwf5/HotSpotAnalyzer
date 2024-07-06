@@ -2,7 +2,7 @@ import { createStore } from "vuex";
 
 export const store = createStore({
   state: {
-    selectedDate: "2024-06-18"
+    selectedDate: "2024-06-29"
   },
   mutations: {
     setSelectedDate(state, date) {

@@ -179,6 +179,9 @@ export namespace EventAnalysis {
   export interface ReqDate {
     date: string;
   }
+  export interface ReqDates {
+    dates: string[];
+  }
   export interface ReqTitle {
     title: string;
   }

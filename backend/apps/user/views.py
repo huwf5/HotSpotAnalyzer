@@ -253,6 +253,10 @@ class SendCodeView(viewsets.ViewSet):
 
 
 class LoginView(TokenObtainPairView):
+    class LoginThrottle(throttling.AnonRateThrottle):
+        rate = "3/min"
+
+    throttle_classes = [LoginThrottle]
     serializer_class = LoginSerializer
     queryset = User.objects.all()
 

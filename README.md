@@ -33,3 +33,8 @@
       ```shell
       make analyze
       ```
+   4. ##### 清理项目（可选）
+      
+      ```shell
+      make clean
+      ```
