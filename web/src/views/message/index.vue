@@ -52,7 +52,7 @@
 <script setup lang="ts" name="message">
 import Filter from "./components/Filter.vue";
 import MessageList from "./components/MessageList.vue";
-import { onMounted, ref } from "vue";
+import { onActivated, ref } from "vue";
 import { Messages } from "@/api/interface";
 import { comp } from "./util";
 import { useUserStore } from "@/stores/modules/user";
@@ -169,7 +169,18 @@ function dealStarAll() {
   });
   messages.value.sort(comp);
 }
-function dealReadOne(msg: Messages.ResMessage) {
+function dealReadOne(msg: Messages.ResMessage & { selected: boolean }) {
+  if (checkboxVisible.value) {
+    msg.selected = !msg.selected;
+    if (msg.selected) {
+      checked.value.set(msg.id, msg);
+      checkAll.value = messages.value.length === checked.value.size;
+    } else {
+      checked.value.delete(msg.id);
+      checkAll.value = false;
+    }
+    return;
+  }
   batchUpdateMsgApi([
     {
       id: msg.id,
@@ -247,7 +258,7 @@ function dealMsgStarred(msg: Messages.ResMessage) {
 function message_settings() {
   router.push("/settings/message");
 }
-onMounted(fetch);
+onActivated(fetch);
 </script>
 
 <style scoped lang="scss">

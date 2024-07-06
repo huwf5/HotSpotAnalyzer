@@ -71,7 +71,7 @@ const fetchGraphData = async (selectedDateValue: string) => {
     const graphData = response ? response : DefaultGraphData;
     initializeGraph(graphData);
   } catch (error) {
-    console.error("Failed to fetch graph data from server, using default data", error);
+    //console.error("Failed to fetch graph data from server, using default data", error);
     initializeGraph(DefaultGraphData); // Fallback to default data on any error
   }
 };

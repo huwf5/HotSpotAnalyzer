@@ -57,6 +57,12 @@ const initChart = hotnessIndex => {
       tooltip: {
         formatter: function (params) {
           return `${params.seriesName} <br/>${params.name} : ${params.value.toFixed(1)}%`;
+        },
+        confine: true,
+        position: function (pos, params, dom, rect, size) {
+          const obj = { top: pos[1] };
+          obj[["left", "right"][+(pos[0] < size.viewSize[0] / 2)]] = 15;
+          return obj;
         }
       },
       series: [
@@ -126,7 +132,18 @@ watch(
   { immediate: true }
 );
 
+window.addEventListener("resize", () => {
+  if (myChart.value) {
+    myChart.value.resize();
+  }
+});
+
 onBeforeUnmount(() => {
+  window.removeEventListener("resize", () => {
+    if (myChart.value) {
+      myChart.value.resize();
+    }
+  });
   if (myChart.value) {
     myChart.value.dispose();
   }
@@ -158,8 +175,12 @@ onBeforeUnmount(() => {
   margin: 0 auto;
 }
 .echarts-tooltip {
+  max-width: 90%;
   padding: 10px !important;
+  overflow: hidden;
   color: white !important;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
   background-color: rgb(0 0 0 / 70%) !important;
   border-radius: 4px !important;
 }

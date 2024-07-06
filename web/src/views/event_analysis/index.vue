@@ -118,7 +118,7 @@ onMounted(() => {
           nodes: response.graph.events.map(item => {
             return { name: item.event, ...item };
           }),
-          links: response.graph.relationships
+          links: response.graph.relationships ? response.graph.relationships : []
         });
       dataSource.value.emotionStatisics = processed_sentiment_data;
       dataSource.value.wordFreqStatistics = response.word_count;
