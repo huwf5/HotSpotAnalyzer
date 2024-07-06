@@ -33,7 +33,7 @@ const current = new Date();
 const emits = defineEmits<{
   itemChecked: [msg: Messages.ResMessage];
   itemStarred: [msg: Messages.ResMessage];
-  itemClicked: [msg: Messages.ResMessage];
+  itemClicked: [msg: Messages.ResMessage & { selected: boolean }];
 }>();
 function itemChecked(msg: Messages.ResMessage) {
   emits("itemChecked", msg);
@@ -51,7 +51,7 @@ function transferTime(time: string) {
     ? time.split("T")[0]
     : time.split("T")[1].split("+")[0];
 }
-function msgClicked(msg: Messages.ResMessage) {
+function msgClicked(msg: Messages.ResMessage & { selected: boolean }) {
   emits("itemClicked", msg);
 }
 </script>

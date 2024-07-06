@@ -34,6 +34,10 @@ export const getGraph3D = (date: string) => {
   return http.get<EventAnalysis.Res3DGraph>(AnalysisPort.MAIN.GRAPH3D, { date: date }, { loading: false });
 };
 
+export const getDates = () => {
+  return http.get<EventAnalysis.ReqDates>(AnalysisPort.MAIN.DATES, { loading: false });
+};
+
 export const getAllEvents = () => {
   return http.get<ResDataList<EventAnalysis.ResEvent>>(AnalysisPort.SEARCH.ALL_EVENTS, undefined, { loading: true });
 };

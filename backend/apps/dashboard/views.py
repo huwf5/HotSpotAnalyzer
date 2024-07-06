@@ -222,7 +222,6 @@ class CardListViewSet(viewsets.ViewSet):
             dir_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data')
             filename = find_closest_date_file(dir_path)
             file_path = os.path.join(dir_path, filename)
-            print(file_path)
 
             with open(file_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
@@ -267,7 +266,6 @@ class CardListViewSet(viewsets.ViewSet):
         except json.JSONDecodeError:
             return Response({'error': 'Failed to decode JSON from the file.'}, status=500)
         except Exception as e:
-            print(e)
             return Response({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
 class TopicCardViewSet(viewsets.ViewSet):
@@ -603,4 +601,28 @@ class FetchChartDataViewSet(viewsets.ViewSet):
         return Response(content)
         # Check if the file exists
 
+class DateViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        method='get',
+        operation_summary="Get Dates",
+        operation_description="Get all available dates.",
+        manual_parameters=[],
+        responses={
+            200: openapi.Response('Data retrieved successfully'),
+            404: 'File not found',
+            500: 'Internal server error'
+        }
+    )
+    @action(detail=False, methods=['get'])
+    def fetch_dates(self, request):
+        file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'result', 'weibo_data')
+        date_list = os.listdir(file_path)
+        date_list = [filename.split(".")[0] for filename in date_list]
+
+        content = {"dates": date_list}
+
+        return Response(content)
+        # Check if the file exists

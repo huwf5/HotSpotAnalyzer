@@ -67,7 +67,8 @@ export namespace AnalysisPort {
     EMOTION = "/emotion/fetch_emotions/",
     WORD_CLOUD = "/wordcloud/fetch_word_cloud",
     TOPICS = "/topiccard/fetch_topic_card/",
-    GRAPH3D = "/graphs/fetch_graph/"
+    GRAPH3D = "/graphs/fetch_graph/",
+    DATES = "/dates/fetch_dates/"
   }
   /** 搜索页面接口 */
   export enum SEARCH {

@@ -100,6 +100,8 @@
   overflow: visible;
 }
 .bottom {
+  z-index: 100;
+
   /* 底部栏 */
   display: flex;
 
