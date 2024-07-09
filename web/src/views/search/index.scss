@@ -82,3 +82,9 @@
   padding: 10px;
   color: var(--el-text-color-secondary);
 }
+
+@media screen and (width <= 850px) {
+  .date_picker {
+    display: none !important;
+  }
+}

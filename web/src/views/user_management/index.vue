@@ -34,7 +34,7 @@ import {
 } from "@/api/modules/user_management";
 import { ColumnProps, EnumProps, ProTableInstance } from "@/components/ProTable/interface";
 import { User } from "@/api/interface";
-import { Ref, ref } from "vue";
+import { onBeforeMount, Ref, ref } from "vue";
 import { useHandleData } from "@/hooks/useHandleData";
 import { getTagsApi } from "@/api/modules/white_list";
 
@@ -102,21 +102,6 @@ function filterField(data: any, params: any): any {
   }
   return result;
 }
-getRoleDictApi().then(response => {
-  let dict: EnumProps[] = [];
-  response.data.forEach(item => dict.push({ value: item.id, label: item.role }));
-  columns.value.push({
-    prop: "role",
-    label: "权限等级",
-    enum: dict,
-    search: {
-      el: "select",
-      order: 3,
-      props: { filterable: true, multiple: true }
-    },
-    width: 200
-  });
-});
 async function changeUserPower(params: User.ResUser, upgrade: boolean) {
   if (upgrade) {
     await useHandleData(batchMandateUserApi, { emailList: [params.email] }, `升级用户${params.username}权限`).then(() => {
@@ -158,8 +143,34 @@ function refreshTags() {
       getTagSet(item.email_format).value.add(item.email_tag);
     });
   });
+  let tags: Set<string> = new Set<string>();
+  let options: { value: string; label: string }[] = [];
+  for (const tag of tag_map.values()) {
+    for (const val of tag.value) tags.add(val);
+  }
+  for (const tag of tags.values()) {
+    options.push({ value: tag, label: tag });
+  }
+  columns.value[4].enum! = options;
 }
-refreshTags();
+onBeforeMount(() => {
+  getRoleDictApi().then(response => {
+    let dict: EnumProps[] = [];
+    response.data.forEach(item => dict.push({ value: item.id, label: item.role }));
+    columns.value.push({
+      prop: "role",
+      label: "权限等级",
+      enum: dict,
+      search: {
+        el: "select",
+        order: 3,
+        props: { filterable: true, multiple: true }
+      },
+      width: 200
+    });
+  });
+  refreshTags();
+});
 </script>
 
 <style scoped lang="scss">

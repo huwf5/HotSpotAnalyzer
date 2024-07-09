@@ -310,10 +310,10 @@ class TopicCardViewSet(viewsets.ViewSet):
         }
 
         # Process topics
-        topic_list = [topicItem[1] for topicItem in topic_data.items() if topicItem[1]["is_news"]]
+        topic_list = [topicItem[1] for topicItem in topic_data.items() ]
         topic_list = sorted(topic_list, key=lambda topicItem: len(topicItem["posts"]), reverse=True)
 
-        message["topic_list"] = topic_list[:12]
+        message["topic_list"] = topic_list[:]
         total_discussion = sum(
             int(np.sum([dataItem["comment_count"] for dataItem in source_data if dataItem["wid"] == postId])) + 1
             for topic in message["topic_list"] for postId in topic["posts"]

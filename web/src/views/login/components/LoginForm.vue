@@ -106,14 +106,14 @@ const login = (formEl: FormInstance | undefined) => {
 };
 
 const emits = defineEmits<{
-  forget: any;
+  forget: [email: string];
 }>();
 
 function forgetPwd() {
   validateEmail(null, loginForm.email, (e?: Error) => {
     if (e === undefined) userStore.userInfo.contactInfo.email = loginForm.email;
   });
-  emits("forget");
+  emits("forget", loginForm.email);
 }
 
 function register() {

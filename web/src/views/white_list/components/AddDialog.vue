@@ -4,7 +4,7 @@
       <span class="dialog_text" style="margin: 0 0 10px">输入邮箱后缀</span>
       <el-input name="postfix_input" v-model="add_item" placeholder='示例："example.com"或"@example.com"'></el-input>
       <span class="dialog_text" style="margin: 20px 0 10px">添加标签（可选）</span>
-      <div class="tag_container"><TagList v-model="newTags" :show-add-tag="true" /></div>
+      <div class="tag_container"><TagList v-model="newTags" :show-add-tag="true" closable /></div>
     </div>
     <template #footer>
       <div class="footer">
@@ -38,18 +38,22 @@ async function addToList() {
   is_loading.value = true;
   if (add_item.value.match(/^(@)?[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$/g) !== null) {
     let email_format = (add_item.value.charAt(0) !== "@" ? "@" : "") + add_item.value;
-    await addToWhiteListApi({ format: email_format }).then(() => {
-      newTags.value.forEach(async email_tag => {
-        await addTagApi({ email_format, email_tag });
+    await addToWhiteListApi({ format: email_format })
+      .then(() => {
+        newTags.value.forEach(async email_tag => {
+          await addTagApi({ email_format, email_tag });
+        });
+        ElMessage({
+          type: "success",
+          message: "添加成功"
+        });
+        add_dialog.value = false;
+        emits("newRow");
+      })
+      .finally(() => {
+        newTags.value.clear();
+        add_item.value = "";
       });
-      ElMessage({
-        type: "success",
-        message: "添加成功"
-      });
-      add_dialog.value = false;
-      emits("newRow");
-    });
-    add_item.value = "";
   } else {
     ElMessage({
       type: "error",
