@@ -26,7 +26,7 @@
       </el-col>
       <el-col :span="rightChartSpan" :lg="rightChartSpan" :md="24" :sm="24" :xs="24">
         <el-card>
-          <el-tabs v-if="displayRightChart" class="map_container">
+          <el-tabs class="map_container">
             <el-tab-pane label="词云图">
               <WordCloud :is-loading="loading" :data="wordFreqData" />
             </el-tab-pane>
@@ -138,7 +138,6 @@ onMounted(() => {
 
 const expand_chart = ref(10);
 const expand_statistic = ref(0);
-const displayRightChart = ref(true);
 
 const upVotes = ref(0);
 const likes = ref(0);

@@ -121,14 +121,17 @@ const resetPwdRules = reactive<FormRules>({
   verify_code: [{ required: true, validator: validateCaptcha, trigger: "blur" }]
 });
 const loading = ref(false);
+const props = defineProps<{
+  email: string;
+}>();
 const resetPwdForm = reactive<Login.ReqForgetPwd & { repeat_password: string }>({
   password: "",
   repeat_password: "",
-  email: "",
+  email: props.email,
   verify_code: ""
 });
 const emits = defineEmits<{
-  finished: any;
+  finished: [email: string];
 }>();
 // reset password
 const resetPwd = (formEl: FormInstance | undefined) => {
@@ -146,7 +149,7 @@ const resetPwd = (formEl: FormInstance | undefined) => {
           duration: 3000
         });
         // 2.返回到登录页
-        emits("finished");
+        emits("finished", resetPwdForm.email);
       });
     } finally {
       loading.value = false;
@@ -154,7 +157,7 @@ const resetPwd = (formEl: FormInstance | undefined) => {
   });
 };
 function goBack() {
-  emits("finished");
+  emits("finished", "");
 }
 onMounted(() => {
   // 监听 enter 事件（调用注册）
