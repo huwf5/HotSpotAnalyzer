@@ -2,7 +2,7 @@
   <MessageItem v-for="(message, index) in messages" v-model="messages[index]" :key="message.id" @click="msgClicked(message)">
     <template #prefix>
       <div class="check-box">
-        <el-checkbox v-model="message.selected" @change="itemChecked(message)" />
+        <el-checkbox v-model="message.selected" @change="itemChecked(message)" @click.stop />
       </div>
     </template>
     <template #suffix>
