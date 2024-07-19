@@ -46,8 +46,8 @@
       v-model="add_dialog"
       @new-row="
         () => {
-          proTable?.getTableList();
           refreshTags();
+          proTable?.getTableList();
         }
       "
     />
@@ -60,7 +60,7 @@ import AddDialog from "./components/AddDialog.vue";
 import TagList from "@/components/TagList/TagList.vue";
 import { ColumnProps, ProTableInstance } from "@/components/ProTable/interface";
 import { User, WhiteList } from "@/api/interface";
-import { Ref, ref } from "vue";
+import { onBeforeMount, Ref, ref } from "vue";
 import { useHandleData } from "@/hooks/useHandleData";
 import {
   activateWhiteListApi,
@@ -200,8 +200,17 @@ function refreshTags() {
       getTagSet(item.email_format).value.add(item.email_tag);
     });
   });
+  let tags: Set<string> = new Set<string>();
+  let options: { value: string; label: string }[] = [];
+  for (const tag of tag_map.values()) {
+    for (const val of tag.value) tags.add(val);
+  }
+  for (const tag of tags.values()) {
+    options.push({ value: tag, label: tag });
+  }
+  columns.value[4].enum! = options;
 }
-refreshTags();
+onBeforeMount(refreshTags);
 </script>
 
 <style scoped lang="scss">

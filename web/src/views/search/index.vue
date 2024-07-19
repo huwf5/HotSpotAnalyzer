@@ -16,7 +16,7 @@
         <el-col :span="2">
           <el-button type="primary" @click="fetchData">搜索</el-button>
         </el-col>
-        <el-col v-if="date_picker" :span="3">
+        <el-col class="date_picker" :span="3">
           <el-date-picker
             v-model="search_date"
             type="daterange"
@@ -91,7 +91,6 @@ const shortcuts = [
 
 const affix_ref = ref<HTMLElement>();
 const ul_ref = ref<VNodeRef>();
-const date_picker = ref(true);
 const events_buffer = ref<EventData[]>([]);
 
 // 缓存全部事件结果，有效时长为10分钟
@@ -109,12 +108,9 @@ const input_height = ref(0);
 onMounted(async () => {
   await nextTick();
   input_height.value = document.getElementById("search_input")!.getBoundingClientRect().height;
-  window.addEventListener("resize", adjustWidth);
   fetchData();
-  adjustWidth();
 });
 onUnmounted(() => {
-  window.removeEventListener("resize", adjustWidth);
   if (buffer_timer.value) clearTimeout(buffer_timer.value);
 });
 const scroll_position = ref(0);
@@ -126,10 +122,6 @@ onBeforeRouteLeave((to, from, next) => {
   scroll_position.value = (ul_ref.value! as unknown as HTMLElement).scrollTop;
   next();
 });
-
-function adjustWidth() {
-  date_picker.value = affix_ref.value!.getBoundingClientRect().width > 850;
-}
 async function fetchData() {
   searchKeyWord.value = searchKeyWord.value.trim();
   if (searchKeyWord.value.length === 0) {
