@@ -5,7 +5,7 @@ from .views import GraphViewSet, WordCloudViewSet, EmotionViewSet, \
     FetchAllEventsViewSet, SearchEventViewSet, FetchChartDataViewSet, DateViewSet
 
 router = DefaultRouter()
-router.register(r'graphs', GraphViewSet, basename='graph')
+router.register(r'graphs', GraphViewSet, basename='graphs')
 router.register(r'wordcloud', WordCloudViewSet, basename='wordcloud')
 router.register(r'emotion', EmotionViewSet, basename='emotion')
 router.register(r'cardlist', CardListViewSet, basename='cardlist')
@@ -18,4 +18,10 @@ router.register(r'chartData', FetchChartDataViewSet, basename='chartData')
 router.register(r'dates', DateViewSet, basename='dates')
 urlpatterns = [
     path('', include(router.urls)),
+    path("wordcloud/", WordCloudViewSet.as_view({'get': 'fetch_word_cloud'}), name="wordcloud"),
+    path("graphs/", GraphViewSet.as_view({'get': 'fetch_graph'}), name="graphs"),
+    path("topiccard/", TopicCardViewSet.as_view({'get': 'fetch_topic_card'}), name="topiccard"),
+    path("event/", EventViewSet.as_view({'get': 'fetch_event'}), name="event"),
+    path("cardlist/", CardListViewSet.as_view({'get': 'fetch_card_list'}), name="cardlist")
+
 ]
